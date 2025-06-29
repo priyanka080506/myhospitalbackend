@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare - Your Health, Our Priority</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container nav-wrapper">
+            <a href="#" class="logo" onclick="window.location.reload(); return false;">
+                <i class="fas fa-plus-circle logo-icon"></i>
+                <h1>MediCare</h1>
+            </a>
+            <nav class="desktop-nav">
+                <a href="#hero" class="nav-link" onclick="showView('patient-portal-content');">Home</a>
+                <a href="#services" class="nav-link" onclick="showView('patient-portal-content');">Services</a>
+                <a href="#doctors" class="nav-link" onclick="showView('patient-portal-content');">Find Doctors</a>
+                <a href="#contact" class="nav-link" onclick="showView('patient-portal-content');">Contact</a>
+            </nav>
+            <div class="header-actions">
+                <div class="phone-info">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>+123 456 7890</span>
+                </div>
+                <button class="btn btn-primary" onclick="openBookingModal()">Book Appointment</button>
+            </div>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <nav class="mobile-nav">
+                <a href="#hero" class="nav-link" onclick="showView('patient-portal-content'); closeMobileMenu();">Home</a>
+                <a href="#services" class="nav-link" onclick="showView('patient-portal-content'); closeMobileMenu();">Services</a>
+                <a href="#doctors" class="nav-link" onclick="showView('patient-portal-content'); closeMobileMenu();">Find Doctors</a>
+                <a href="#contact" class="nav-link" onclick="showView('patient-portal-content'); closeMobileMenu();">Contact</a>
+            </nav>
+            <div class="mobile-actions">
+                <div class="phone-info">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>+123 456 7890</span>
+                </div>
+                <button class="btn btn-primary" onclick="openBookingModal()">Book Appointment</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div id="patient-portal-content" class="portal-content active-portal">
+            <section class="hero" id="hero">
+                <div class="container hero-content">
+                    <div class="hero-text">
+                        <h1 class="hero-title">Your Health, Our Priority. Dedicated Care for a Healthier You.</h1>
+                        <p class="hero-description">Experience world-class healthcare with our expert doctors and state-of-the-art facilities. Your well-being is at the heart of everything we do.</p>
+                        <div class="hero-buttons">
+                            <a href="index2.html" class="btn btn-primary btn-large">Patient</a>
+                            <button class="btn btn-outline btn-large" onclick="window.location.href='indexd.html'">Doctor</button>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stat">
+                                <div class="stat-number">25+</div>
+                                <div class="stat-label">Years Experience</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">150+</div>
+                                <div class="stat-label">Expert Doctors</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-features">
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-hospital"></i></div>
+                            <h3>Modern Facilities</h3>
+                            <p>State-of-the-art equipment for accurate diagnostics and effective treatments.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-user-md"></i></div>
+                            <h3>Expert Doctors</h3>
+                            <p>Highly qualified and experienced medical professionals dedicated to your care.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-heartbeat"></i></div>
+                            <h3>Personalized Care</h3>
+                            <p>Tailored treatment plans focused on your individual health needs.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon"><i class="fas fa-award"></i></div>
+                            <h3>Award-Winning Service</h3>
+                            <p>Recognized for excellence in patient care and medical innovation.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="services" id="services">
+                <div class="container">
+                    <div class="section-header">
+                        <h2>Our Specialized Medical Services</h2>
+                        <p>We offer a wide range of medical services, ensuring comprehensive care for all your health needs with a focus on cutting-edge treatments and compassionate support.</p>
+                    </div>
+                    <div class="services-grid" id="servicesGrid">
+                        </div>
+                </div>
+            </section>
+
+            <section class="doctors" id="doctors">
+                <div class="container">
+                    <div class="section-header">
+                        <h2>Meet Our Experienced Doctors</h2>
+                        <p>Our team of highly qualified specialists are dedicated to providing you with the best possible care, bringing years of experience and expertise.</p>
+                    </div>
+                    <div class="doctors-grid" id="doctorsGrid">
+                        </div>
+                </div>
+            </section>
+
+            <section class="services" id="about">
+                <div class="container section-header">
+                    <h2>About Us</h2>
+                    <p>Learn more about our mission, vision, and the values that drive our commitment to exceptional healthcare. We are dedicated to serving our community with integrity and excellence.</p>
+                </div>
+            </section>
+
+            <section class="doctors" id="contact">
+                <div class="container section-header">
+                    <h2>Contact Us</h2>
+                    <p>Have questions or need assistance? Reach out to us through our contact form or find our location and emergency contact details below.</p>
+                </div>
+            </section>
+        </div>
+
+        <div id="doctor-portal-content" class="portal-content">
+            <section class="doctors" id="doctorsPortal">
+                <div class="container">
+                    <div class="section-header">
+                        <h2>Doctor Portal: Manage Profiles & Appointments</h2>
+                        <p>Welcome, Doctors! Here you can view and manage your profiles, schedules, and patient appointments.</p>
+                        <p>You are now accessing the Doctor Portal via a direct link. This section could be used for an embedded experience or a placeholder before redirecting.</p>
+                    </div>
+                    <div class="doctors-grid" id="doctorsViewGrid">
+                        </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section about">
+                    <a href="#" class="logo footer-logo" onclick="window.location.reload(); return false;">
+                        <i class="fas fa-plus-circle logo-icon"></i>
+                        <h1>MediCare</h1>
+                    </a>
+                    <p>Providing compassionate and cutting-edge healthcare services to improve lives every day.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section quick-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#about" onclick="showView('patient-portal-content')">About Us</a></li>
+                        <li><a href="#services" onclick="showView('patient-portal-content')">Our Services</a></li>
+                        <li><a href="#doctors" onclick="showView('patient-portal-content')">Meet Our Doctors</a></li>
+                        <li><a href="#contact" onclick="showView('patient-portal-content')">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section services-list">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="#" onclick="showView('patient-portal-content')">Cardiology</a></li>
+                        <li><a href="#" onclick="showView('patient-portal-content')">Neurology</a></li>
+                        <li><a href="#" onclick="showView('patient-portal-content')">Orthopedics</a></li>
+                        <li><a href="#" onclick="showView('patient-portal-content')">Surgeon</a></li>
+                        <li><a href="#" onclick="showView('patient-portal-content')">Pediatrics</a></li>
+                        <li><a href="#" onclick="showView('patient-portal-content')">Dermatology</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section contact-info">
+                    <h3>Contact Info</h3>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>123 Medical Drive, Health City, State 12345</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <span>+123 456 7890</span>
+                            <span class="hours">Mon - Fri: 9:00 AM - 6:00 PM</span>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>medicare@gmail.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <span class="emergency">Emergency: +123 987 6543</span>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <span class="copyright">&copy; 2025 MediCare. All rights reserved.</span>
+                    <div class="footer-links">
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Sitemap</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="bookingModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-calendar-check"></i>
+                    <h2>Book Your Appointment</h2>
+                </div>
+                <button class="modal-close" onclick="closeBookingModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-steps">
+                    <div class="progress-step active">1</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">2</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">3</div>
+                </div>
+                <div class="progress-labels">
+                    <span>Patient Info</span>
+                    <span>Appointment Details</span>
+                    <span>Confirmation</span>
+                </div>
+            </div>
+            <form id="bookingForm" class="booking-form">
+                <div id="step1" class="form-step active">
+                    <div class="step-header">
+                        <h3>Your Information</h3>
+                        <p>Please provide your personal details for the appointment.</p>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="address">Address</label>
+                            <input type="text" id="address" name="address">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step2" class="form-step">
+                    <div class="step-header">
+                        <h3>Appointment Details</h3>
+                        <p>Select your desired service, doctor, date, and time.</p>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="service">Service</label>
+                            <select id="service" name="service" required>
+                                <option value="">Select a Service</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Neurology">Neurology</option>
+                                <option value="Orthopedics">Orthopedics</option>
+                                <option value="Ophthalmology">Surgeon</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="General Medicine">Dermatology</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="doctor">Preferred Doctor</label>
+                            <select id="doctor" name="doctor" required>
+                                <option value="">Any Doctor</option>
+                                <option value="Dr. Sarah Johnson">Dr. Raksha (Cardiology)</option>
+                                <option value="Dr. Michael Chen">Dr. Bruda S (Neurology)</option>
+                                <option value="Dr. Emily Rodriguez">Dr. Aishwarya D S (Pediatrics)</option>
+                                <option value="Dr. James Wilson">Dr. Shruthi N (Orthopedics)</option>
+                                <option value="Dr. Lisa Thompson">Dr. Vijay (Surgeon)</option>
+                                <option value="Dr. Robert Kumar">Dr. Amaresh A M (Dermatology)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentDate">Appointment Date</label>
+                            <input type="date" id="appointmentDate" name="appointmentDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointmentTime">Appointment Time</label>
+                            <input type="time" id="appointmentTime" name="appointmentTime" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="notes">Additional Notes (Optional)</label>
+                            <textarea id="notes" name="notes"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step3" class="form-step">
+                    <div class="step-header">
+                        <h3>Confirm Your Appointment</h3>
+                        <p>Please review your details before confirming your booking.</p>
+                    </div>
+                    <div class="appointment-summary">
+                        <h4>Appointment Summary</h4>
+                        <div id="summaryContent" class="summary-content">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="backBtn" class="btn btn-outline" style="display: none;" onclick="previousStep()">Back</button>
+                    <button type="button" id="nextBtn" class="btn btn-primary" onclick="nextStep()">Next</button>
+                    <button type="submit" id="submitBtn" class="btn btn-primary" style="display: none;">Confirm Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
