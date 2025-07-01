@@ -4,6 +4,17 @@
 // This line must be at the very top of your file.
 require('dotenv').config();
 
+// --- DEBUGGING LOGS: START ---
+console.log('--- Render Deployment Debugging Check ---');
+console.log('Current working directory:', process.cwd());
+console.log('process.env.NODE_ENV:', process.env.NODE_ENV); // Render usually sets this to 'production'
+console.log('process.env.PORT:', process.env.PORT); // Render sets its own PORT
+console.log('process.env.MONGO_URI (raw from process.env):', process.env.MONGO_URI); // THIS IS THE KEY ONE
+console.log('process.env.JWT_SECRET (raw from process.env):', process.env.JWT_SECRET);
+console.log('-----------------------------------------');
+// --- DEBUGGING LOGS: END ---
+
+
 // 2. Import necessary libraries
 const express = require('express');
 const mongoose = require('mongoose'); // For MongoDB interaction
@@ -27,7 +38,11 @@ const app = express();
 
 // 4. Get PORT and MongoDB URI from environment variables
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGO_URI;
+
+// --- DEBUGGING LOG: Check MONGODB_URI after assignment ---
+console.log('MONGODB_URI variable after assignment:', MONGODB_URI);
+// --- DEBUGGING LOG: END ---
 
 // --- 5. Middleware ---
 app.use(cors());
@@ -36,7 +51,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // --- 6. MongoDB Connection ---
-mongoose.connect(MONGODB_URI)
+mongoose.connect(MONGODB_URI) // This is the line that's failing
     .then(() => {
         console.log('MongoDB connected successfully!');
         app.listen(PORT, () => {
