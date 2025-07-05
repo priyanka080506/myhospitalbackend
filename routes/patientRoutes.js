@@ -15,9 +15,7 @@ router.post('/register', async (req, res) => {
     console.log('Backend received patient registration payload:', req.body);
     // --- END DEBUGGING LINE ---
 
-    // Destructure fields from req.body.
-    // Note: Frontend sends 'dateOfBirth' and 'gender'.
-    // Ensure these match your Patient model schema.
+    // Correctly destructure dateOfBirth and gender from req.body
     const { name, email, phone, dateOfBirth, gender, password } = req.body;
 
     try {
@@ -27,13 +25,13 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'Registration failed: User with this email already exists.' });
         }
 
-        // 2. Create a new Patient instance
+        // 2. Create a new Patient instance using the correct field names
         patient = new Patient({
             name,
             email,
             phone,
-            dateOfBirth, // Use dateOfBirth as per frontend and schema
-            gender,      // Use gender as per frontend and schema
+            dateOfBirth, // Use dateOfBirth as per frontend payload and Patient model schema
+            gender,      // Use gender as per frontend payload and Patient model schema
             password     // This will be hashed below
         });
 
