@@ -56,6 +56,16 @@
                         <label for="registerDob">Date of Birth</label>
                         <input type="date" id="registerDob" required>
                     </div>
+                    <!-- NEW: Gender Field -->
+                    <div class="form-group">
+                        <label for="registerGender">Gender</label>
+                        <select id="registerGender" required>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label for="registerPassword">Password</label>
                         <input type="password" id="registerPassword" required>
@@ -101,6 +111,11 @@
                         <div class="meta-item">
                             <i class="fas fa-map-marker-alt"></i>
                             <span id="patientAddressDisplay">Mysore, India</span>
+                        </div>
+                        <!-- NEW: Display for Gender -->
+                        <div class="meta-item">
+                            <i class="fas fa-venus-mars"></i>
+                            <span id="patientGenderDisplay">Gender: N/A</span>
                         </div>
                     </div>
                     <div class="badges">

@@ -27,6 +27,16 @@ const completedAppointmentsElement = document.getElementById('completedAppointme
 const totalReportsElement = document.getElementById('totalReports');
 const searchInput = document.getElementById('searchInput');
 
+// New DOM element for gender display
+const patientGenderDisplay = document.getElementById('patientGenderDisplay');
+// New DOM elements for other patient details (from index2.html)
+const patientIdDisplay = document.getElementById('patientIdDisplay');
+const patientDobDisplay = document.getElementById('patientDobDisplay');
+const patientPhoneDisplay = document.getElementById('patientPhoneDisplay');
+const patientEmailDisplay = document.getElementById('patientEmailDisplay');
+const patientAddressDisplay = document.getElementById('patientAddressDisplay');
+
+
 // --- Helper Functions ---
 
 function formatDate(dateString) {
@@ -86,7 +96,6 @@ if (loginFormElement) {
         }
 
         try {
-            // This URL remains /api/auth/login as per your server.js and authRoutes.js
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
@@ -122,6 +131,7 @@ if (registerFormElement) {
         const emailInput = document.getElementById('registerEmail');
         const phoneInput = document.getElementById('registerPhone');
         const dobInput = document.getElementById('registerDob');
+        const genderInput = document.getElementById('registerGender'); // Get gender input
         const passwordInput = document.getElementById('registerPassword');
         const confirmPasswordInput = document.getElementById('confirmPassword');
 
@@ -129,10 +139,10 @@ if (registerFormElement) {
         let email = emailInput ? emailInput.value : '';
         let phone = phoneInput ? phoneInput.value : '';
         let dob = dobInput ? dobInput.value : '';
+        let gender = genderInput ? genderInput.value : ''; // Get gender value
         
-        console.log('passwordInput:', passwordInput); // Debugging line for password input element
+        console.log('passwordInput:', passwordInput);
         
-        // Ensure password and confirmPassword are safely accessed
         let password = '';
         if (passwordInput) {
             password = passwordInput.value;
@@ -144,7 +154,7 @@ if (registerFormElement) {
         }
 
         // Validate form
-        if (!name || !email || !phone || !dob || !password || !confirmPassword) {
+        if (!name || !email || !phone || !dob || !gender || !password || !confirmPassword) {
             alert('Please fill in all fields.');
             return;
         }
@@ -160,14 +170,13 @@ if (registerFormElement) {
         }
 
         try {
-            // ************ UPDATED URL HERE ************
-            // Changed from /api/auth/register to /api/patients/register
             const response = await fetch(`${BASE_URL}/api/patients/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, email, phone, dob, password }),
+                // Send dateOfBirth and gender
+                body: JSON.stringify({ name, email, phone, dateOfBirth: dob, gender, password }),
             });
 
             const data = await response.json();
@@ -193,14 +202,11 @@ if (logoutButton) {
         currentUser = null;
         localStorage.removeItem('authToken'); // Clear auth token
         localStorage.removeItem('currentLoggedInPatientEmail'); // Clear mock login state
-        // Redirect to the main index.html or show auth section
         if (authSection) authSection.style.display = 'flex';
         if (mainDashboard) mainDashboard.style.display = 'none';
-        if (loginFormElement) loginFormElement.reset(); // Clear forms
+        if (loginFormElement) loginFormElement.reset();
         if (registerFormElement) registerFormElement.reset();
         if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
-        // Optionally redirect to index.html if this is index2.html
-        // window.location.href = 'index.html'; // Uncomment if you want to redirect to main site
     });
 }
 
@@ -208,7 +214,6 @@ if (logoutButton) {
 function showAuth() {
     if (authSection) authSection.style.display = 'flex';
     if (mainDashboard) mainDashboard.style.display = 'none';
-    // Ensure login form is active by default
     if (loginForm) loginForm.classList.add('active');
     if (registerForm) registerForm.classList.remove('active');
 }
@@ -217,27 +222,20 @@ async function showDashboard() {
     if (authSection) authSection.style.display = 'none';
     if (mainDashboard) mainDashboard.style.display = 'block';
 
-    // Update patient info if user is logged in
     if (currentUser) {
-        // Assuming your backend sends back full patient data including these fields
         if (patientNameElement) patientNameElement.textContent = currentUser.name || 'Patient';
         if (dashboardWelcomeText) dashboardWelcomeText.textContent = `Welcome, ${currentUser.name || 'Patient'}!`;
 
-        // Update other patient details if you have corresponding IDs in index2.html
-        const patientIdDisplay = document.getElementById('patientIdDisplay');
-        const patientDobDisplay = document.getElementById('patientDobDisplay');
-        const patientPhoneDisplay = document.getElementById('patientPhoneDisplay');
-        const patientEmailDisplay = document.getElementById('patientEmailDisplay');
-        const patientAddressDisplay = document.getElementById('patientAddressDisplay'); // Assuming an address field
-
-        if (patientIdDisplay) patientIdDisplay.textContent = currentUser.id || 'N/A'; // Assuming 'id' field
-        if (patientDobDisplay) patientDobDisplay.textContent = `DOB: ${formatDate(currentUser.dob) || 'N/A'}`;
+        // Update other patient details
+        if (patientIdDisplay) patientIdDisplay.textContent = currentUser.id || 'N/A';
+        // Use currentUser.dateOfBirth for display if available, fallback to currentUser.dob
+        if (patientDobDisplay) patientDobDisplay.textContent = `DOB: ${formatDate(currentUser.dateOfBirth || currentUser.dob) || 'N/A'}`;
         if (patientPhoneDisplay) patientPhoneDisplay.textContent = currentUser.phone || 'N/A';
         if (patientEmailDisplay) patientEmailDisplay.textContent = currentUser.email || 'N/A';
-        if (patientAddressDisplay) patientAddressDisplay.textContent = currentUser.address || 'N/A'; // Update if address is part of user data
+        if (patientAddressDisplay) patientAddressDisplay.textContent = currentUser.address || 'N/A';
+        if (patientGenderDisplay) patientGenderDisplay.textContent = `Gender: ${currentUser.gender || 'N/A'}`;
     }
 
-    // Initialize dashboard content with data from backend
     await initializeDashboardContent();
 }
 
@@ -257,7 +255,6 @@ async function initializeDashboardContent() {
     }
 
     try {
-        // Fetch Appointments
         const appointmentsResponse = await fetch(`${BASE_URL}/api/appointments/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -266,10 +263,9 @@ async function initializeDashboardContent() {
             renderAppointments(appointments);
         } else {
             console.error('Failed to fetch appointments:', appointments.message);
-            renderAppointments([]); // Render empty if fetch fails
+            renderAppointments([]);
         }
 
-        // Fetch Reports
         const reportsResponse = await fetch(`${BASE_URL}/api/patients/reports/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -278,10 +274,9 @@ async function initializeDashboardContent() {
             renderReports(reports);
         } else {
             console.error('Failed to fetch reports:', reports.message);
-            renderReports([]); // Render empty if fetch fails
+            renderReports([]);
         }
 
-        // Setup search and tabs after data is potentially loaded
         setupSearch(appointments, reports);
         setupTabs();
         updateStats(appointments, reports);
@@ -289,8 +284,6 @@ async function initializeDashboardContent() {
     } catch (error) {
         console.error('Error initializing dashboard content:', error);
         alert('Failed to load dashboard data. Please try refreshing or logging in again.');
-        // Consider logging out on severe error
-        // logout();
     }
 }
 
@@ -412,8 +405,7 @@ function renderReports(reports) {
 
 function setupSearch(appointments, reports) {
     const searchInput = document.getElementById('searchInput');
-    // Store original data references to filter from
-    const originalAppointments = [...appointments]; // Create copies to avoid modifying original arrays
+    const originalAppointments = [...appointments];
     const originalReports = [...reports];
 
     if (!searchInput) return;
@@ -456,9 +448,8 @@ function setupTabs() {
             if (targetPanel) targetPanel.classList.add('active');
         });
     });
-    // Ensure one tab is active by default on load
     if (tabButtons.length > 0) {
-        tabButtons[0].click(); // Activate the first tab by default
+        tabButtons[0].click();
     }
 }
 
@@ -470,7 +461,6 @@ function updateStats(appointments, reports) {
         totalReportsElement.textContent = reports.length;
     }
     if (upcomingAppointmentsElement) {
-        // Filter for upcoming appointments (date in future and not completed)
         const upcoming = appointments.filter(apt => new Date(apt.date) >= new Date() && apt.status !== 'completed').length;
         upcomingAppointmentsElement.textContent = upcoming;
     }
@@ -487,13 +477,11 @@ function checkAuth() {
     const authToken = localStorage.getItem('authToken');
 
     if (loggedInEmail && authToken) {
-        // Attempt to re-authenticate using the stored email and token
         fetch(`${BASE_URL}/api/patients/profile?email=${loggedInEmail}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         })
         .then(response => {
             if (!response.ok) {
-                // If token is invalid or expired, or profile not found
                 throw new Error('Authentication failed or profile not found');
             }
             return response.json();
@@ -504,37 +492,33 @@ function checkAuth() {
                 showDashboard();
             } else {
                 console.error('Re-authentication failed or patient data mismatch.');
-                logout(); // Clear invalid state
+                logout();
             }
         })
         .catch(error => {
             console.error('Error during re-authentication:', error);
-            logout(); // Clear state on network/API error
+            logout();
         });
     } else {
-        showAuth(); // No stored credentials, show login/register
+        showAuth();
     }
 }
 
-// Initialize the app when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuth(); // Initial check for authentication status
+    checkAuth();
 
-    // Attach dashboard search and tab listeners
     const tabButtonsContainer = document.querySelector('.tabs');
     if (tabButtonsContainer) {
         tabButtonsContainer.addEventListener('click', (e) => {
             if (e.target.classList.contains('tab-button')) {
-                setupTabs(); // Re-run setupTabs to activate the clicked tab
+                setupTabs();
             }
         });
     }
     if (searchInput) {
         // setupSearch needs to be called with actual data after it's fetched by initializeDashboardContent
-        // The listener is attached here, but the data it filters will be the ones loaded by initializeDashboardContent
     }
 
-    // Attach logout listener
     if (logoutButton) {
         logoutButton.addEventListener('click', () => {
             logout();
