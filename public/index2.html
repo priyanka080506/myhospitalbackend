@@ -83,22 +83,24 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="patient-details">
-                    <h1 id="patientName">Madhushree</h1>
-                    <p class="patient-id">Patient ID: #PT-2024-001</p>
+                    <h1 id="patientName">Madhushree</h1> <!-- This will be dynamically updated by JS -->
+                    <p class="patient-id">Patient ID: <span id="patientIdDisplay">#PT-2024-001</span></p> <!-- Added span for dynamic ID -->
                     <div class="patient-meta">
                         <div class="meta-item">
                             <i class="fas fa-calendar"></i>
-                            <span>DOB: September 14, 2005</span> </div>
+                            <span id="patientDobDisplay">DOB: September 14, 2005</span>
+                        </div>
                         <div class="meta-item">
                             <i class="fas fa-phone"></i>
-                            <span>+91 94493 32309</span> </div>
+                            <span id="patientPhoneDisplay">+91 94493 32309</span>
+                        </div>
                         <div class="meta-item">
                             <i class="fas fa-envelope"></i>
-                            <span>madhu@email.com</span>
+                            <span id="patientEmailDisplay">madhu@email.com</span>
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-map-marker-alt"></i>
-                            <span>Mysore, India</span>
+                            <span id="patientAddressDisplay">Mysore, India</span>
                         </div>
                     </div>
                     <div class="badges">
@@ -115,6 +117,26 @@
             </div>
         </div>
 
+        <!-- Added Dashboard Overview Section -->
+        <div class="dashboard-overview">
+            <div class="stat-card">
+                <h3>Total Appointments</h3>
+                <p id="totalAppointments" class="stat-number">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Upcoming Appointments</h3>
+                <p id="upcomingAppointments" class="stat-number">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Completed Appointments</h3>
+                <p id="completedAppointments" class="stat-number">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Reports</h3>
+                <p id="totalReports" class="stat-number">0</p>
+            </div>
+        </div>
+
         <div class="search-section">
             <div class="search-box">
                 <i class="fas fa-search"></i>
@@ -123,29 +145,29 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-button active" data-tab="appointments">
+            <button class="tab-button active" data-tab="appointments-tab">
                 <i class="fas fa-calendar"></i>
                 Appointments
             </button>
-            <button class="tab-button" data-tab="reports">
+            <button class="tab-button" data-tab="reports-tab">
                 <i class="fas fa-file-text"></i>
                 Reports
             </button>
         </div>
 
         <div class="tab-content">
-            <div id="appointments" class="tab-panel active">
+            <div id="appointments-tab" class="tab-panel active">
                 <div class="section-header">
                     <h2>Previous Appointments</h2>
-                    <span class="count-badge" id="appointmentCount">4 appointments</span>
+                    <span class="count-badge" id="appointmentCount">0 appointments</span>
                 </div>
                 <div id="appointmentsList" class="appointments-list"></div>
             </div>
 
-            <div id="reports" class="tab-panel">
+            <div id="reports-tab" class="tab-panel">
                 <div class="section-header">
                     <h2>Medical Reports</h2>
-                    <span class="count-badge" id="reportsCount">4 reports</span>
+                    <span class="count-badge" id="reportsCount">0 reports</span>
                 </div>
                 <div id="reportsList" class="reports-list"></div>
             </div>

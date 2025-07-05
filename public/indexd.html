@@ -76,9 +76,7 @@
                             <div class="working-place-row">
                                 <input type="text" class="working-place-input" placeholder="e.g., City General Hospital" required>
                                 <input type="text" class="working-timing-input" placeholder="e.g., Mon-Fri 9AM-5PM" required>
-                                <button type="button" class="remove-input-button" style="display:none;">
-                                    <i class="fas fa-times-circle"></i>
-                                </button>
+                                <!-- Remove button will be added dynamically for subsequent rows -->
                             </div>
                         </div>
                         <button type="button" id="addWorkingPlace" class="add-more-button">
@@ -110,7 +108,7 @@
         <div class="doctor-header">
             <div class="doctor-info">
                 <div class="avatar" id="doctorAvatarContainer">
-                    <img id="doctorPhoto" src="Raksha.jpg.jpeg" alt="Doctor Photo">
+                    <img id="doctorPhoto" src="https://i.pravatar.cc/80?img=1" alt="Doctor Photo">
                     <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
                     <label for="photoUploadInput" class="change-photo-overlay" title="Change Photo">
                         <i class="fas fa-camera"></i>
@@ -122,19 +120,20 @@
                     <div class="doctor-meta">
                         <div class="meta-item">
                             <i class="fas fa-id-badge"></i>
-                            <span>License: #MD-2024-001</span>
+                            <span id="doctorLicenseDisplay">License: N/A</span>
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-phone"></i>
-                            <span>+91 64573 64747</span>
+                            <span id="doctorPhoneDisplay">N/A</span>
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-envelope"></i>
-                            <span id="doctorEmail">raksha@gmail.com</span>
+                            <span id="doctorEmail">N/A</span>
                         </div>
-                        <div class="meta-item">
+                        <!-- Working places will be dynamically populated here by JS -->
+                        <div id="doctorWorkingPlacesDisplay" class="meta-item">
                             <i class="fas fa-hospital"></i>
-                            <span>City General Hospital</span>
+                            <span></span>
                         </div>
                     </div>
                     <div class="badges">
@@ -157,7 +156,7 @@
                     <i class="fas fa-calendar-check"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="todayAppointments">8</h3>
+                    <h3 id="todayAppointments">0</h3>
                     <p>Today's Appointments</p>
                 </div>
             </div>
@@ -166,7 +165,7 @@
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="totalPatients">124</h3>
+                    <h3 id="totalPatients">0</h3>
                     <p>Total Patients</p>
                 </div>
             </div>
@@ -175,7 +174,7 @@
                     <i class="fas fa-file-medical"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="pendingReports">5</h3>
+                    <h3 id="pendingReports">0</h3>
                     <p>Pending Reports</p>
                 </div>
             </div>
@@ -184,7 +183,7 @@
                     <i class="fas fa-clock"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="upcomingAppointments">12</h3>
+                    <h3 id="upcomingAppointments">0</h3>
                     <p>This Week</p>
                 </div>
             </div>
@@ -198,35 +197,35 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-button active" data-tab="schedule">
+            <button class="tab-button active" data-tab="schedule-tab">
                 <i class="fas fa-calendar"></i>
                 Schedule
             </button>
-            <button class="tab-button" data-tab="patients">
+            <button class="tab-button" data-tab="patients-tab">
                 <i class="fas fa-users"></i>
                 Patient Reports
             </button>
         </div>
 
         <div class="tab-content">
-            <div id="schedule" class="tab-panel active">
+            <div id="schedule-tab" class="tab-panel active">
                 <div class="section-header">
                     <h2>Today's Schedule</h2>
-                    <span class="count-badge" id="scheduleCount">8 appointments</span>
+                    <span class="count-badge" id="scheduleCount">0 appointments</span>
                 </div>
                 <div id="scheduleList" class="schedule-list"></div>
             </div>
 
-            <div id="patients" class="tab-panel">
+            <div id="patients-tab" class="tab-panel">
                 <div class="section-header">
                     <h2>Patient Reports & Follow-ups</h2>
-                    <span class="count-badge" id="patientsCount">15 reports</span>
+                    <span class="count-badge" id="patientsCount">0 reports</span>
                 </div>
                 <div id="patientsList" class="patients-list"></div>
             </div>
         </div>
     </div>
 
-    <script src="scriptd.js"></script>
+    <script src="doctordashboard.js"></script>
 </body>
 </html>

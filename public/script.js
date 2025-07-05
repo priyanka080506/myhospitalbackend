@@ -1,8 +1,11 @@
-// Global variables
+// --- Configuration ---
+const BASE_URL = 'https://proud-doctors.onrender.com'; // Your Render deployment URL
+
+// --- Global variables for index.html functionality ---
 let currentStep = 1;
 const totalSteps = 3;
 
-// Services data
+// Services data (still hardcoded here as per your original script, will be fetched if you decide to move it to backend later)
 const servicesData = [
     {
         icon: 'fas fa-heart',
@@ -42,7 +45,7 @@ const servicesData = [
     }
 ];
 
-// Doctors data
+// Doctors data (still hardcoded here as per your original script)
 const doctorsData = [
     {
         name: 'Dr. Raksha',
@@ -106,50 +109,253 @@ const doctorsData = [
     }
 ];
 
-// Initialize the website when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initializeServices();
-    initializeDoctors('patients'); // Initialize for the patient-facing doctor grid
-    initializeDoctors('doctors'); // Initialize for the doctor-portal's doctor grid
-    initializeForm();
-    initializeSmoothScrolling();
-    setMinDate();
-    // Ensure the patient portal content is active by default on page load
-    showView('patient-portal-content');
-});
+// --- DOM Elements (cached for efficiency) ---
+const bookingModal = document.getElementById('bookingModal');
+const bookingFormElement = document.getElementById('bookingForm');
+const appointmentDateInput = document.getElementById('appointmentDate');
+const serviceSelect = document.getElementById('service');
+const doctorSelect = document.getElementById('doctor');
+const summaryContentElement = document.getElementById('summaryContent');
+const backBtn = document.getElementById('backBtn');
+const nextBtn = document.getElementById('nextBtn');
+const submitBtn = document.getElementById('submitBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+const menuBtn = document.querySelector('.mobile-menu-btn i');
+const servicesGrid = document.getElementById('servicesGrid');
+const doctorsGrid = document.getElementById('doctorsGrid'); // Patient-facing doctors grid
 
-// Function to switch between patient and doctor portal content sections
+// --- Helper Functions ---
+
+// Helper function to generate star rating HTML for doctor cards
+function generateStars(rating) {
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= Math.floor(rating)) {
+            stars += '<i class="fas fa-star star filled"></i>';
+        } else {
+            stars += '<i class="fas fa-star star"></i>';
+        }
+    }
+    return stars;
+}
+
+// Helper function to format date for display
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+}
+
+// Set the minimum date for the appointment date input to today
+function setMinDate() {
+    if (appointmentDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        appointmentDateInput.setAttribute('min', today);
+    }
+}
+
+// --- UI/Modal Functions ---
+
+// Toggle mobile menu visibility and icon
+function toggleMobileMenu() {
+    if (mobileMenu && menuBtn) {
+        mobileMenu.classList.toggle('active');
+        menuBtn.className = mobileMenu.classList.contains('active') ? 'fas fa-times' : 'fas fa-bars';
+    }
+}
+
+// Close mobile menu
+function closeMobileMenu() {
+    if (mobileMenu && menuBtn) {
+        mobileMenu.classList.remove('active');
+        menuBtn.className = 'fas fa-bars';
+    }
+}
+
+// Open the appointment booking modal
+function openBookingModal() {
+    if (bookingModal) {
+        bookingModal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        populateServiceDropdown(); // Populate dropdowns when modal opens
+        populateDoctorDropdown();
+    }
+}
+
+// Close the appointment booking modal
+function closeBookingModal() {
+    if (bookingModal) {
+        bookingModal.classList.remove('active');
+        document.body.style.overflow = 'auto'; // Allow background scrolling
+        resetForm(); // Reset form state when modal closes
+    }
+}
+
+// Update the visibility of form steps, progress bar, and navigation buttons
+function updateStep() {
+    document.querySelectorAll('.form-step').forEach((step, index) => {
+        step.classList.toggle('active', index + 1 === currentStep);
+    });
+
+    document.querySelectorAll('.progress-step').forEach((step, index) => {
+        step.classList.toggle('active', index + 1 <= currentStep);
+    });
+
+    document.querySelectorAll('.progress-line').forEach((line, index) => {
+        line.classList.toggle('active', index + 1 < currentStep);
+    });
+
+    if (backBtn) backBtn.style.display = currentStep > 1 ? 'block' : 'none';
+    if (nextBtn) nextBtn.style.display = currentStep < totalSteps ? 'block' : 'none';
+    if (submitBtn) submitBtn.style.display = currentStep === totalSteps ? 'block' : 'none';
+}
+
+// Validate required fields in the current form step
+function validateCurrentStep() {
+    const currentStepElement = document.getElementById(`step${currentStep}`);
+    if (!currentStepElement) return true;
+
+    const requiredInputs = currentStepElement.querySelectorAll('input[required], select[required]');
+
+    let isValid = true;
+    requiredInputs.forEach(input => {
+        if (!input.value.trim()) {
+            input.style.borderColor = '#ef4444'; // Highlight invalid fields
+            isValid = false;
+        } else {
+            input.style.borderColor = '#e2e8f0'; // Reset border for valid fields
+        }
+    });
+
+    if (!isValid) {
+        alert('Please fill in all required fields for this step.');
+    }
+    return isValid;
+}
+
+// Populate the appointment summary on the final step
+function updateSummary() {
+    if (!bookingFormElement || !summaryContentElement) return;
+
+    const formData = new FormData(bookingFormElement);
+
+    const firstName = formData.get('firstName');
+    const lastName = formData.get('lastName');
+    const service = formData.get('service');
+    const doctor = formData.get('doctor');
+    const appointmentDate = formData.get('appointmentDate');
+    const appointmentTime = formData.get('appointmentTime');
+
+    summaryContentElement.innerHTML = `
+        <div class="summary-item">
+            <span class="summary-label">Patient:</span>
+            <span class="summary-value">${firstName} ${lastName}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Service:</span>
+            <span class="summary-value">${service}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Doctor:</span>
+            <span class="summary-value">${doctor}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Date & Time:</span>
+            <span class="summary-value">${formatDate(appointmentDate)} at ${appointmentTime}</span>
+        </div>
+    `;
+}
+
+// Reset the form and its UI state
+function resetForm() {
+    currentStep = 1;
+    if (bookingFormElement) {
+        bookingFormElement.reset();
+        updateStep();
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.style.borderColor = '#e2e8f0';
+        });
+    }
+}
+
+// Populate service dropdown in booking modal
+function populateServiceDropdown() {
+    if (serviceSelect) {
+        serviceSelect.innerHTML = '<option value="">Select a Service</option>'; // Clear existing options
+        servicesData.forEach(service => {
+            const option = document.createElement('option');
+            option.value = service.title;
+            option.textContent = service.title;
+            serviceSelect.appendChild(option);
+        });
+    }
+}
+
+// Populate doctor dropdown in booking modal
+function populateDoctorDropdown() {
+    if (doctorSelect) {
+        doctorSelect.innerHTML = '<option value="">Any Doctor</option>'; // Clear existing options
+        doctorsData.forEach(doctor => {
+            const option = document.createElement('option');
+            option.value = doctor.name;
+            option.textContent = `Dr. ${doctor.name} (${doctor.specialty})`;
+            doctorSelect.appendChild(option);
+        });
+    }
+}
+
+// --- Core Page Navigation (for index.html sections) ---
+
+// Function to switch between main content sections within index.html
 function showView(viewId) {
-    // Hide all portal content sections first
+    // Hide all main content sections in index.html
     document.querySelectorAll('.portal-content').forEach(view => {
         view.classList.remove('active-portal');
-        view.style.display = 'none'; // Explicitly hide
+        view.style.display = 'none';
     });
     // Show the requested view
     const targetView = document.getElementById(viewId);
     if (targetView) {
         targetView.classList.add('active-portal');
         targetView.style.display = 'block'; // Or 'flex' depending on its default styling
-
-        // Scroll to the top of the newly activated view for better UX
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    // Close mobile menu if it was open
     closeMobileMenu();
 }
 
+// Initialize smooth scrolling for all internal anchor links
+function initializeSmoothScrolling() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            // This is for scrolling within the 'patient-portal-content' section
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                const headerHeight = document.querySelector('.header').offsetHeight;
+                const targetPosition = targetElement.offsetTop - headerHeight;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+}
+
+// --- Dynamic Content Initializers ---
+
 // Dynamically populate the services section
 function initializeServices() {
-    const servicesGrid = document.getElementById('servicesGrid');
-
-    // Clear any existing content to prevent duplication if called multiple times
-    if (servicesGrid) { // Added check for element existence
+    if (servicesGrid) {
         servicesGrid.innerHTML = '';
-
         servicesData.forEach(service => {
             const serviceCard = document.createElement('div');
             serviceCard.className = 'service-card';
-
             serviceCard.innerHTML = `
                 <div class="service-icon">
                     <i class="${service.icon}"></i>
@@ -160,33 +366,25 @@ function initializeServices() {
                     ${service.features.map(feature => `<li>${feature}</li>`).join('')}
                 </ul>
             `;
-
             servicesGrid.appendChild(serviceCard);
         });
     }
 }
 
-// Dynamically populate the doctors sections based on the target view
+// Dynamically populate the doctors sections based on the target view (for index.html)
 function initializeDoctors(targetView) {
-    // Determine which doctor grid to populate based on the targetView parameter
-    const doctorsGrid = document.getElementById(targetView === 'patients' ? 'doctorsGrid' : 'doctorsViewGrid');
+    // In index.html, we only have 'doctorsGrid' for the patient-facing view
+    const doctorsContainer = doctorsGrid;
 
-    // Clear any existing content to prevent duplication
-    if (doctorsGrid) { // Added check for element existence
-        doctorsGrid.innerHTML = '';
-
+    if (doctorsContainer) {
+        doctorsContainer.innerHTML = '';
         doctorsData.forEach(doctor => {
             const doctorCard = document.createElement('div');
             doctorCard.className = 'doctor-card';
-
             const stars = generateStars(doctor.rating);
 
-            // Customize the button on the doctor card based on the active view
-            // Patients view: "Book Appointment" button that opens the modal
-            // Doctors view: "View Profile" button (placeholder for doctor-specific action)
-            const buttonHtml = targetView === 'patients' ?
-                `<button class="btn btn-primary" onclick="openBookingModal()">Book Appointment</button>` :
-                `<button class="btn btn-outline">View Profile</button>`; // Or other doctor-specific action
+            // Button will always be "Book Appointment" for the public-facing site
+            const buttonHtml = `<button class="btn btn-primary" onclick="openBookingModal()">Book Appointment</button>`;
 
             doctorCard.innerHTML = `
                 <div class="doctor-image">
@@ -222,337 +420,123 @@ function initializeDoctors(targetView) {
                     ${buttonHtml}
                 </div>
             `;
-
-            doctorsGrid.appendChild(doctorCard);
+            doctorsContainer.appendChild(doctorCard);
         });
     }
 }
 
-// Helper function to generate star rating HTML for doctor cards
-function generateStars(rating) {
-    let stars = '';
-    for (let i = 1; i <= 5; i++) {
-        // Add 'filled' class for stars up to the doctor's rating
-        if (i <= Math.floor(rating)) {
-            stars += '<i class="fas fa-star star filled"></i>';
-        } else {
-            stars += '<i class="fas fa-star star"></i>';
-        }
-    }
-    return stars;
-}
+// --- Form Submission (Booking Modal) ---
+async function handleFormSubmit(e) {
+    e.preventDefault();
 
-// Toggle mobile menu visibility and icon
-function toggleMobileMenu() {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const menuBtn = document.querySelector('.mobile-menu-btn i');
+    if (validateCurrentStep()) {
+        const formData = new FormData(bookingFormElement);
+        const bookingData = {
+            firstName: formData.get('firstName'),
+            lastName: formData.get('lastName'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            address: formData.get('address'),
+            service: formData.get('service'),
+            doctor: formData.get('doctor'),
+            appointmentDate: formData.get('appointmentDate'),
+            appointmentTime: formData.get('appointmentTime'),
+            notes: formData.get('notes')
+        };
 
-    if (mobileMenu && menuBtn) { // Added checks for existence
-        mobileMenu.classList.toggle('active'); // Toggle 'active' class for visibility
+        // For index.html, we assume this is a public booking, not tied to a logged-in user.
+        // If you need it tied to a user, that logic would be in index2.html's JS.
+        // If your backend requires a user ID even for public bookings, you'd need to adjust.
 
-        // Change menu icon based on its state
-        if (mobileMenu.classList.contains('active')) {
-            menuBtn.className = 'fas fa-times'; // Change to 'X' icon
-        } else {
-            menuBtn.className = 'fas fa-bars'; // Change back to hamburger icon
-        }
-    }
-}
+        try {
+            // Send booking data to your backend
+            const response = await fetch(`${BASE_URL}/api/appointments/public-book`, { // Example endpoint for public booking
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookingData)
+            });
 
-// Close mobile menu
-function closeMobileMenu() {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const menuBtn = document.querySelector('.mobile-menu-btn i');
+            const result = await response.json();
 
-    if (mobileMenu && menuBtn) { // Added checks for existence
-        mobileMenu.classList.remove('active'); // Remove 'active' class to hide
-        menuBtn.className = 'fas fa-bars'; // Ensure hamburger icon is displayed
-    }
-}
-
-// Initialize smooth scrolling for all internal anchor links
-function initializeSmoothScrolling() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault(); // Prevent default jump behavior
-            const targetId = this.getAttribute('href');
-            // Check if the link is intended to switch the main portal view
-            // In this setup, header navigation links lead to patient portal sections,
-            // while hero buttons toggle between patient/doctor portals.
-            const isPatientSectionLink = targetId === '#hero' || targetId === '#services' || targetId === '#doctors' || targetId === '#about' || targetId === '#contact';
-
-            // If it's a patient section link, ensure patient portal is active, then scroll
-            if (isPatientSectionLink) {
-                showView('patient-portal-content'); // Always switch to patient portal
-                // A small delay to allow the view switch to complete before scrolling
-                setTimeout(() => {
-                     const updatedTargetElement = document.querySelector(targetId);
-                     if(updatedTargetElement) {
-                         const headerHeight = document.querySelector('.header').offsetHeight;
-                         const targetPosition = updatedTargetElement.offsetTop - headerHeight;
-                         window.scrollTo({
-                            top: targetPosition,
-                            behavior: 'smooth'
-                        });
-                     }
-                }, 100); // Adjust delay as needed
+            if (response.ok) {
+                alert('Appointment booked successfully! We will contact you shortly to confirm.');
+                closeBookingModal();
+                // No dashboard update here, as this is index.html
+            } else {
+                alert(`Appointment booking failed: ${result.message || 'An error occurred.'}`);
             }
-            // If it's not a patient section link (e.g., could be a new internal link added later not handled by showView),
-            // then the `showView` function above would handle portal switching.
-            // For general smooth scrolling *within the active portal*, the below logic applies if `showView` didn't already trigger it.
-            else {
-                const targetElement = document.querySelector(targetId);
-                const currentActivePortal = document.querySelector('.portal-content.active-portal');
-
-                if (targetElement && currentActivePortal && currentActivePortal.contains(targetElement)) {
-                    const headerHeight = document.querySelector('.header').offsetHeight;
-                    const targetPosition = targetElement.offsetTop - headerHeight;
-
-                    window.scrollTo({
-                        top: targetPosition,
-                        behavior: 'smooth'
-                    });
-                }
-            }
-        });
-    });
-}
-
-
-// Open the appointment booking modal
-function openBookingModal() {
-    const modal = document.getElementById('bookingModal');
-    if (modal) { // Added check for existence
-        modal.classList.add('active'); // Show modal
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-    }
-}
-
-// Close the appointment booking modal
-function closeBookingModal() {
-    const modal = document.getElementById('bookingModal');
-    if (modal) { // Added check for existence
-        modal.classList.remove('active'); // Hide modal
-        document.body.style.overflow = 'auto'; // Allow background scrolling
-        resetForm(); // Reset form state when modal closes
-    }
-}
-
-// Close modal when clicking on the overlay itself
-const bookingModalElement = document.getElementById('bookingModal');
-if (bookingModalElement) { // Added check for existence
-    bookingModalElement.addEventListener('click', function(e) {
-        if (e.target === this) { // Check if the click target is the overlay itself
-            closeBookingModal();
+        } catch (error) {
+            console.error('Booking error:', error);
+            alert('An error occurred during booking. Please check your connection.');
         }
-    });
+    }
 }
 
-// Initialize form submission and input validation listeners
-function initializeForm() {
-    const form = document.getElementById('bookingForm');
-    if (form) { // Added check for existence
-        form.addEventListener('submit', handleFormSubmit); // Handle form submission
 
-        // Add input event listeners for real-time validation feedback
-        const inputs = form.querySelectorAll('input, select, textarea');
-        inputs.forEach(input => {
+// --- Event Listeners ---
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize static content
+    initializeServices();
+    initializeDoctors('patients'); // Initialize for the patient-facing doctor grid
+
+    // Set min date for appointment input
+    setMinDate();
+
+    // Attach event listeners for booking form
+    if (bookingFormElement) {
+        bookingFormElement.addEventListener('submit', handleFormSubmit);
+        bookingFormElement.querySelectorAll('input, select, textarea').forEach(input => {
             input.addEventListener('input', validateCurrentStep);
         });
     }
-}
 
-// Set the minimum date for the appointment date input to today
-function setMinDate() {
-    const appointmentDateInput = document.getElementById('appointmentDate');
-    if (appointmentDateInput) { // Added check for existence
-        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-        appointmentDateInput.setAttribute('min', today);
+    // Attach event listeners for modal navigation
+    if (nextBtn) nextBtn.addEventListener('click', nextStep);
+    if (backBtn) backBtn.addEventListener('click', previousStep);
+
+    // Close modal when clicking on the overlay itself
+    if (bookingModal) {
+        bookingModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeBookingModal();
+            }
+        });
     }
-}
 
-// Navigate to the next step in the multi-step form
-function nextStep() {
-    if (validateCurrentStep()) { // Only proceed if current step is valid
-        if (currentStep < totalSteps) {
-            currentStep++; // Increment step
-            updateStep(); // Update UI
-            if (currentStep === 3) {
-                updateSummary(); // Populate summary on the final step
+    // Header scroll effect
+    window.addEventListener('scroll', function() {
+        const header = document.querySelector('.header');
+        if (header) {
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(10px)';
+            } else {
+                header.style.background = 'white';
+                header.style.backdropFilter = 'none';
             }
         }
-    }
-}
-
-// Navigate to the previous step in the multi-step form
-function previousStep() {
-    if (currentStep > 1) {
-        currentStep--; // Decrement step
-        updateStep(); // Update UI
-    }
-}
-
-// Update the visibility of form steps, progress bar, and navigation buttons
-function updateStep() {
-    // Hide/show form steps based on currentStep
-    document.querySelectorAll('.form-step').forEach((step, index) => {
-        step.classList.toggle('active', index + 1 === currentStep);
     });
 
-    // Update progress steps (circles)
-    document.querySelectorAll('.progress-step').forEach((step, index) => {
-        step.classList.toggle('active', index + 1 <= currentStep);
-    });
-
-    // Update progress lines between steps
-    document.querySelectorAll('.progress-line').forEach((line, index) => {
-        line.classList.toggle('active', index + 1 < currentStep);
-    });
-
-    // Update button visibility
-    const backBtn = document.getElementById('backBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const submitBtn = document.getElementById('submitBtn');
-
-    if (backBtn) backBtn.style.display = currentStep > 1 ? 'block' : 'none'; // Show 'Back' button from step 2
-    if (nextBtn) nextBtn.style.display = currentStep < totalSteps ? 'block' : 'none'; // Show 'Next' button until last step
-    if (submitBtn) submitBtn.style.display = currentStep === totalSteps ? 'block' : 'none'; // Show 'Submit' button on last step
-}
-
-// Validate required fields in the current form step
-function validateCurrentStep() {
-    const currentStepElement = document.getElementById(`step${currentStep}`);
-    if (!currentStepElement) return true; // If element doesn't exist, assume valid for safety
-
-    // Select all required inputs and selects within the current active step
-    const requiredInputs = currentStepElement.querySelectorAll('input[required], select[required]');
-
-    let isValid = true;
-
-    requiredInputs.forEach(input => {
-        if (!input.value.trim()) { // Check if input value is empty or just whitespace
-            input.style.borderColor = '#ef4444'; // Highlight invalid fields
-            isValid = false;
-        } else {
-            input.style.borderColor = '#e2e8f0'; // Reset border for valid fields
-        }
-    });
-
-    if (!isValid) {
-        // Display a generic alert for missing fields
-        // In a production app, more specific error messages would be better
-        alert('Please fill in all required fields for this step.');
-    }
-
-    return isValid;
-}
-
-// Populate the appointment summary on the final step
-function updateSummary() {
-    const bookingFormElement = document.getElementById('bookingForm');
-    const summaryContentElement = document.getElementById('summaryContent');
-
-    if (!bookingFormElement || !summaryContentElement) return; // Exit if elements don't exist
-
-    const formData = new FormData(bookingFormElement); // Get form data
-
-    // Extract values from form data
-    const firstName = formData.get('firstName');
-    const lastName = formData.get('lastName');
-    const service = formData.get('service');
-    const doctor = formData.get('doctor');
-    const appointmentDate = formData.get('appointmentDate');
-    const appointmentTime = formData.get('appointmentTime');
-
-    // Generate HTML for the summary
-    summaryContentElement.innerHTML = `
-        <div class="summary-item">
-            <span class="summary-label">Patient:</span>
-            <span class="summary-value">${firstName} ${lastName}</span>
-        </div>
-        <div class="summary-item">
-            <span class="summary-label">Service:</span>
-            <span class="summary-value">${service}</span>
-        </div>
-        <div class="summary-item">
-            <span class="summary-label">Doctor:</span>
-            <span class="summary-value">${doctor}</span>
-        </div>
-        <div class="summary-item">
-            <span class="summary-label">Date & Time:</span>
-            <span class="summary-value">${formatDate(appointmentDate)} at ${appointmentTime}</span>
-        </div>
-    `;
-}
-
-// Helper function to format date for display
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-}
-
-// Handle form submission
-function handleFormSubmit(e) {
-    e.preventDefault(); // Prevent default form submission behavior
-
-    if (validateCurrentStep()) {
-        // Simulate form submission success
-        alert('Appointment booked successfully! We will contact you shortly to confirm.');
-        closeBookingModal(); // Close modal after successful submission
-    }
-}
-
-// Reset the form and its UI state
-function resetForm() {
-    currentStep = 1; // Reset to first step
-    const bookingFormElement = document.getElementById('bookingForm');
-    if (bookingFormElement) { // Added check for existence
-        bookingFormElement.reset(); // Clear form fields
-        updateStep(); // Update UI to reflect step 1
-
-        // Reset border colors for all input fields
-        document.querySelectorAll('input, select, textarea').forEach(input => {
-            input.style.borderColor = '#e2e8f0';
-        });
-    }
-}
-
-// Add a scroll effect to the header for a subtle visual change
-window.addEventListener('scroll', function() {
-    const header = document.querySelector('.header');
-    if (header) { // Added check for header existence
-        if (window.scrollY > 100) {
-            // Apply a slightly transparent background and blur when scrolled down
-            header.style.background = 'rgba(255, 255, 255, 0.95)';
-            header.style.backdropFilter = 'blur(10px)';
-        } else {
-            // Revert to solid white background when at the top
-            header.style.background = 'white';
-            header.style.backdropFilter = 'none';
-        }
-    }
-});
-
-// Add a fade-in animation for images when they load
-document.addEventListener('DOMContentLoaded', function() {
-    const images = document.querySelectorAll('img');
-    images.forEach(img => {
-        img.addEventListener('load', function() {
-            this.style.opacity = '1'; // Fade in the image when loaded
-        });
-
-        // Set initial opacity to 0 and add transition for the fade-in effect
+    // Image fade-in animation
+    document.querySelectorAll('img').forEach(img => {
         img.style.opacity = '0';
         img.style.transition = 'opacity 0.3s ease';
+        img.addEventListener('load', function() {
+            this.style.opacity = '1';
+        });
     });
+
+    // Initialize smooth scrolling
+    initializeSmoothScrolling();
+
+    // Ensure the patient portal content is active by default on page load
+    showView('patient-portal-content'); // This will be the default view for index.html
 });
 
-// Make functions globally accessible (as they are called via onclick in HTML)
+// Make globally accessible functions available
 window.showView = showView;
 window.toggleMobileMenu = toggleMobileMenu;
 window.closeMobileMenu = closeMobileMenu;

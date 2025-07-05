@@ -6,7 +6,7 @@
     <title>MediCare - Your Health, Our Priority</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" xintegrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -19,10 +19,10 @@
                 <h1>MediCare</h1>
             </a>
             <nav class="desktop-nav">
-                <a href="#hero" class="nav-link" onclick="showView('patient-portal-content');">Home</a>
-                <a href="#services" class="nav-link" onclick="showView('patient-portal-content');">Services</a>
-                <a href="#doctors" class="nav-link" onclick="showView('patient-portal-content');">Find Doctors</a>
-                <a href="#contact" class="nav-link" onclick="showView('patient-portal-content');">Contact</a>
+                <a href="#hero" class="nav-link">Home</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#doctors" class="nav-link">Find Doctors</a>
+                <a href="#contact" class="nav-link">Contact</a>
             </nav>
             <div class="header-actions">
                 <div class="phone-info">
@@ -37,10 +37,10 @@
         </div>
         <div class="mobile-menu" id="mobileMenu">
             <nav class="mobile-nav">
-                <a href="#hero" class="nav-link" onclick="showView('patient-portal-content'); closeMobileMenu();">Home</a>
-                <a href="#services" class="nav-link" onclick="showView('patient-portal-content'); closeMobileMenu();">Services</a>
-                <a href="#doctors" class="nav-link" onclick="showView('patient-portal-content'); closeMobileMenu();">Find Doctors</a>
-                <a href="#contact" class="nav-link" onclick="showView('patient-portal-content'); closeMobileMenu();">Contact</a>
+                <a href="#hero" class="nav-link" onclick="closeMobileMenu();">Home</a>
+                <a href="#services" class="nav-link" onclick="closeMobileMenu();">Services</a>
+                <a href="#doctors" class="nav-link" onclick="closeMobileMenu();">Find Doctors</a>
+                <a href="#contact" class="nav-link" onclick="closeMobileMenu();">Contact</a>
             </nav>
             <div class="mobile-actions">
                 <div class="phone-info">
@@ -53,6 +53,7 @@
     </header>
 
     <main>
+        <!-- This is the main content for the marketing site -->
         <div id="patient-portal-content" class="portal-content active-portal">
             <section class="hero" id="hero">
                 <div class="container hero-content">
@@ -60,8 +61,9 @@
                         <h1 class="hero-title">Your Health, Our Priority. Dedicated Care for a Healthier You.</h1>
                         <p class="hero-description">Experience world-class healthcare with our expert doctors and state-of-the-art facilities. Your well-being is at the heart of everything we do.</p>
                         <div class="hero-buttons">
-                            <a href="index2.html" class="btn btn-primary btn-large">Patient</a>
-                            <button class="btn btn-outline btn-large" onclick="window.location.href='indexd.html'">Doctor</button>
+                            <!-- These buttons will now link to your separate portal HTML files -->
+                            <a href="index2.html" class="btn btn-primary btn-large">Patient Portal</a>
+                            <a href="indexd.html" class="btn btn-outline btn-large">Doctor Portal</a>
                         </div>
                         <div class="hero-stats">
                             <div class="stat">
@@ -106,7 +108,8 @@
                         <p>We offer a wide range of medical services, ensuring comprehensive care for all your health needs with a focus on cutting-edge treatments and compassionate support.</p>
                     </div>
                     <div class="services-grid" id="servicesGrid">
-                        </div>
+                        <!-- Services will be loaded here by JavaScript -->
+                    </div>
                 </div>
             </section>
 
@@ -117,7 +120,8 @@
                         <p>Our team of highly qualified specialists are dedicated to providing you with the best possible care, bringing years of experience and expertise.</p>
                     </div>
                     <div class="doctors-grid" id="doctorsGrid">
-                        </div>
+                        <!-- Doctors will be loaded here by JavaScript -->
+                    </div>
                 </div>
             </section>
 
@@ -136,16 +140,16 @@
             </section>
         </div>
 
+        <!-- The doctor-portal-content is kept here as a placeholder for consistency,
+             but its content will be minimal as the real portal is in indexd.html -->
         <div id="doctor-portal-content" class="portal-content">
             <section class="doctors" id="doctorsPortal">
                 <div class="container">
                     <div class="section-header">
-                        <h2>Doctor Portal: Manage Profiles & Appointments</h2>
-                        <p>Welcome, Doctors! Here you can view and manage your profiles, schedules, and patient appointments.</p>
-                        <p>You are now accessing the Doctor Portal via a direct link. This section could be used for an embedded experience or a placeholder before redirecting.</p>
+                        <h2>Doctor Portal Access</h2>
+                        <p>Please visit the dedicated Doctor Portal for login and management features.</p>
+                        <p><a href="indexd.html" class="btn btn-primary">Go to Doctor Portal</a></p>
                     </div>
-                    <div class="doctors-grid" id="doctorsViewGrid">
-                        </div>
                 </div>
             </section>
         </div>
@@ -171,22 +175,22 @@
                 <div class="footer-section quick-links">
                     <h3>Quick Links</h3>
                     <ul>
-                        <li><a href="#about" onclick="showView('patient-portal-content')">About Us</a></li>
-                        <li><a href="#services" onclick="showView('patient-portal-content')">Our Services</a></li>
-                        <li><a href="#doctors" onclick="showView('patient-portal-content')">Meet Our Doctors</a></li>
-                        <li><a href="#contact" onclick="showView('patient-portal-content')">Contact Us</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#services">Our Services</a></li>
+                        <li><a href="#doctors">Meet Our Doctors</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
                         <li><a href="#">Privacy Policy</a></li>
                     </ul>
                 </div>
                 <div class="footer-section services-list">
                     <h3>Services</h3>
                     <ul>
-                        <li><a href="#" onclick="showView('patient-portal-content')">Cardiology</a></li>
-                        <li><a href="#" onclick="showView('patient-portal-content')">Neurology</a></li>
-                        <li><a href="#" onclick="showView('patient-portal-content')">Orthopedics</a></li>
-                        <li><a href="#" onclick="showView('patient-portal-content')">Surgeon</a></li>
-                        <li><a href="#" onclick="showView('patient-portal-content')">Pediatrics</a></li>
-                        <li><a href="#" onclick="showView('patient-portal-content')">Dermatology</a></li>
+                        <li><a href="#">Cardiology</a></li>
+                        <li><a href="#">Neurology</a></li>
+                        <li><a href="#">Orthopedics</a></li>
+                        <li><a href="#">Surgeon</a></li>
+                        <li><a href="#">Pediatrics</a></li>
+                        <li><a href="#">Dermatology</a></li>
                     </ul>
                 </div>
                 <div class="footer-section contact-info">
@@ -289,24 +293,14 @@
                             <label for="service">Service</label>
                             <select id="service" name="service" required>
                                 <option value="">Select a Service</option>
-                                <option value="Cardiology">Cardiology</option>
-                                <option value="Neurology">Neurology</option>
-                                <option value="Orthopedics">Orthopedics</option>
-                                <option value="Ophthalmology">Surgeon</option>
-                                <option value="Pediatrics">Pediatrics</option>
-                                <option value="General Medicine">Dermatology</option>
+                                <!-- Options will be dynamically populated by JavaScript -->
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="doctor">Preferred Doctor</label>
                             <select id="doctor" name="doctor" required>
                                 <option value="">Any Doctor</option>
-                                <option value="Dr. Sarah Johnson">Dr. Raksha (Cardiology)</option>
-                                <option value="Dr. Michael Chen">Dr. Bruda S (Neurology)</option>
-                                <option value="Dr. Emily Rodriguez">Dr. Aishwarya D S (Pediatrics)</option>
-                                <option value="Dr. James Wilson">Dr. Shruthi N (Orthopedics)</option>
-                                <option value="Dr. Lisa Thompson">Dr. Vijay (Surgeon)</option>
-                                <option value="Dr. Robert Kumar">Dr. Amaresh A M (Dermatology)</option>
+                                <!-- Options will be dynamically populated by JavaScript -->
                             </select>
                         </div>
                         <div class="form-group">
@@ -332,7 +326,8 @@
                     <div class="appointment-summary">
                         <h4>Appointment Summary</h4>
                         <div id="summaryContent" class="summary-content">
-                            </div>
+                            <!-- Summary will be populated by JavaScript -->
+                        </div>
                     </div>
                 </div>
 
