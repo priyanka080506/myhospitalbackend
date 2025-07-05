@@ -11,13 +11,20 @@ const Patient = require('../models/Patient'); // Import the Patient model
 // @desc    Register a new patient
 // @access  Public (for initial registration)
 router.post('/register', async (req, res) => {
-    const { name, email, phone, dob, password } = req.body;
+    // --- DEBUGGING LINE: Log the received payload ---
+    console.log('Backend received patient registration payload:', req.body);
+    // --- END DEBUGGING LINE ---
+
+    // Destructure fields from req.body.
+    // Note: Frontend sends 'dateOfBirth' and 'gender'.
+    // Ensure these match your Patient model schema.
+    const { name, email, phone, dateOfBirth, gender, password } = req.body;
 
     try {
         // 1. Check if patient with this email already exists
         let patient = await Patient.findOne({ email });
         if (patient) {
-            return res.status(400).json({ message: 'Registration failed: Patient with this email already exists.' });
+            return res.status(400).json({ message: 'Registration failed: User with this email already exists.' });
         }
 
         // 2. Create a new Patient instance
@@ -25,8 +32,9 @@ router.post('/register', async (req, res) => {
             name,
             email,
             phone,
-            dob,
-            password // This will be hashed below
+            dateOfBirth, // Use dateOfBirth as per frontend and schema
+            gender,      // Use gender as per frontend and schema
+            password     // This will be hashed below
         });
 
         // 3. Hash the password before saving
@@ -59,7 +67,8 @@ router.post('/register', async (req, res) => {
                         name: patient.name,
                         email: patient.email,
                         phone: patient.phone,
-                        dob: patient.dob
+                        dateOfBirth: patient.dateOfBirth, // Send back dateOfBirth
+                        gender: patient.gender             // Send back gender
                     }
                 });
             }
