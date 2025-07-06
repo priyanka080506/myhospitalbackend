@@ -54,5 +54,33 @@ router.get('/', async (req, res) => {
     }
 });
 
+// @route   GET /api/appointments/:patientId
+// @desc    Get appointments for a specific patient
+// @access  Public (for now) / Private (e.g., Patient themselves, Doctors, Admins later)
+router.get('/:patientId', async (req, res) => {
+    // --- DEBUGGING LINE: Log the patient ID received ---
+    console.log('Backend received request for appointments for patientId:', req.params.patientId);
+    // --- END DEBUGGING LINE ---
+
+    try {
+        const patientId = req.params.patientId;
+
+        // Find appointments where the 'patient' field matches the patientId
+        // This assumes your Appointment model has a 'patient' field that's a reference to the Patient model
+        const appointments = await Appointment.find({ patient: patientId })
+            .populate('patient', 'name email phone dateOfBirth gender') // Populate relevant patient fields
+            .populate('doctor', 'name specialization'); // Populate relevant doctor fields
+
+        // --- DEBUGGING LINE: Log found appointments ---
+        console.log(`Found ${appointments.length} appointments for patient ${patientId}`);
+        // --- END DEBUGGING LINE ---
+
+        res.json(appointments);
+
+    } catch (err) {
+        console.error('Error fetching appointments by patient ID:', err.message);
+        res.status(500).send('Server Error fetching patient appointments');
+    }
+});
 
 module.exports = router;
