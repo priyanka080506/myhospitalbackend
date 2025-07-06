@@ -1,107 +1,74 @@
-// server.js
+    // ... (rest of your script2.js code) ...
 
-// 1. Load environment variables from .env file FIRST.
-// This line must be at the very top of your file.
-require('dotenv').config();
+    // --- Registration Logic (Backend Integration) ---
+    if (registerFormElement) {
+        registerFormElement.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nameInput = document.getElementById('registerName');
+            const emailInput = document.getElementById('registerEmail');
+            const phoneInput = document.getElementById('registerPhone');
+            const dobInput = document.getElementById('registerDob');
+            const genderInput = document.getElementById('registerGender'); // Ensure this is present in index2.html
+            const passwordInput = document.getElementById('registerPassword');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
 
-// --- DEBUGGING LOGS: START ---
-console.log('--- Render Deployment Debugging Check ---');
-console.log('Current working directory:', process.cwd());
-console.log('process.env.NODE_ENV:', process.env.NODE_ENV); // Render usually sets this to 'production'
-console.log('process.env.PORT:', process.env.PORT); // Render sets its own PORT
-console.log('process.env.MONGO_URI (raw from process.env):', process.env.MONGO_URI); // THIS IS THE KEY ONE
-console.log('process.env.JWT_SECRET (raw from process.env):', process.env.JWT_SECRET);
-console.log('-----------------------------------------');
-// --- DEBUGGING LOGS: END ---
+            const name = nameInput ? nameInput.value : '';
+            const email = emailInput ? emailInput.value : '';
+            const phone = phoneInput ? phoneInput.value : '';
+            const dob = dobInput ? dobInput.value : '';
+            const gender = genderInput ? genderInput.value : ''; // Get gender value
+            
+            let password = '';
+            if (passwordInput) {
+                password = passwordInput.value;
+            }
 
+            let confirmPassword = '';
+            if (confirmPasswordInput) {
+                confirmPassword = confirmPasswordInput.value;
+            }
 
-// 2. Import necessary libraries
-const express = require('express');
-const mongoose = require('mongoose'); // For MongoDB interaction
-const cors = require('cors');         // For Cross-Origin Resource Sharing
-const path = require('path');         // Node.js built-in module for working with file and directory paths
+            // Validate form
+            if (!name || !email || !phone || !dob || !gender || !password || !confirmPassword) {
+                alert('Please fill in all fields.');
+                return;
+            }
 
-// --- ADDED FOR AUTHENTICATION ROUTES ---
-const authRoutes = require('./routes/authRoutes');
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return;
+            }
 
-// --- ADDED FOR DOCTOR ROUTES ---
-const doctorRoutes = require('./routes/doctorRoutes');
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                return;
+            }
 
-// --- ADDED FOR PATIENT ROUTES ---
-const patientRoutes = require('./routes/patientRoutes');
+            try {
+                // *** THIS IS THE CRITICAL LINE TO ENSURE IT'S CORRECT ***
+                const response = await fetch(`${BASE_URL}/api/patients/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, phone, dateOfBirth: dob, gender, password }),
+                });
 
-// --- ADDED FOR APPOINTMENT ROUTES ---
-const appointmentRoutes = require('./routes/appointmentRoutes'); // <-- NEW LINE ADDED HERE!
+                const data = await response.json();
 
-// 3. Initialize Express app
-const app = express();
-
-// 4. Get PORT and MongoDB URI from environment variables
-const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGO_URI;
-
-// --- DEBUGGING LOG: Check MONGODB_URI after assignment ---
-console.log('MONGODB_URI variable after assignment:', MONGODB_URI);
-// --- DEBUGGING LOG: END ---
-
-// --- 5. Middleware ---
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-// --- 6. MongoDB Connection ---
-mongoose.connect(MONGODB_URI) // This is the line that's failing
-    .then(() => {
-        console.log('MongoDB connected successfully!');
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-            console.log(`Access your frontend at: http://localhost:${PORT}`);
-            console.log(`API endpoints will be at: http://localhost:${PORT}/api/...`);
-        });
-    })
-    .catch(err => {
-        console.error('MongoDB connection error:', err);
-        process.exit(1);
-    });
-
-// --- 7. API Routes ---
-const userRoutes = require('./routes/userRoutes');
-app.use('/api/users', userRoutes);
-
-app.use('/api/auth', authRoutes);
-
-app.use('/api/doctors', doctorRoutes);
-
-app.use('/api/patients', patientRoutes);
-
-app.use('/api/appointments', appointmentRoutes); // <-- NEW LINE ADDED HERE!
-
-
-// Example for Doctors API (assuming you create routes/doctors.js with a 'router' export)
-// const doctorsRouter = require('./routes/doctors');
-// app.use('/api/doctors', doctorsRouter);
-
-// Example for Patients API (assuming you create routes/patients.js with a 'router' export)
-// const patientsRouter = require('./routes/patients');
-// app.use('/api/patients', patientsRouter);
-
-// Add other API routes as you build them, e.g.:
-// app.use('/api/services', require('./routes/services'));
-
-
-// --- 8. Catch-all for undefined API routes (Optional) ---
-app.use((req, res, next) => {
-    if (req.path.startsWith('/api/')) {
-        res.status(404).json({ message: "API endpoint not found" });
-    } else {
-        res.status(404).send("Page not found");
-    }
-});
-
-
-// --- 9. Global Error Handling Middleware (Optional but Recommended) ---
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: 'Something went wrong on the server!', error: err.message });
-});
+                if (response.ok) {
+                    alert('Account created successfully! Please log in.');
+                    if (loginForm) loginForm.classList.add('active');
+                    if (registerForm) registerForm.classList.remove('active');
+                    if (registerFormElement) registerFormElement.reset();
+                } else {
+                    alert(data.message || 'Registration failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('An error occurred during registration. Please try again later.');
+            }
+        });
+    }
+    // ... (rest of your script2.js code) ...
+    

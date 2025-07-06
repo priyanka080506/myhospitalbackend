@@ -16,6 +16,7 @@ router.post('/register', async (req, res) => {
     // --- END DEBUGGING LINE ---
 
     // Correctly destructure dateOfBirth and gender from req.body
+    // These names MUST match the frontend payload and the Patient model schema
     const { name, email, phone, dateOfBirth, gender, password } = req.body;
 
     try {
