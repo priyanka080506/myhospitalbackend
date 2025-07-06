@@ -254,29 +254,35 @@ async function initializeDashboardContent() {
         return;
     }
 
+    let appointments = []; // Initialize as empty array
+    let reports = [];     // Initialize as empty array
+
     try {
         const appointmentsResponse = await fetch(`${BASE_URL}/api/appointments/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const appointments = await appointmentsResponse.json();
-        if (appointmentsResponse.ok) {
+        const appointmentsData = await appointmentsResponse.json();
+        if (appointmentsResponse.ok && Array.isArray(appointmentsData)) {
+            appointments = appointmentsData;
             renderAppointments(appointments);
         } else {
-            console.error('Failed to fetch appointments:', appointments.message);
+            console.error('Failed to fetch appointments or received non-array data:', appointmentsData);
             renderAppointments([]);
         }
 
         const reportsResponse = await fetch(`${BASE_URL}/api/patients/reports/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const reports = await reportsResponse.json();
-        if (reportsResponse.ok) {
+        const reportsData = await reportsResponse.json();
+        if (reportsResponse.ok && Array.isArray(reportsData)) {
+            reports = reportsData;
             renderReports(reports);
         } else {
-            console.error('Failed to fetch reports:', reports.message);
+            console.error('Failed to fetch reports or received non-array data:', reportsData);
             renderReports([]);
         }
 
+        // Pass the guaranteed-to-be-arrays to setupSearch
         setupSearch(appointments, reports);
         setupTabs();
         updateStats(appointments, reports);
@@ -405,7 +411,8 @@ function renderReports(reports) {
 
 function setupSearch(appointments, reports) {
     const searchInput = document.getElementById('searchInput');
-    const originalAppointments = [...appointments];
+    // Store original data references to filter from
+    const originalAppointments = [...appointments]; // Create copies to avoid modifying original arrays
     const originalReports = [...reports];
 
     if (!searchInput) return;
@@ -448,8 +455,9 @@ function setupTabs() {
             if (targetPanel) targetPanel.classList.add('active');
         });
     });
+    // Ensure one tab is active by default on load
     if (tabButtons.length > 0) {
-        tabButtons[0].click();
+        tabButtons[0].click(); // Activate the first tab by default
     }
 }
 
@@ -461,6 +469,7 @@ function updateStats(appointments, reports) {
         totalReportsElement.textContent = reports.length;
     }
     if (upcomingAppointmentsElement) {
+        // Filter for upcoming appointments (date in future and not completed)
         const upcoming = appointments.filter(apt => new Date(apt.date) >= new Date() && apt.status !== 'completed').length;
         upcomingAppointmentsElement.textContent = upcoming;
     }
@@ -477,11 +486,14 @@ function checkAuth() {
     const authToken = localStorage.getItem('authToken');
 
     if (loggedInEmail && authToken) {
+        // Attempt to re-authenticate using the stored email and token
+        // UPDATED URL: /api/patients/profile?email=${loggedInEmail}
         fetch(`${BASE_URL}/api/patients/profile?email=${loggedInEmail}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         })
         .then(response => {
             if (!response.ok) {
+                // If token is invalid or expired, or profile not found
                 throw new Error('Authentication failed or profile not found');
             }
             return response.json();
@@ -492,33 +504,37 @@ function checkAuth() {
                 showDashboard();
             } else {
                 console.error('Re-authentication failed or patient data mismatch.');
-                logout();
+                logout(); // Clear invalid state
             }
         })
         .catch(error => {
             console.error('Error during re-authentication:', error);
-            logout();
+            logout(); // Clear state on network/API error
         });
     } else {
-        showAuth();
+        showAuth(); // No stored credentials, show login/register
     }
 }
 
+// Initialize the app when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
+    checkAuth(); // Initial check for authentication status
 
+    // Attach dashboard search and tab listeners
     const tabButtonsContainer = document.querySelector('.tabs');
     if (tabButtonsContainer) {
         tabButtonsContainer.addEventListener('click', (e) => {
             if (e.target.classList.contains('tab-button')) {
-                setupTabs();
+                setupTabs(); // Re-run setupTabs to activate the clicked tab
             }
         });
     }
     if (searchInput) {
         // setupSearch needs to be called with actual data after it's fetched by initializeDashboardContent
+        // The listener is attached here, but the data it filters will be the ones loaded by initializeDashboardContent
     }
 
+    // Attach logout listener
     if (logoutButton) {
         logoutButton.addEventListener('click', () => {
             logout();
