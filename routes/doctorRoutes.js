@@ -10,6 +10,10 @@ const Doctor = require('../models/Doctor'); // Import the Doctor model
 // @desc    Register a new doctor
 // @access  Public (for initial registration)
 router.post('/register', async (req, res) => {
+    // --- DEBUGGING LINE: Log the received registration payload ---
+    console.log('Backend received doctor registration payload:', req.body);
+    // --- END DEBUGGING LINE ---
+
     const { name, email, phone, specialty, license, password, workingPlaces, photo } = req.body;
 
     try {
