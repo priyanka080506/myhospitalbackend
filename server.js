@@ -21,17 +21,14 @@ const mongoose = require('mongoose'); // For MongoDB interaction
 const cors = require('cors');         // For Cross-Origin Resource Sharing
 const path = require('path');         // Node.js built-in module for working with file and directory paths
 
-// --- ADDED FOR AUTHENTICATION ROUTES ---
+// --- Import all your route files ---
 const authRoutes = require('./routes/authRoutes');
-
-// --- ADDED FOR DOCTOR ROUTES ---
-const doctorRoutes = require('./routes/doctorRoutes');
-
-// --- ADDED FOR PATIENT ROUTES ---
+const doctorRoutes = require('./routes/doctorRoutes'); // Ensure this is imported
 const patientRoutes = require('./routes/patientRoutes');
-
-// --- ADDED FOR APPOINTMENT ROUTES ---
 const appointmentRoutes = require('./routes/appointmentRoutes');
+// Assuming userRoutes exists, if not, remove or create it
+const userRoutes = require('./routes/userRoutes'); 
+
 
 // 3. Initialize Express app
 const app = express();
@@ -47,6 +44,7 @@ console.log('MONGODB_URI variable after assignment:', MONGODB_URI);
 // --- 5. Middleware ---
 app.use(cors());
 app.use(express.json());
+// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
 
@@ -66,24 +64,21 @@ mongoose.connect(MONGODB_URI)
     });
 
 // --- 7. API Routes ---
-// Assuming userRoutes exists, if not, remove or create it
-const userRoutes = require('./routes/userRoutes'); 
+// Mount your route files here
 app.use('/api/users', userRoutes);
-
 app.use('/api/auth', authRoutes);
-
-app.use('/api/doctors', doctorRoutes);
-
+app.use('/api/doctors', doctorRoutes); // Ensure this line is present and correct
 app.use('/api/patients', patientRoutes);
-
 app.use('/api/appointments', appointmentRoutes);
 
 
-// --- 8. Catch-all for undefined API routes (Optional) ---
+// --- 8. Catch-all for undefined API routes (Optional, but useful for debugging) ---
 app.use((req, res, next) => {
     if (req.path.startsWith('/api/')) {
+        // If it's an API path but no route matched, send 404 JSON
         res.status(404).json({ message: "API endpoint not found" });
     } else {
+        // For non-API paths, let Express handle static files or send a generic 404 HTML
         res.status(404).send("Page not found");
     }
 });
