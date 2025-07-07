@@ -162,7 +162,8 @@ if (registerFormElement) {
         const phone = phoneInput ? phoneInput.value : '';
         const specialty = specialtyInput ? specialtyInput.value : '';
         const license = licenseInput ? licenseInput.value : '';
-        const password = passwordInput ? password.value : '';
+        // FIX: Corrected the assignment for 'password'
+        const password = passwordInput ? passwordInput.value : ''; // Corrected line
         const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
 
         // Get all working places and timings
