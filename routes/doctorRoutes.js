@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs'); // For hashing passwords
+const bcrypt = require('bcryptjs'); // For hashing and comparing passwords
 const jwt = require('jsonwebtoken'); // For creating JWTs
 const Doctor = require('../models/Doctor'); // Import the Doctor model
 
@@ -46,7 +46,6 @@ router.post('/register', async (req, res) => {
         const payload = {
             doctor: {
                 id: doctor.id, // Mongoose virtual 'id' for '_id'
-                // You can add more doctor-specific data to the payload if needed
             },
         };
 
@@ -89,6 +88,74 @@ router.post('/register', async (req, res) => {
     }
 });
 
+// @route   POST /api/doctors/login
+// @desc    Authenticate doctor & get token
+// @access  Public
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    // --- DEBUGGING LINE: Log the received login payload ---
+    console.log('Backend received doctor login payload:', req.body);
+    // --- END DEBUGGING LINE ---
+
+    try {
+        // 1. Check if doctor exists in the Doctor collection
+        // Select the password explicitly because it's set to 'select: false' in the schema
+        const doctor = await Doctor.findOne({ email }).select('+password');
+        
+        // --- DEBUGGING LINE: Log found doctor ---
+        console.log('Found doctor for login:', doctor ? doctor.email : 'None');
+        // --- END DEBUGGING LINE ---
+
+        if (!doctor) {
+            return res.status(400).json({ message: 'Invalid Credentials (Doctor account not found)' });
+        }
+
+        // 2. Compare provided password with hashed password in DB
+        const isMatch = await bcrypt.compare(password, doctor.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid Credentials (Password incorrect)' });
+        }
+
+        // 3. If credentials are valid, create and sign a JSON Web Token (JWT)
+        const payload = {
+            doctor: { // Use 'doctor' in payload to indicate it's a doctor
+                id: doctor.id, // Mongoose virtual 'id' for '_id'
+            },
+        };
+
+        // Sign the token with your secret key (from .env)
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET, // Your secret key, defined in .env
+            { expiresIn: '1h' },    // Token expires in 1 hour
+            (err, token) => {
+                if (err) throw err; // If there's an error signing the token
+                // Send the token and doctor data back to the client
+                res.json({
+                    token,
+                    doctor: { // Send back relevant doctor data (excluding password)
+                        _id: doctor._id,
+                        id: doctor.id,
+                        name: doctor.name,
+                        email: doctor.email,
+                        phone: doctor.phone,
+                        specialty: doctor.specialty,
+                        license: doctor.license,
+                        workingPlaces: doctor.workingPlaces,
+                        photo: doctor.photo
+                    }
+                });
+            }
+        );
+
+    } catch (err) {
+        console.error('Doctor Login Error:', err.message); // Log the actual error for debugging on the server side
+        res.status(500).send('Server Error'); // Generic server error message for the client
+    }
+});
+
+
 // @route   GET /api/doctors
 // @desc    Get all doctors
 // @access  Public or Private (e.g., Any logged-in user)
@@ -108,12 +175,10 @@ router.get('/', async (req, res) => {
 // @route   GET /api/doctors/profile
 // @desc    Get current doctor's profile (used for re-authentication)
 // @access  Private (requires auth token)
-// You will need to implement an auth middleware to protect this route
-// Example: router.get('/profile', authMiddleware, async (req, res) => { ... });
+// This route needs an authentication middleware to identify the doctor.
+// For now, it's a placeholder. Assuming you'll pass email as query for testing,
+// but in production, you'd get doctor ID from the JWT token in authMiddleware.
 router.get('/profile', async (req, res) => {
-    // This route needs an authentication middleware to identify the doctor.
-    // For now, it's a placeholder. Assuming you'll pass email as query for testing,
-    // but in production, you'd get doctor ID from the JWT token in authMiddleware.
     const { email } = req.query; // For testing without auth middleware
 
     try {
