@@ -220,9 +220,70 @@
                 <div class="section-header">
                     <h2>Patient Reports & Follow-ups</h2>
                     <span class="count-badge" id="patientsCount">0 reports</span>
+                    <button id="addNewReportBtn" class="btn btn-primary add-new-button">
+                        <i class="fas fa-plus-circle"></i> Add New Report
+                    </button>
                 </div>
                 <div id="patientsList" class="patients-list"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- Add New Report Modal -->
+    <div id="addReportModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-file-medical"></i>
+                    <h2>Add New Patient Report</h2>
+                </div>
+                <button class="modal-close" onclick="closeAddReportModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addReportForm" class="booking-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="reportPatientId">Patient</label>
+                        <select id="reportPatientId" name="patientId" required>
+                            <option value="">Select Patient</option>
+                            <!-- Patient options will be dynamically loaded by JS -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportTitle">Report Title</label>
+                        <input type="text" id="reportTitle" name="title" placeholder="e.g., Blood Test Results" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportType">Report Type</label>
+                        <select id="reportType" name="type" required>
+                            <option value="">Select Type</option>
+                            <option value="Laboratory">Laboratory</option>
+                            <option value="Radiology">Radiology</option>
+                            <option value="Consultation">Consultation</option>
+                            <option value="Prescription">Prescription</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportDate">Report Date</label>
+                        <input type="date" id="reportDate" name="date" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="reportSummary">Summary</label>
+                        <textarea id="reportSummary" name="summary" rows="4" placeholder="Brief summary of the report findings..." required></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="reportNextAction">Next Action / Recommendation</label>
+                        <textarea id="reportNextAction" name="nextAction" rows="2" placeholder="e.g., Schedule follow-up in 2 weeks"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Add Report
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

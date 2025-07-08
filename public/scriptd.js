@@ -43,7 +43,43 @@ const upcomingAppointmentsElement = document.getElementById('upcomingAppointment
 // New DOM elements for doctor profile details
 const doctorLicenseDisplay = document.getElementById('doctorLicenseDisplay');
 const doctorPhoneDisplay = document.getElementById('doctorPhoneDisplay');
-const doctorHospitalDisplay = document.getElementById('doctorHospitalDisplay');
+const doctorWorkingPlacesDisplay = document.getElementById('doctorWorkingPlacesDisplay'); // Corrected ID
+
+// Add Report Modal Elements
+const addReportModal = document.getElementById('addReportModal');
+const addNewReportBtn = document.getElementById('addNewReportBtn');
+const addReportForm = document.getElementById('addReportForm');
+const reportPatientIdSelect = document.getElementById('reportPatientId');
+const reportDateInput = document.getElementById('reportDate');
+
+
+// --- Helper Functions ---
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
+    try {
+        const date = new Date(dateString + 'T00:00:00Z'); // Treat as UTC to avoid timezone issues
+        return date.toLocaleDateString('en-US', options);
+    } catch (e) {
+        console.error('Invalid date string for formatting:', dateString, e);
+        return dateString;
+    }
+}
+
+function getReportIcon(type) {
+    switch (type) {
+        case 'Laboratory': return '<i class="fas fa-flask"></i>';
+        case 'Radiology': return '<i class="fas fa-x-ray"></i>';
+        case 'Consultation': return '<i class="fas fa-user-md"></i>';
+        case 'Prescription': return '<i class="fas fa-prescription-bottle-alt"></i>';
+        default: return '<i class="fas fa-file-alt"></i>';
+    }
+}
 
 
 // --- Authentication event listeners ---
@@ -117,7 +153,6 @@ if (loginFormElement) {
         }
 
         try {
-            // UPDATED URL: /api/doctors/login
             const response = await fetch(`${BASE_URL}/api/doctors/login`, {
                 method: 'POST',
                 headers: {
@@ -162,8 +197,7 @@ if (registerFormElement) {
         const phone = phoneInput ? phoneInput.value : '';
         const specialty = specialtyInput ? specialtyInput.value : '';
         const license = licenseInput ? licenseInput.value : '';
-        // FIX: Corrected the assignment for 'password'
-        const password = passwordInput ? passwordInput.value : ''; // Corrected line
+        const password = passwordInput ? passwordInput.value : '';
         const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
 
         // Get all working places and timings
@@ -205,7 +239,6 @@ if (registerFormElement) {
         }
 
         try {
-            // UPDATED URL: /api/doctors/register
             const response = await fetch(`${BASE_URL}/api/doctors/register`, {
                 method: 'POST',
                 headers: {
@@ -308,37 +341,13 @@ async function showDashboard() {
         if (doctorLicenseDisplay) doctorLicenseDisplay.textContent = `License: ${currentDoctor.license || 'N/A'}`;
         if (doctorPhoneDisplay) doctorPhoneDisplay.textContent = currentDoctor.phone || 'N/A';
         // Display working places (first one or list all)
-        if (doctorHospitalDisplay) {
+        if (doctorWorkingPlacesDisplay) { // Corrected ID usage
             if (currentDoctor.workingPlaces && currentDoctor.workingPlaces.length > 0) {
-                doctorHospitalDisplay.textContent = currentDoctor.workingPlaces[0].place; // Display first working place
+                // Display all working places, separated by commas or line breaks
+                const placesHtml = currentDoctor.workingPlaces.map(wp => `${wp.place} (${wp.timing})`).join('<br>');
+                doctorWorkingPlacesDisplay.innerHTML = `<i class="fas fa-hospital"></i><span>${placesHtml}</span>`;
             } else {
-                doctorHospitalDisplay.textContent = 'N/A';
-            }
-        }
-
-
-        // Populate working places dynamically
-        if (workingPlacesContainer) {
-            workingPlacesContainer.innerHTML = ''; // Clear existing
-            currentDoctor.workingPlaces?.forEach(wp => {
-                const row = document.createElement('div');
-                row.className = 'working-place-row';
-                row.innerHTML = `
-                    <input type="text" class="working-place-input" value="${wp.place}" readonly>
-                    <input type="text" class="working-timing-input" value="${wp.timing}" readonly>
-                `;
-                workingPlacesContainer.appendChild(row);
-            });
-            // Add an empty row for new input if no places or if we want to allow adding
-            if (!currentDoctor.workingPlaces || currentDoctor.workingPlaces.length === 0) {
-                 const newRow = document.createElement('div');
-                 newRow.className = 'working-place-row';
-                 newRow.innerHTML = `
-                     <input type="text" class="working-place-input" placeholder="e.g., City General Hospital" required>
-                     <input type="text" class="working-timing-input" placeholder="e.g., Mon 9AM-5PM" required>
-                     <button type="button" class="remove-input-button" style="display:none;"><i class="fas fa-times-circle"></i></button>
-                 `;
-                 if (workingPlacesContainer) workingPlacesContainer.appendChild(newRow);
+                doctorWorkingPlacesDisplay.innerHTML = `<i class="fas fa-hospital"></i><span>N/A</span>`;
             }
         }
     }
@@ -363,13 +372,6 @@ if (photoUploadInput) {
             // For now, we'll just update the client-side currentDoctor object
             if (currentDoctor) {
                 currentDoctor.photo = e.target.result;
-                // If you were storing doctors in localStorage, you'd update it here:
-                // const doctors = JSON.parse(localStorage.getItem('doctors')) || [];
-                // const doctorIndex = doctors.findIndex(doc => doc.email === currentDoctor.email);
-                // if (doctorIndex !== -1) {
-                //     doctors[doctorIndex].photo = e.target.result;
-                //     localStorage.setItem('doctors', JSON.stringify(doctors));
-                // }
             }
         };
 
@@ -395,7 +397,6 @@ async function initializeDashboardContent() {
 
     try {
         // Fetch Today's Schedule (Appointments for this doctor)
-        // UPDATED URL: /api/doctors/schedule/:doctorId
         const scheduleResponse = await fetch(`${BASE_URL}/api/doctors/schedule/${currentDoctor._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -408,7 +409,6 @@ async function initializeDashboardContent() {
         }
 
         // Fetch Patient Reports (Reports associated with this doctor's patients)
-        // UPDATED URL: /api/doctors/patient-reports/:doctorId
         const patientReportsResponse = await fetch(`${BASE_URL}/api/doctors/patient-reports/${currentDoctor._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -419,6 +419,19 @@ async function initializeDashboardContent() {
             console.error('Failed to fetch patient reports:', patientReports.message);
             renderPatientReports([]); // Render empty if fetch fails
         }
+
+        // Fetch all patients for the 'Add Report' dropdown
+        const allPatientsResponse = await fetch(`${BASE_URL}/api/patients`, { // Assuming /api/patients returns all patients
+            headers: { 'Authorization': `Bearer ${token}` } // If this route is protected
+        });
+        const allPatients = await allPatientsResponse.json();
+        if (allPatientsResponse.ok) {
+            populatePatientDropdown(allPatients);
+        } else {
+            console.error('Failed to fetch all patients:', allPatients.message);
+            populatePatientDropdown([]); // Render empty if fetch fails
+        }
+
 
         // Setup search and tabs after data is potentially loaded
         setupSearch(todaysSchedule, patientReports);
@@ -507,40 +520,29 @@ function renderPatientReports(reports) {
     patientsCount.textContent = `${reports.length} reports`;
 
     if (reports.length === 0) {
-        patientsList.innerHTML = '<p class="no-data-message">No patient reports found.</p>';
+        patientsList.innerHTML = '<p class="no-data-message">No patient reports found. Click "Add New Report" to add one.</p>';
         return;
     }
 
     patientsList.innerHTML = reports.map(report => `
         <div class="card">
-            <div class="patient-header">
-                <div class="patient-name-section">
-                    <div class="patient-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
+            <div class="report-header">
+                <div class="report-title-section">
+                    <div class="report-icon">${getReportIcon(report.type)}</div>
                     <div>
-                        <div class="patient-name">${report.patient || 'N/A'}</div>
-                        <div class="patient-id">${report.patientId || 'N/A'}</div>
+                        <div class="report-title">${report.title || 'N/A'}</div>
+                        <div class="report-date">
+                            <i class="fas fa-calendar"></i>
+                            <span>${formatDate(report.lastVisit || report.date)}</span>
+                        </div>
                     </div>
                 </div>
-                <span class="urgency-badge ${report.urgency?.toLowerCase() || ''}">${report.urgency?.toUpperCase() || 'N/A'}</span>
+                <span class="report-type-badge ${report.type?.toLowerCase() || ''}">${report.type || 'N/A'}</span>
             </div>
 
-            <div class="patient-info">
-                <div class="patient-detail">
-                    <i class="fas fa-calendar"></i>
-                    <div>
-                        <span class="label">Last Visit</span>
-                        <div class="value">${formatDate(report.lastVisit)}</div>
-                    </div>
-                </div>
-                <div class="patient-detail">
-                    <i class="fas fa-heartbeat"></i>
-                    <div>
-                        <span class="label">Condition</span>
-                        <div class="value">${report.condition || 'N/A'}</div>
-                    </div>
-                </div>
+            <div class="report-patient-info">
+                <i class="fas fa-user"></i>
+                <span>Patient: ${report.patient || 'N/A'} (${report.patientId || 'N/A'})</span>
             </div>
 
             <div class="report-summary">
@@ -548,19 +550,18 @@ function renderPatientReports(reports) {
                 <p><strong>Next Action:</strong> ${report.nextAction || 'N/A'}</p>
             </div>
 
-            <div class="action-buttons">
-                <button class="action-button primary">
-                    <i class="fas fa-edit"></i>
-                    Update Report
-                </button>
-                <button class="action-button">
-                    <i class="fas fa-eye"></i>
-                    View History
-                </button>
-                <button class="action-button">
-                    <i class="fas fa-phone"></i>
-                    Contact
-                </button>
+            <div class="report-footer">
+                <span class="final-badge">✓ ${report.status || 'N/A'}</span>
+                <div class="report-actions">
+                    <button class="action-button view">
+                        <i class="fas fa-eye"></i>
+                        View
+                    </button>
+                    <button class="action-button download">
+                        <i class="fas fa-download"></i>
+                        Download
+                    </button>
+                </div>
             </div>
         </div>
     `).join('');
@@ -587,7 +588,9 @@ function setupSearch(schedule, reports) {
             (report.patient && report.patient.toLowerCase().includes(searchTerm)) ||
             (report.condition && report.condition.toLowerCase().includes(searchTerm)) ||
             (report.patientId && report.patientId.toLowerCase().includes(searchTerm)) ||
-            (report.summary && report.summary.toLowerCase().includes(searchTerm))
+            (report.summary && report.summary.toLowerCase().includes(searchTerm)) ||
+            (report.title && report.title.toLowerCase().includes(searchTerm)) || // Added title to search
+            (report.type && report.type.toLowerCase().includes(searchTerm))      // Added type to search
         );
 
         renderSchedule(filteredSchedule);
@@ -623,21 +626,20 @@ function updateStats(schedule, reports) {
         todayAppointmentsElement.textContent = schedule.length;
     }
     if (totalPatientsElement) {
-        const uniquePatientIds = new Set(reports.map(report => report.patientId));
-        totalPatientsElement.textContent = uniquePatientIds.size;
+        // Count unique patients from reports and schedule
+        const uniquePatientIdsFromReports = new Set(reports.map(report => report.patientId));
+        const uniquePatientIdsFromSchedule = new Set(schedule.map(appt => appt.patientId));
+        const allUniquePatientIds = new Set([...Array.from(uniquePatientIdsFromReports), ...Array.from(uniquePatientIdsFromSchedule)]);
+        totalPatientsElement.textContent = allUniquePatientIds.size;
     }
     if (pendingReportsElement) {
         // Count reports with urgency 'high' or status 'pending'
         pendingReportsElement.textContent = reports.filter(r => r.urgency === 'high' || (r.status && r.status.toLowerCase() === 'pending')).length;
     }
     if (upcomingAppointmentsElement) {
-        // This was hardcoded to '12' in your original. If it should be dynamic,
-        // you'd need to filter 'schedule' for upcoming appointments based on date.
-        // For now, keeping it as is or deriving from schedule if possible.
         // For demonstration, let's make it a count of future appointments in the schedule
         const now = new Date();
         const upcoming = schedule.filter(apt => {
-            // Assuming appointment.date is available for future appointments in the schedule
             const apptDate = new Date(apt.date + 'T' + apt.time); // Combine date and time for comparison
             return apptDate > now && apt.status !== 'completed';
         }).length;
@@ -645,37 +647,111 @@ function updateStats(schedule, reports) {
     }
 }
 
-function formatDate(dateString) {
-    if (!dateString) return 'N/A';
-    const options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    };
-    try {
-        // Ensure date is treated as UTC to avoid timezone issues with `new Date()` parsing
-        const date = new Date(dateString + 'T00:00:00Z');
-        return date.toLocaleDateString('en-US', options);
-    } catch (e) {
-        console.error('Invalid date string for formatting:', dateString, e);
-        return dateString;
+// --- Add Report Modal Functions ---
+function openAddReportModal() {
+    if (addReportModal) {
+        addReportModal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        // Set current date as default for report date
+        if (reportDateInput) {
+            reportDateInput.valueAsDate = new Date();
+        }
+        // Populate patient dropdown (already done in initializeDashboardContent)
     }
 }
 
-// --- Initial App Load & Authentication Check (Backend Integration) ---
+function closeAddReportModal() {
+    if (addReportModal) {
+        addReportModal.classList.remove('active');
+        document.body.style.overflow = 'auto'; // Allow background scrolling
+        if (addReportForm) addReportForm.reset(); // Reset the form
+    }
+}
+
+// Populate the patient dropdown in the "Add Report" modal
+function populatePatientDropdown(patients) {
+    if (reportPatientIdSelect) {
+        reportPatientIdSelect.innerHTML = '<option value="">Select Patient</option>'; // Clear existing options
+        patients.forEach(patient => {
+            const option = document.createElement('option');
+            option.value = patient._id; // Use patient's _id as the value
+            option.textContent = `${patient.name} (${patient.email})`; // Display name and email
+            reportPatientIdSelect.appendChild(option);
+        });
+    }
+}
+
+// Handle Add Report Form Submission
+if (addReportForm) {
+    addReportForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(addReportForm);
+        const patientId = formData.get('patientId');
+        const title = formData.get('title');
+        const date = formData.get('date');
+        const type = formData.get('type');
+        const summary = formData.get('summary');
+        const nextAction = formData.get('nextAction');
+
+        // Basic client-side validation
+        if (!patientId || !title || !date || !type || !summary) {
+            alert('Please fill in all required fields for the report.');
+            return;
+        }
+
+        if (!currentDoctor || !currentDoctor._id) {
+            alert('Doctor not logged in. Please log in to add a report.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/doctors/add-report`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}` // Send auth token
+                },
+                body: JSON.stringify({
+                    patientId,
+                    doctorId: currentDoctor._id, // Send current doctor's ID
+                    title,
+                    date,
+                    type,
+                    summary,
+                    nextAction
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Report added successfully!');
+                closeAddReportModal();
+                initializeDashboardContent(); // Refresh reports list
+            } else {
+                alert(data.message || 'Failed to add report. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error submitting report:', error);
+            alert('An error occurred while adding the report. Please check your connection.');
+        }
+    });
+}
+
+
+// --- Initial App Load & Authentication Check ---
 function checkAuth() {
     const loggedInEmail = localStorage.getItem('currentLoggedInDoctorEmail');
     const authToken = localStorage.getItem('authToken');
 
     if (loggedInEmail && authToken) {
         // Attempt to re-authenticate using the stored email and token
-        // UPDATED URL: /api/doctors/profile?email=${loggedInEmail}
         fetch(`${BASE_URL}/api/doctors/profile?email=${loggedInEmail}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         })
         .then(response => {
             if (!response.ok) {
-                // If token is invalid or expired, or profile not found
                 throw new Error('Authentication failed or profile not found');
             }
             return response.json();
@@ -703,17 +779,28 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAuth(); // Initial check for authentication status
 
     // Attach dashboard search and tab listeners
-    const tabButtonsContainer = document.querySelector('.tabs'); // Assuming .tabs is the container for tab-buttons
+    const tabButtonsContainer = document.querySelector('.tabs');
     if (tabButtonsContainer) {
         tabButtonsContainer.addEventListener('click', (e) => {
             if (e.target.classList.contains('tab-button')) {
-                setupTabs(); // Re-run setupTabs to activate the clicked tab
+                // When a tab is clicked, re-run setupTabs to ensure active class is set
+                setupTabs();
             }
         });
     }
-    if (searchInput) {
-        // setupSearch needs to be called with actual data after it's fetched by initializeDashboardContent
-        // The listener is attached here, but the data it filters will be the ones loaded by initializeDashboardContent
+
+    // Attach "Add New Report" button listener
+    if (addNewReportBtn) {
+        addNewReportBtn.addEventListener('click', openAddReportModal);
+    }
+
+    // Close Add Report modal when clicking on the overlay itself
+    if (addReportModal) {
+        addReportModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddReportModal();
+            }
+        });
     }
 
     // Attach logout listener

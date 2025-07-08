@@ -5,6 +5,11 @@ const router = express.Router();
 const bcrypt = require('bcryptjs'); // For hashing and comparing passwords
 const jwt = require('jsonwebtoken'); // For creating JWTs
 const Doctor = require('../models/Doctor'); // Import the Doctor model
+const Patient = require('../models/Patient'); // Import Patient model to populate patient details
+const Report = require('../models/Report');   // Import the Report model
+
+// Middleware for authentication (placeholder for now, you'd implement this fully)
+// const authMiddleware = require('../middleware/authMiddleware');
 
 // @route   POST /api/doctors/register
 // @desc    Register a new doctor
@@ -217,21 +222,91 @@ router.get('/schedule/:doctorId', async (req, res) => {
 // @route   GET /api/doctors/patient-reports/:doctorId
 // @desc    Get patient reports relevant to a doctor
 // @access  Private (e.g., Doctor themselves or admin)
-// You will need to implement this to fetch actual patient reports from your database
 router.get('/patient-reports/:doctorId', async (req, res) => {
     try {
         const { doctorId } = req.params;
-        // In a real app, you'd fetch reports where this doctor is involved or has access
-        // For now, sending mock data
-        const mockReports = [
-            { id: 1, patient: "Mega", patientId: "PT-2024-001", lastVisit: "2024-06-15", condition: "Hypertension", urgency: "medium", summary: "Blood pressure remains elevated despite medication.", nextAction: "Schedule follow-up in 2 weeks" },
-            { id: 2, patient: "Punith", patientId: "PT-2024-047", lastVisit: "2024-06-18", condition: "Chest Pain", urgency: "high", summary: "ECG shows minor abnormalities. Stress test recommended.", nextAction: "Schedule stress test immediately" },
-            // ... more mock reports
-        ];
-        res.json(mockReports);
+
+        // Find reports where the doctor field matches the provided doctorId
+        // Populate the 'patient' field to get patient's name and ID
+        const reports = await Report.find({ doctor: doctorId })
+                                    .populate('patient', 'name email _id') // Select only necessary patient fields
+                                    .sort({ date: -1 }); // Sort by newest first
+
+        // Transform reports to match frontend's expected structure
+        const formattedReports = reports.map(report => ({
+            id: report._id,
+            patient: report.patient ? report.patient.name : 'N/A',
+            patientId: report.patient ? report.patient._id : 'N/A', // Assuming patientId is patient's _id
+            lastVisit: report.date, // Using report date as last visit for simplicity
+            condition: report.summary, // Using summary as condition for display
+            urgency: report.status, // Using report status as urgency for display
+            summary: report.summary,
+            nextAction: report.nextAction,
+            title: report.title,
+            type: report.type,
+            doctor: report.doctor // This is the doctor's ObjectId, might need to populate if doctor's name is needed
+        }));
+
+        res.json(formattedReports);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        console.error('Error fetching patient reports for doctor:', err.message);
+        res.status(500).send('Server Error fetching patient reports');
+    }
+});
+
+// @route   POST /api/doctors/add-report
+// @desc    Add a new medical report for a patient by a doctor
+// @access  Private (requires doctor auth) - you'll need auth middleware
+router.post('/add-report', async (req, res) => {
+    // For a real app, you'd get doctorId from authMiddleware (req.doctor.id)
+    // For now, let's assume doctorId is sent in the body for testing, or use currentDoctor._id from frontend
+    const { patientId, doctorId, title, date, type, status, summary, nextAction } = req.body;
+
+    // --- DEBUGGING LINE: Log the received add-report payload ---
+    console.log('Backend received add-report payload:', req.body);
+    // --- END DEBUGGING LINE ---
+
+    try {
+        // Basic validation
+        if (!patientId || !doctorId || !title || !summary) {
+            return res.status(400).json({ message: 'Missing required report fields.' });
+        }
+
+        // Verify patient and doctor exist (optional but recommended for data integrity)
+        const patientExists = await Patient.findById(patientId);
+        if (!patientExists) {
+            return res.status(404).json({ message: 'Patient not found.' });
+        }
+        const doctorExists = await Doctor.findById(doctorId);
+        if (!doctorExists) {
+            return res.status(404).json({ message: 'Doctor not found.' });
+        }
+
+        const newReport = new Report({
+            patient: patientId,
+            doctor: doctorId,
+            title,
+            date: date || Date.now(), // Use provided date or default to now
+            type: type || 'Other',
+            status: status || 'pending',
+            summary,
+            nextAction
+        });
+
+        await newReport.save();
+        res.status(201).json({ message: 'Report added successfully!', report: newReport });
+
+    } catch (err) {
+        console.error('Error adding report:', err.message);
+        // Handle validation errors from Mongoose
+        if (err.name === 'ValidationError') {
+            let errors = {};
+            Object.keys(err.errors).forEach((key) => {
+                errors[key] = err.errors[key].message;
+            });
+            return res.status(400).json({ message: 'Validation Error', errors });
+        }
+        res.status(500).send('Server Error adding report');
     }
 });
 
