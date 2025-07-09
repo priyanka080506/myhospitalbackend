@@ -229,7 +229,7 @@ body {
     border-radius: 8px;
     padding: 4px;
     margin-bottom: 24px;
-    max-width: 400px; /* Re-added max-width to control overall tab container size */
+    max-width: 400px; /* Control overall tab container size */
     margin-left: auto; /* Center the tabs */
     margin-right: auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -239,7 +239,7 @@ body {
 }
 
 .tab-button {
-    /* Removed flex: 1 to prevent stretching */
+    flex: 1; /* Make buttons equally wide on larger screens */
     padding: 12px 16px;
     border: none;
     background: transparent;
@@ -254,8 +254,7 @@ body {
     gap: 8px;
     color: #4b5563; /* Default text color */
     white-space: nowrap; /* Prevent text from wrapping inside buttons */
-    /* Added some margin to separate buttons if not using gap on parent */
-    margin: 0 4px; 
+    /* Removed margin: 0 4px; as flex: 1 will handle spacing */
 }
 
 .tab-button.active {
@@ -1052,12 +1051,16 @@ body {
 
     .tabs {
         flex-direction: column; /* Stack tabs vertically on small screens */
-        max-width: 100%;
+        max-width: 100%; /* Allow container to take full width */
+        align-items: center; /* Center the narrower buttons horizontally */
     }
 
     .tab-button {
-        width: 100%;
+        width: auto; /* Let button size to its content */
+        max-width: 200px; /* Optional: set a max width for vertical buttons if they get too wide with auto */
         margin-bottom: 8px;
+        margin-left: auto; /* Center the button */
+        margin-right: auto; /* Center the button */
     }
 
     .schedule-list,
