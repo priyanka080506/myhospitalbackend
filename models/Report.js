@@ -11,7 +11,10 @@ const ReportSchema = new mongoose.Schema({
     doctor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Doctor', // Reference to the Doctor model
-        required: [true, 'Doctor ID is required for a report']
+        // This can be null for patient self-reports, but required for doctor-added reports
+        // You might want to make this `required: true` if all reports MUST have a doctor,
+        // or handle it conditionally in your routes. For now, it's optional here.
+        default: null
     },
     title: {
         type: String,
@@ -24,7 +27,7 @@ const ReportSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['Laboratory', 'Radiology', 'Consultation', 'Prescription', 'Other'],
+        enum: ['Laboratory', 'Radiology', 'Consultation', 'Prescription', 'Symptoms Log', 'Home Monitoring', 'Questionnaire', 'Other'], // Expanded types
         default: 'Other'
     },
     status: {
@@ -34,7 +37,8 @@ const ReportSchema = new mongoose.Schema({
     },
     summary: {
         type: String,
-        trim: true
+        trim: true,
+        required: [true, 'Report summary is required']
     },
     nextAction: {
         type: String,

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Portal</title>
+    <title>Doctor Portal - MediCare</title>
     <link rel="stylesheet" href="stylesd.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -13,11 +13,11 @@
             <div class="auth-header">
                 <i class="fas fa-user-md"></i>
                 <h1>Doctor Portal</h1>
-                <p>Manage your patients and appointments</p>
+                <p>Manage your patients and schedule</p>
             </div>
 
             <div id="loginForm" class="auth-form active">
-                <h2>Login to Your Account</h2>
+                <h2>Login to Your Doctor Account</h2>
                 <form id="loginFormElement">
                     <div class="form-group">
                         <label for="loginEmail">Email Address</label>
@@ -54,13 +54,13 @@
                     </div>
                     <div class="form-group">
                         <label for="registerSpecialty">Specialty</label>
-                        <input type="text" id="registerSpecialty" placeholder="e.g., Cardiology, Pediatrics" required>
+                        <input type="text" id="registerSpecialty" placeholder="e.g., Cardiology, Neurology" required>
                     </div>
                     <div class="form-group">
                         <label for="registerLicense">Medical License Number</label>
                         <input type="text" id="registerLicense" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group full-width">
                         <label>Working Places & Timings</label>
                         <div id="workingPlacesContainer">
                             <div class="working-place-row">
@@ -70,7 +70,7 @@
                             </div>
                         </div>
                         <button type="button" id="addWorkingPlace" class="add-more-button">
-                            <i class="fas fa-plus-circle"></i> Add More
+                            <i class="fas fa-plus-circle"></i> Add Another Place
                         </button>
                     </div>
                     <div class="form-group">
@@ -87,7 +87,7 @@
                     </button>
                 </form>
                 <div class="auth-switch">
-                    <p>Already have an account? <button id="showLogin" class="link-button">Login</button></p>
+                    <p>Already have an account? <button id="showLogin" class="link-button">Login Here</button></p>
                 </div>
             </div>
         </div>
@@ -95,39 +95,34 @@
 
     <div id="mainDashboard" class="container" style="display: none;">
         <div class="doctor-header">
-            <div class="doctor-info">
-                <div class="avatar">
+            <div class="doctor-profile">
+                <div class="profile-photo-container">
                     <img id="doctorPhoto" src="https://i.pravatar.cc/80?img=1" alt="Doctor Photo">
-                    <label for="photoUploadInput" class="change-photo-overlay">
+                    <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
+                    <button class="edit-photo-btn" onclick="document.getElementById('photoUploadInput').click()">
                         <i class="fas fa-camera"></i>
-                    </label>
-                    <input type="file" id="photoUploadInput" accept="image/*" style="display:none;">
+                    </button>
                 </div>
-                <div class="doctor-details">
-                    <h1 id="doctorName">Dr. John Doe</h1>
-                    <p id="doctorSpecialty" class="doctor-specialty">Cardiology Specialist</p>
-                    <div class="doctor-meta">
-                        <div class="meta-item">
+                <div class="doctor-info">
+                    <h1 id="doctorName">Dr. Jane Doe</h1>
+                    <p id="doctorSpecialty">General Practitioner</p>
+                    <div class="doctor-contact">
+                        <div class="contact-item">
                             <i class="fas fa-envelope"></i>
-                            <span id="doctorEmail">john.doe@example.com</span>
+                            <span id="doctorEmail">jane.doe@example.com</span>
                         </div>
-                        <div class="meta-item">
+                        <div class="contact-item">
                             <i class="fas fa-id-card"></i>
-                            <span id="doctorLicenseDisplay">License: L123456</span>
+                            <span id="doctorLicenseDisplay">License: ABC12345</span>
                         </div>
-                        <div class="meta-item">
+                        <div class="contact-item">
                             <i class="fas fa-phone"></i>
                             <span id="doctorPhoneDisplay">+1 234 567 8900</span>
                         </div>
-                        <div class="meta-item" id="doctorWorkingPlacesDisplay">
-                            <!-- Working places will be dynamically loaded here -->
+                        <div class="contact-item">
                             <i class="fas fa-hospital"></i>
-                            <span>City Hospital (Mon-Fri)</span>
+                            <span id="doctorWorkingPlacesDisplay">City General Hospital (Mon-Fri 9AM-5PM)</span>
                         </div>
-                    </div>
-                    <div class="badges">
-                        <span class="badge active">Online</span>
-                        <span class="badge verified">Verified</span>
                     </div>
                 </div>
             </div>
@@ -139,48 +134,38 @@
             </div>
         </div>
 
-        <div class="stats-grid">
+        <h2 id="dashboardWelcomeText" class="dashboard-welcome-text">Welcome, Dr. Jane Doe!</h2>
+
+        <div class="dashboard-overview">
             <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-                <div class="stat-info">
-                    <h3 id="todayAppointments">0</h3>
-                    <p>Appointments Today</p>
-                </div>
+                <h3>Today's Appointments</h3>
+                <p id="todayAppointments" class="stat-number">0</p>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-users"></i></div>
-                <div class="stat-info">
-                    <h3 id="totalPatients">0</h3>
-                    <p>Total Patients</p>
-                </div>
+                <h3>Total Patients</h3>
+                <p id="totalPatients" class="stat-number">0</p>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-file-medical"></i></div>
-                <div class="stat-info">
-                    <h3 id="pendingReports">0</h3>
-                    <p>Pending Reports</p>
-                </div>
+                <h3>Pending Reports</h3>
+                <p id="pendingReports" class="stat-number">0</p>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
-                <div class="stat-info">
-                    <h3 id="upcomingAppointments">0</h3>
-                    <p>Upcoming Appointments</p>
-                </div>
-            </div>
+                <h3>Upcoming Appointments</h3>
+                <p id="upcomingAppointments" class="stat-number">0</p>
+            </p>
         </div>
 
         <div class="search-section">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search schedule or patient reports...">
+                <input type="text" id="searchInput" placeholder="Search patients, conditions, or reports...">
             </div>
         </div>
 
         <div class="tabs">
             <button class="tab-button active" data-tab="schedule-tab">
                 <i class="fas fa-calendar-alt"></i>
-                Schedule
+                My Schedule
             </button>
             <button class="tab-button" data-tab="patients-tab">
                 <i class="fas fa-users"></i>
@@ -191,11 +176,11 @@
         <div class="tab-content">
             <div id="schedule-tab" class="tab-panel active">
                 <div class="section-header">
-                    <h2>Today's Schedule</h2>
+                    <h2>Today's Appointments</h2>
                     <span class="count-badge" id="scheduleCount">0 appointments</span>
                 </div>
                 <div id="scheduleList" class="schedule-list">
-                    <!-- Schedule items will be loaded here by JavaScript -->
+                    <!-- Appointments will be loaded here by JavaScript -->
                 </div>
             </div>
 
@@ -203,10 +188,9 @@
                 <div class="section-header">
                     <h2>Patient Reports</h2>
                     <span class="count-badge" id="patientsCount">0 reports</span>
-                    <!-- Updated button to link to the new add-report.html page -->
-                    <a href="report.html" class="add-new-button">
-                        <i class="fas fa-plus"></i> Add New Report
-                    </a>
+                    <button id="addNewReportBtn" class="btn btn-primary add-new-button">
+                        <i class="fas fa-plus-circle"></i> Add New Report
+                    </button>
                 </div>
                 <div id="patientsList" class="patients-list">
                     <!-- Patient reports will be loaded here by JavaScript -->
@@ -215,7 +199,71 @@
         </div>
     </div>
 
-    <!-- Removed the addReportModal HTML from here -->
+    <!-- Add New Report Modal -->
+    <div id="addReportModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-file-medical"></i>
+                    <h2>Add New Medical Report</h2>
+                </div>
+                <button class="modal-close" onclick="closeAddReportModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addReportForm" class="booking-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="reportPatientId">Select Patient</label>
+                        <select id="reportPatientId" name="patientId" required>
+                            <option value="">Loading Patients...</option>
+                            <!-- Patients will be dynamically populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportTitle">Report Title</label>
+                        <input type="text" id="reportTitle" name="title" placeholder="e.g., Follow-up Visit, Lab Results" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportDate">Report Date</label>
+                        <input type="date" id="reportDate" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportType">Report Type</label>
+                        <select id="reportType" name="type" required>
+                            <option value="">Select Type</option>
+                            <option value="Consultation">Consultation</option>
+                            <option value="Laboratory">Laboratory</option>
+                            <option value="Radiology">Radiology</option>
+                            <option value="Prescription">Prescription</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportStatus">Status</label>
+                        <select id="reportStatus" name="status" required>
+                            <option value="pending">Pending</option>
+                            <option value="final">Final</option>
+                            <option value="reviewed">Reviewed</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="reportSummary">Summary / Findings</label>
+                        <textarea id="reportSummary" name="summary" rows="4" placeholder="Enter key findings, diagnosis, and treatment plan..." required></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="reportNextAction">Next Action / Recommendations (Optional)</label>
+                        <textarea id="reportNextAction" name="nextAction" rows="2" placeholder="e.g., Schedule follow-up, Prescribe new medication"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="scriptd.js"></script>
 </body>

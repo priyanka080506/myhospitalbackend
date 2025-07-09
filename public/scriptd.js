@@ -45,12 +45,12 @@ const doctorLicenseDisplay = document.getElementById('doctorLicenseDisplay');
 const doctorPhoneDisplay = document.getElementById('doctorPhoneDisplay');
 const doctorWorkingPlacesDisplay = document.getElementById('doctorWorkingPlacesDisplay'); // Corrected ID
 
-// Removed Add Report Modal Elements as it's now a separate page
-// const addReportModal = document.getElementById('addReportModal');
-// const addNewReportBtn = document.getElementById('addNewReportBtn'); // This button will now be an <a> tag
-// const addReportForm = document.getElementById('addReportForm');
-// const reportPatientIdSelect = document.getElementById('reportPatientId');
-// const reportDateInput = document.getElementById('reportDate');
+// Add Report Modal Elements
+const addReportModal = document.getElementById('addReportModal');
+const addNewReportBtn = document.getElementById('addNewReportBtn');
+const addReportForm = document.getElementById('addReportForm');
+const reportPatientIdSelect = document.getElementById('reportPatientId');
+const reportDateInput = document.getElementById('reportDate');
 
 
 // --- Helper Functions ---
@@ -69,7 +69,7 @@ function formatDate(dateString) {
         console.error('Invalid date string for formatting:', dateString, e);
         return dateString;
     }
-}
+} // End of formatDate function
 
 function getReportIcon(type) {
     switch (type) {
@@ -79,7 +79,7 @@ function getReportIcon(type) {
         case 'Prescription': return '<i class="fas fa-prescription-bottle-alt"></i>';
         default: return '<i class="fas fa-file-alt"></i>';
     }
-}
+} // End of getReportIcon function
 
 
 // --- Authentication event listeners ---
@@ -88,14 +88,14 @@ if (showRegisterBtn) {
         if (loginForm) loginForm.classList.remove('active');
         if (registerForm) registerForm.classList.add('active');
     });
-}
+} // End of if (showRegisterBtn)
 
 if (showLoginBtn) {
     showLoginBtn.addEventListener('click', () => {
         if (registerForm) registerForm.classList.remove('active');
         if (loginForm) loginForm.classList.add('active');
     });
-}
+} // End of if (showLoginBtn)
 
 // Logic for adding new working place & timing input fields dynamically
 if (addWorkingPlaceBtn) {
@@ -135,7 +135,8 @@ if (addWorkingPlaceBtn) {
             workingPlacesContainer.appendChild(newRow);
         }
     });
-}
+} // End of if (addWorkingPlaceBtn)
+
 
 // --- Login Logic (Backend Integration) ---
 if (loginFormElement) {
@@ -180,8 +181,8 @@ if (loginFormElement) {
             alert('An error occurred during login. Please try again later.');
             // Removed loginFormElement.reset() from here
         }
-    });
-}
+    }); // End of loginFormElement submit listener
+} // End of if (loginFormElement)
 
 // --- Registration Logic (Backend Integration) ---
 if (registerFormElement) {
@@ -222,26 +223,33 @@ if (registerFormElement) {
 
         // Validate form
         if (!name || !email || !phone || !specialty || !license || !password || !confirmPassword) {
+            console.log('Validation: Please fill in all fields.'); // Added console log
             alert('Please fill in all fields.');
             return;
         }
 
         if (workingPlacesAndTimings.length === 0) {
+            console.log('Validation: Please add at least one Working Place and its Timings.'); // Added console log
             alert('Please add at least one Working Place and its Timings.');
             return;
         }
 
         if (password.length < 6) {
+            console.log('Validation: Password must be at least 6 characters long.'); // Added console log
             alert('Password must be at least 6 characters long.');
             return;
         }
 
         if (password !== confirmPassword) {
+            console.log('Validation: Passwords do not match.'); // Added console log
             alert('Passwords do not match.');
             return;
         }
 
         try {
+            console.log('Attempting to register doctor with payload:', { // Added console log
+                name, email, phone, specialty, license, workingPlaces: workingPlacesAndTimings, photo: 'https://i.pravatar.cc/80?img=1'
+            });
             const response = await fetch(`${BASE_URL}/api/doctors/register`, {
                 method: 'POST',
                 headers: {
@@ -262,6 +270,7 @@ if (registerFormElement) {
             const data = await response.json();
 
             if (response.ok) {
+                console.log('Doctor registration successful:', data); // Added console log
                 alert('Account created successfully! Please log in.');
                 if (loginForm) loginForm.classList.add('active');
                 if (registerForm) registerForm.classList.remove('active');
@@ -280,14 +289,15 @@ if (registerFormElement) {
                     if (timingInput) timingInput.value = '';
                 }
             } else {
+                console.error('Doctor registration failed:', data.message); // Added console log
                 alert(data.message || 'Registration failed. Please try again.');
             }
         } catch (error) {
-            console.error('Registration error:', error);
+            console.error('Registration error (network/unexpected):', error); // Added console log
             alert('An error occurred during registration. Please try again later.');
         }
-    });
-}
+    }); // End of registerFormElement submit listener
+} // End of if (registerFormElement)
 
 // --- Logout Logic ---
 if (logoutButton) {
@@ -317,7 +327,7 @@ if (logoutButton) {
         // Reset doctor photo to default on logout
         if (doctorPhotoElement) doctorPhotoElement.src = 'https://i.pravatar.cc/80?img=1';
     });
-}
+} // End of if (logoutButton)
 
 // --- UI Display Functions ---
 function showAuth() {
@@ -326,7 +336,7 @@ function showAuth() {
     // Ensure login form is active by default
     if (loginForm) loginForm.classList.add('active');
     if (registerForm) registerForm.classList.remove('active');
-}
+} // End of showAuth function
 
 async function showDashboard() {
     if (authSection) authSection.style.display = 'none';
@@ -357,7 +367,7 @@ async function showDashboard() {
 
     // Initialize dashboard content with data from backend
     await initializeDashboardContent();
-}
+} // End of showDashboard function
 
 // --- Photo Upload Logic (Client-Side Only for Mock) ---
 if (photoUploadInput) {
@@ -381,7 +391,7 @@ if (photoUploadInput) {
         reader.readAsDataURL(file);
         alert('Profile photo updated (client-side only)! In a real app, this would be uploaded to the server.');
     });
-}
+} // End of if (photoUploadInput)
 
 // --- Dashboard Data Fetching and Rendering (from Backend) ---
 async function initializeDashboardContent() {
@@ -418,12 +428,11 @@ async function initializeDashboardContent() {
         const patientReports = await patientReportsResponse.json();
         if (patientReportsResponse.ok) {
             renderPatientReports(patientReports);
+            populatePatientDropdown(patientReports); // Populate dropdown for adding new reports
         } else {
             console.error('Failed to fetch patient reports:', patientReports.message);
             renderPatientReports([]); // Render empty if fetch fails
         }
-
-        // Removed populatePatientDropdown call from here as it's now in add-report-script.js
 
 
         // Setup search and tabs after data is potentially loaded
@@ -437,7 +446,7 @@ async function initializeDashboardContent() {
         // Consider logging out on severe error
         // logout();
     }
-}
+} // End of initializeDashboardContent function
 
 function renderSchedule(schedule) {
     if (!scheduleList || !scheduleCount) return;
@@ -505,7 +514,7 @@ function renderSchedule(schedule) {
             </div>
         </div>
     `).join('');
-}
+} // End of renderSchedule function
 
 function renderPatientReports(reports) {
     if (!patientsList || !patientsCount) return;
@@ -558,7 +567,7 @@ function renderPatientReports(reports) {
             </div>
         </div>
     `).join('');
-}
+} // End of renderPatientReports function
 
 function setupSearch(schedule, reports) {
     const searchInput = document.getElementById('searchInput');
@@ -589,7 +598,7 @@ function setupSearch(schedule, reports) {
         renderSchedule(filteredSchedule);
         renderPatientReports(filteredReports);
     });
-}
+} // End of setupSearch function
 
 function setupTabs() {
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -611,7 +620,7 @@ function setupTabs() {
     if (tabButtons.length > 0) {
         tabButtons[0].click(); // Activate the first tab by default
     }
-}
+} // End of setupTabs function
 
 function updateStats(schedule, reports) {
     if (todayAppointmentsElement) {
@@ -638,12 +647,110 @@ function updateStats(schedule, reports) {
         }).length;
         upcomingAppointmentsElement.textContent = upcoming.toString();
     }
+} // End of updateStats function
 
-// Removed Add Report Modal Functions as it's now a separate page
-// function openAddReportModal() { ... }
-// function closeAddReportModal() { ... }
-// function populatePatientDropdown(patients) { ... }
-// if (addReportForm) { ... }
+// --- Add Report Modal Functions ---
+function openAddReportModal() {
+    if (addReportModal) {
+        addReportModal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        // Set current date as default for report date
+        if (reportDateInput) {
+            reportDateInput.valueAsDate = new Date();
+        }
+    }
+} // End of openAddReportModal function
+
+function closeAddReportModal() {
+    if (addReportModal) {
+        addReportModal.classList.remove('active');
+        document.body.style.overflow = 'auto'; // Allow background scrolling
+        if (addReportForm) addReportForm.reset(); // Reset the form
+    }
+} // End of closeAddReportModal function
+
+function populatePatientDropdown(patientReports) {
+    if (!reportPatientIdSelect) return;
+
+    // Clear existing options
+    reportPatientIdSelect.innerHTML = '<option value="">Select Patient</option>';
+
+    // Get unique patients from the fetched reports
+    const uniquePatients = new Map(); // Map to store unique patientId -> patientName
+    patientReports.forEach(report => {
+        if (report.patientId && report.patient) {
+            uniquePatients.set(report.patientId, report.patient);
+        }
+    });
+
+    // Add unique patients to the dropdown
+    uniquePatients.forEach((patientName, patientId) => {
+        const option = document.createElement('option');
+        option.value = patientId;
+        option.textContent = `${patientName} (ID: ${patientId})`; // Display name and full ID
+        reportPatientIdSelect.appendChild(option);
+    });
+} // End of populatePatientDropdown function
+
+// Handle Add Report Form Submission
+if (addReportForm) {
+    addReportForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(addReportForm);
+        const patientId = formData.get('patientId');
+        const title = formData.get('title');
+        const date = formData.get('date');
+        const type = formData.get('type');
+        const status = formData.get('status');
+        const summary = formData.get('summary');
+        const nextAction = formData.get('nextAction');
+
+        // Basic client-side validation
+        if (!patientId || !title || !date || !type || !status || !summary) {
+            alert('Please fill in all required fields for the report.');
+            return;
+        }
+
+        if (!currentDoctor || !currentDoctor._id) {
+            alert('Doctor not logged in. Please log in to add a report.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/doctors/add-report`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}` // Send auth token
+                },
+                body: JSON.stringify({
+                    patientId,
+                    doctorId: currentDoctor._id, // Send current doctor's ID
+                    title,
+                    date,
+                    type,
+                    status,
+                    summary,
+                    nextAction
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Report added successfully!');
+                closeAddReportModal();
+                initializeDashboardContent(); // Refresh reports list
+            } else {
+                alert(data.message || 'Failed to add report. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error submitting report:', error);
+            alert('An error occurred while adding the report. Please check your connection.');
+        }
+    }); // End of addReportForm submit listener
+} // End of if (addReportForm)
 
 
 // --- Initial App Load & Authentication Check ---
@@ -678,7 +785,7 @@ function checkAuth() {
     } else {
         showAuth(); // No stored credentials, show login/register
     }
-}
+} // End of checkAuth function
 
 // Initialize the app when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -695,14 +802,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Removed "Add New Report" button listener as it's now an <a> tag
-    // if (addNewReportBtn) { addNewReportBtn.addEventListener('click', openAddReportModal); }
+    // Attach "Add New Report" button listener
+    if (addNewReportBtn) {
+        addNewReportBtn.addEventListener('click', openAddReportModal);
+    }
 
-    // Removed Close Add Report modal listener
-    // if (addReportModal) { addReportModal.addEventListener('click', function(e) { ... }); }
+    // Close Add Report modal when clicking on the overlay itself
+    if (addReportModal) {
+        addReportModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddReportModal();
+            }
+        });
+    }
 
-    // Removed Add Report Form Submission listener
-    // if (addReportForm) { addReportForm.addEventListener('submit', async (e) => { ... }); }
+    // Handle Add Report Form Submission
+    // The event listener for addReportForm.addEventListener('submit') is defined above
+    // so this block is just ensuring the form element exists.
+    if (addReportForm) {
+        // No additional listener needed here as it's already attached above.
+    }
 
 
     // Attach logout listener
@@ -711,4 +830,5 @@ document.addEventListener('DOMContentLoaded', () => {
             logout();
         });
     }
-});
+}); // End of DOMContentLoaded listener
+// End of scriptd.js

@@ -56,7 +56,6 @@
                         <label for="registerDob">Date of Birth</label>
                         <input type="date" id="registerDob" required>
                     </div>
-                    <!-- NEW: Gender Field -->
                     <div class="form-group">
                         <label for="registerGender">Gender</label>
                         <select id="registerGender" required>
@@ -93,8 +92,8 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="patient-details">
-                    <h1 id="patientName">Madhushree</h1> <!-- This will be dynamically updated by JS -->
-                    <p class="patient-id">Patient ID: <span id="patientIdDisplay">#PT-2024-001</span></p> <!-- Added span for dynamic ID -->
+                    <h1 id="patientName">Madhushree</h1>
+                    <p class="patient-id">Patient ID: <span id="patientIdDisplay">#PT-2024-001</span></p>
                     <div class="patient-meta">
                         <div class="meta-item">
                             <i class="fas fa-calendar"></i>
@@ -112,7 +111,6 @@
                             <i class="fas fa-map-marker-alt"></i>
                             <span id="patientAddressDisplay">Mysore, India</span>
                         </div>
-                        <!-- NEW: Display for Gender -->
                         <div class="meta-item">
                             <i class="fas fa-venus-mars"></i>
                             <span id="patientGenderDisplay">Gender: N/A</span>
@@ -132,7 +130,6 @@
             </div>
         </div>
 
-        <!-- Added Dashboard Overview Section -->
         <div class="dashboard-overview">
             <div class="stat-card">
                 <h3>Total Appointments</h3>
@@ -183,17 +180,64 @@
                 <div class="section-header">
                     <h2>Medical Reports</h2>
                     <span class="count-badge" id="reportsCount">0 reports</span>
-                    <!-- Updated button to link to the new add-report.html page -->
-                    <a href="report.html" class="add-new-button">
-                        <i class="fas fa-plus"></i> Add New Report
-                    </a>
+                    <button id="patientAddNewReportBtn" class="btn btn-primary add-new-button">
+                        <i class="fas fa-plus-circle"></i> Add New Report
+                    </button>
                 </div>
                 <div id="reportsList" class="reports-list"></div>
             </div>
         </div>
     </div>
 
-    <!-- Removed the patientAddReportModal HTML from here -->
+    <!-- Add New Report Modal (for Patients) -->
+    <div id="patientAddReportModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-file-medical"></i>
+                    <h2>Add New Medical Report</h2>
+                </div>
+                <button class="modal-close" onclick="closePatientAddReportModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="patientAddReportForm" class="booking-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="patientReportTitle">Report Title</label>
+                        <input type="text" id="patientReportTitle" name="title" placeholder="e.g., Symptoms Log, Home Blood Pressure" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientReportType">Report Type</label>
+                        <select id="patientReportType" name="type" required>
+                            <option value="">Select Type</option>
+                            <option value="Symptoms Log">Symptoms Log</option>
+                            <option value="Home Monitoring">Home Monitoring</option>
+                            <option value="Questionnaire">Questionnaire</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientReportDate">Report Date</label>
+                        <input type="date" id="patientReportDate" name="date" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="patientReportSummary">Summary / Details</label>
+                        <textarea id="patientReportSummary" name="summary" rows="4" placeholder="Describe your symptoms, observations, or details of the report..." required></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="patientReportNextAction">Questions / Next Steps (Optional)</label>
+                        <textarea id="patientReportNextAction" name="nextAction" rows="2" placeholder="e.g., Need to discuss with doctor, Follow-up on medication"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="script2.js"></script>
 </body>
