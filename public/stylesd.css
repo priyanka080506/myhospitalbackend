@@ -224,15 +224,17 @@ body {
 /* --- Tabs Navigation --- */
 .tabs {
     display: flex;
+    flex-direction: row; /* Explicitly set to row */
     background: white;
     border-radius: 8px;
     padding: 4px;
     margin-bottom: 24px;
-    /* Removed max-width to allow more flexibility */
     margin-left: auto; /* Center the tabs */
     margin-right: auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     flex-wrap: nowrap; /* Ensure tabs stay in a single row by default */
+    justify-content: space-around; /* Distribute space evenly */
+    align-items: center; /* Vertically align items */
 }
 
 .tab-button {
@@ -250,6 +252,7 @@ body {
     justify-content: center;
     gap: 8px;
     color: #4b5563; /* Default text color */
+    white-space: nowrap; /* Prevent text from wrapping inside buttons */
 }
 
 .tab-button.active {
@@ -1045,7 +1048,7 @@ body {
     }
 
     .tabs {
-        flex-direction: column;
+        flex-direction: column; /* Stack tabs vertically on small screens */
         max-width: 100%;
     }
 
