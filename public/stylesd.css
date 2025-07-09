@@ -1,3 +1,13 @@
+/*
+ * stylesd.css
+ *
+ * This stylesheet defines the visual presentation for the Doctor Portal.
+ * It includes styles for authentication forms, the main dashboard layout,
+ * doctor profile display, appointment schedules, patient reports,
+ * and responsive adjustments for various screen sizes.
+ */
+
+/* --- Global Styles & Typography --- */
 * {
     margin: 0;
     padding: 0;
@@ -6,9 +16,9 @@
 
 body {
     font-family: -apple-system, BlinkMacMacFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: rgb(204, 232, 243); /* Changed from linear-gradient to skyblue */
+    background-color: rgb(204, 232, 243); /* Light blue background */
     min-height: 100vh;
-    color: #1f2937;
+    color: #1f2937; /* Dark gray text */
 }
 
 .container {
@@ -17,7 +27,7 @@ body {
     padding: 24px;
 }
 
-/* Doctor Header */
+/* --- Doctor Header Section --- */
 .doctor-header {
     background: white;
     border-radius: 12px;
@@ -26,125 +36,118 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: flex-start; /* Align items to the top */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 20px; /* Space between profile and logout section */
 }
 
-.doctor-info {
+.doctor-profile {
     display: flex;
     gap: 24px;
-    align-items: flex-start;
-    flex: 1;
+    align-items: flex-start; /* Align items to the top */
+    flex: 1; /* Allows it to take available space */
+    flex-wrap: wrap; /* Allow wrapping of photo and info on smaller screens */
 }
 
-/* START: Updated Avatar Styles for Doctor Photo */
-.avatar {
-    width: 80px;
-    height: 80px;
-    background: #0268f7; /* Keep background for initial load/fallback */
-    border-radius: 50%;
-    display: flex; /* Changed to flex for centering content */
-    align-items: center;
-    justify-content: center;
-    color: white; /* For the fallback icon/text */
-    font-size: 32px; /* For the fallback icon */
-    border: 4px solid #d1fae5;
-    position: relative; /* Added for overlay positioning */
-    overflow: hidden; /* Ensures image stays within bounds */
-}
-
-.avatar img {
-    width: 100%; /* Make image fill the avatar div */
-    height: 100%;
-    border-radius: 50%; /* Make image round */
-    object-fit: cover; /* Ensures image covers the area without distortion */
-    display: block; /* Remove extra space below image */
-}
-
-.change-photo-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+/* --- Doctor Photo Container (Fixed Styling) --- */
+.profile-photo-container {
+    width: 100px; /* Larger size for the photo */
+    height: 100px;
+    background: #e0e7ff; /* Light background for placeholder/loading */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 24px;
+    font-size: 40px; /* For fallback icon */
+    border: 4px solid #0275f7; /* Blue border */
+    position: relative;
+    overflow: hidden; /* Ensures image stays within bounds */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.profile-photo-container img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover; /* Ensures image covers the area without distortion */
+    display: block;
+}
+
+.edit-photo-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #0275f7; /* Blue background */
+    color: white;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
     cursor: pointer;
-    opacity: 0; /* Hidden by default */
-    transition: opacity 0.3s ease;
+    transition: background-color 0.2s ease;
 }
 
-.avatar:hover .change-photo-overlay {
-    opacity: 1; /* Show on hover */
+.edit-photo-btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
 }
-/* END: Updated Avatar Styles for Doctor Photo */
 
+/* --- Doctor Info Details --- */
+.doctor-info {
+    flex: 1; /* Allows info to take remaining space */
+    min-width: 250px; /* Ensures it doesn't get too small */
+}
 
-.doctor-details h1 {
+.doctor-info h1 {
     font-size: 28px;
     font-weight: bold;
     margin-bottom: 4px;
-    color: #0767f7;
+    color: #0767f7; /* Primary blue */
 }
 
 .doctor-specialty {
-    color: #6b7280;
+    color: #6b7280; /* Gray text */
     margin-bottom: 16px;
     font-weight: 500;
 }
 
-.doctor-meta {
+.doctor-contact {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid for contact items */
     gap: 16px;
     margin-bottom: 16px;
 }
 
-.meta-item {
+.contact-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #6b7280;
+    color: #4b5563; /* Darker gray text */
     font-size: 14px;
 }
 
-.meta-item i {
-    color: #0687f1;
-    width: 16px;
+.contact-item i {
+    color: #0687f1; /* Icon color */
+    width: 16px; /* Fixed width for icons */
 }
 
-.badges {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
+/* --- Dashboard Welcome Text --- */
+.dashboard-welcome-text {
+    font-size: 2em;
     font-weight: 600;
+    color: #1f2937;
+    text-align: center;
+    margin-bottom: 32px;
 }
 
-.badge.active {
-    background: #d1fae5;
-    color: #0275f8;
-}
-
-.badge.verified {
-    background: #dbeafe;
-    color: #1e40af;
-    border: 1px solid #93c5fd;
-}
-
-/* Stats Grid */
-.stats-grid {
+/* --- Dashboard Overview (Stat Cards) --- */
+.dashboard-overview {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
     margin-bottom: 32px;
 }
@@ -156,48 +159,42 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     border: 1px solid #e5e7eb;
     display: flex;
-    align-items: center;
-    gap: 16px;
+    flex-direction: column; /* Stack content vertically */
+    align-items: center; /* Center horizontally */
+    text-align: center;
+    gap: 12px;
     transition: all 0.2s;
 }
 
 .stat-card:hover {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     border-color: #0395f0;
+    transform: translateY(-2px); /* Slight lift effect */
 }
 
-.stat-icon {
-    width: 60px;
-    height: 60px;
-    background: #ecfdf5;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #078efc;
-    font-size: 24px;
-}
-
-.stat-info h3 {
-    font-size: 32px;
-    font-weight: bold;
-    color: #1f2937;
-    margin-bottom: 4px;
-}
-
-.stat-info p {
+.stat-card h3 {
+    font-size: 1.1em;
     color: #6b7280;
-    font-size: 14px;
+    margin-bottom: 0;
 }
 
-/* Search Section */
+.stat-number {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #078efc; /* Primary blue for numbers */
+}
+
+/* --- Search Section --- */
 .search-section {
     margin-bottom: 24px;
+    display: flex; /* Use flex to center the search box */
+    justify-content: center;
 }
 
 .search-box {
     position: relative;
-    max-width: 400px;
+    max-width: 500px; /* Max width for the search input */
+    width: 100%;
 }
 
 .search-box i {
@@ -205,16 +202,17 @@ body {
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+    color: #9ca3af; /* Icon color */
 }
 
 .search-box input {
     width: 100%;
-    padding: 12px 12px 12px 40px;
+    padding: 12px 12px 12px 40px; /* Left padding for icon */
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 1em;
     background: white;
+    transition: all 0.2s;
 }
 
 .search-box input:focus {
@@ -223,48 +221,59 @@ body {
     box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
 }
 
-/* Tabs */
+/* --- Tabs Navigation --- */
 .tabs {
     display: flex;
+    flex-direction: row; /* Explicitly set to row */
     background: white;
     border-radius: 8px;
     padding: 4px;
     margin-bottom: 24px;
-    max-width: 400px;
+    max-width: 400px; /* Control overall tab container size */
+    margin-left: auto; /* Center the tabs */
+    margin-right: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    flex-wrap: nowrap; /* Ensure tabs stay in a single row by default */
+    justify-content: space-around; /* Distribute space evenly */
+    align-items: center; /* Vertically align items */
 }
 
 .tab-button {
-    flex: 1;
+    flex: 1; /* Make buttons equally wide on larger screens */
     padding: 12px 16px;
     border: none;
     background: transparent;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 1em;
     font-weight: 500;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    color: #4b5563; /* Default text color */
+    white-space: nowrap; /* Prevent text from wrapping inside buttons */
+    /* Removed margin: 0 4px; as flex: 1 will handle spacing */
 }
 
 .tab-button.active {
-    background: #ecfdf5;
-    color: #0278ff;
+    background: #ecfdf5; /* Light green background for active tab */
+    color: #0278ff; /* Primary blue for active tab text */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .tab-button:hover:not(.active) {
-    background: #f9fafb;
+    background: #f9fafb; /* Light gray on hover for inactive tabs */
 }
 
-/* Tab Content */
+/* --- Tab Content Panels --- */
 .tab-panel {
-    display: none;
+    display: none; /* Hidden by default */
 }
 
 .tab-panel.active {
-    display: block;
+    display: block; /* Shown when active */
 }
 
 .section-header {
@@ -272,11 +281,14 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    gap: 10px; /* Space between elements */
 }
 
 .section-header h2 {
-    font-size: 24px;
+    font-size: 1.5em;
     font-weight: bold;
+    color: #1f2937;
 }
 
 .count-badge {
@@ -284,11 +296,31 @@ body {
     color: #0483f9;
     padding: 4px 12px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 0.75em;
     font-weight: 600;
 }
 
-/* Cards */
+.add-new-button {
+    background: #0382f9; /* Primary blue */
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-new-button:hover {
+    background: #059fff; /* Darker blue on hover */
+    transform: translateY(-1px);
+}
+
+/* --- General Card Styling --- */
 .card {
     background: white;
     border-radius: 12px;
@@ -304,12 +336,20 @@ body {
     border-color: #0081fa;
 }
 
-/* Schedule Cards */
+/* --- Schedule Cards --- */
+.schedule-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Responsive grid for appointments */
+    gap: 20px;
+}
+
 .schedule-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .appointment-time {
@@ -321,11 +361,11 @@ body {
 
 .appointment-time i {
     color: #0073ff;
-    font-size: 18px;
+    font-size: 1.1em;
 }
 
 .appointment-time .time {
-    font-size: 18px;
+    font-size: 1.1em;
     font-weight: 600;
     color: #0577fa;
 }
@@ -335,18 +375,19 @@ body {
     align-items: center;
     gap: 8px;
     color: #6b7280;
-    font-size: 14px;
+    font-size: 0.9em;
 }
 
 .appointment-badges {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
-.status-badge {
+.status-badge, .type-badge {
     padding: 4px 12px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 0.75em;
     font-weight: 600;
 }
 
@@ -361,10 +402,6 @@ body {
 }
 
 .type-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
     border: 1px solid;
 }
 
@@ -388,7 +425,7 @@ body {
 
 .patient-info {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
     margin-bottom: 16px;
 }
@@ -411,7 +448,7 @@ body {
 
 .patient-detail .value {
     color: #6b7280;
-    font-size: 14px;
+    font-size: 0.9em;
 }
 
 .appointment-notes {
@@ -434,90 +471,12 @@ body {
 
 .notes-title {
     font-weight: 500;
-    font-size: 14px;
+    font-size: 0.9em;
 }
 
 .notes-content {
     color: #4b5563;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-/* Patient Report Cards */
-.patients-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 16px;
-}
-
-.patient-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
-
-.patient-name-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.patient-avatar {
-    width: 48px;
-    height: 48px;
-    background: #0483f9;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 18px;
-}
-
-.patient-name {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.patient-id {
-    color: #6b7280;
-    font-size: 14px;
-}
-
-.urgency-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.urgency-badge.high {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.urgency-badge.medium {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.urgency-badge.low {
-    background: #d1fae5;
-    color: #0477f2;
-}
-
-.report-summary {
-    background: #f8fafc;
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-}
-
-.report-summary p {
-    color: #4b5563;
-    font-size: 14px;
+    font-size: 0.9em;
     line-height: 1.5;
 }
 
@@ -525,6 +484,7 @@ body {
     display: flex;
     gap: 8px;
     justify-content: flex-end;
+    flex-wrap: wrap;
 }
 
 .action-button {
@@ -535,8 +495,9 @@ body {
     cursor: pointer;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    font-size: 14px;
+    font-size: 0.9em;
     transition: all 0.2s;
 }
 
@@ -555,13 +516,148 @@ body {
     border-color: #0b8cf6;
 }
 
-/* Authentication Styles */
+/* --- Patient Report Cards --- */
+.patients-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Responsive grid for reports */
+    gap: 20px;
+}
+
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.report-title-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.report-icon {
+    width: 40px;
+    height: 40px;
+    background: #e0f2fe; /* Light blue background for icons */
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0275f7;
+    font-size: 1.2em;
+}
+
+.report-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.report-date {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    font-size: 0.85em;
+}
+
+.report-type-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-weight: 600;
+    border: 1px solid;
+}
+
+.report-type-badge.laboratory {
+    background: #e0f2fe;
+    color: #0284c7;
+    border-color: #7dd3fc;
+}
+
+.report-type-badge.radiology {
+    background: #fef2f2;
+    color: #ef4444;
+    border-color: #fca5a5;
+}
+
+.report-type-badge.consultation {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #6ee7b7;
+}
+
+.report-type-badge.prescription {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #93c5fd;
+}
+
+.report-type-badge.symptomslog,
+.report-type-badge.homemonitoring,
+.report-type-badge.questionnaire,
+.report-type-badge.other {
+    background: #f3e8ff; /* Light purple for patient-added types */
+    color: #7e22ce;
+    border-color: #d8b4fe;
+}
+
+
+.report-patient-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #4b5563;
+    font-size: 0.95em;
+    margin-bottom: 16px;
+}
+
+.report-summary {
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.report-summary p {
+    color: #4b5563;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.report-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.final-badge {
+    background: #d1fae5;
+    color: #059669;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.report-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* --- Authentication Styles --- */
 .auth-container {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #0275f0 0%, #0689ec 100%);
+    background: linear-gradient(135deg, #0275f0 0%, #0689ec 100%); /* Blue gradient */
     padding: 20px;
 }
 
@@ -598,11 +694,11 @@ body {
 }
 
 .auth-form {
-    display: none;
+    display: none; /* Hidden by default */
 }
 
 .auth-form.active {
-    display: block;
+    display: block; /* Shown when active */
 }
 
 .auth-form h2 {
@@ -631,7 +727,7 @@ body {
     padding: 12px 16px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 1em;
     transition: all 0.2s;
     box-sizing: border-box;
 }
@@ -650,7 +746,7 @@ body {
     border: none;
     padding: 14px 20px;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 1em;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -693,11 +789,11 @@ body {
 }
 
 .logout-section {
-    margin-left: auto;
+    margin-left: auto; /* Pushes logout button to the right */
 }
 
 .logout-button {
-    background: #ef4444;
+    background: #ef4444; /* Red color */
     color: white;
     border: none;
     padding: 8px 16px;
@@ -706,15 +802,15 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
+    font-size: 0.9em;
     transition: all 0.2s;
 }
 
 .logout-button:hover {
-    background: #dc2626;
+    background: #dc2626; /* Darker red on hover */
 }
 
-/* Styles for Working Places & Timings */
+/* --- Styles for Working Places & Timings (Registration Form) --- */
 #workingPlacesContainer {
     display: flex;
     flex-direction: column;
@@ -728,17 +824,9 @@ body {
     gap: 10px;
 }
 
-.working-place-input {
-    flex: 2;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1em;
-    box-sizing: border-box;
-}
-
+.working-place-input,
 .working-timing-input {
-    flex: 1;
+    flex: 1; /* Distribute space equally */
     padding: 10px 15px;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -747,7 +835,7 @@ body {
 }
 
 .add-more-button {
-    background-color: #5cb85c;
+    background-color: #5cb85c; /* Green color */
     color: white;
     padding: 10px 15px;
     border: none;
@@ -763,13 +851,13 @@ body {
 }
 
 .add-more-button:hover {
-    background-color: #4cae4c;
+    background-color: #4cae4c; /* Darker green on hover */
 }
 
 .remove-input-button {
     background: none;
     border: none;
-    color: #dc3545;
+    color: #dc3545; /* Red color */
     cursor: pointer;
     font-size: 1.2em;
     padding: 5px;
@@ -778,66 +866,225 @@ body {
 }
 
 .remove-input-button:hover {
-    color: #c82333;
+    color: #c82333; /* Darker red on hover */
+}
+
+/* --- Modal Overlay (for Add Report Modal) --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent dark background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 600px; /* Max width for the modal content */
+    width: 90%; /* Responsive width */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    transform: translateY(-20px); /* Initial slight offset */
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal {
+    transform: translateY(0); /* Slide up animation */
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.modal-title i {
+    font-size: 2em;
+    color: #0275f7;
+}
+
+.modal-title h2 {
+    font-size: 1.5em;
+    margin: 0;
+    color: #1f2937;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    color: #6b7280;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+    color: #ef4444; /* Red on hover */
+}
+
+.booking-form .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns for form groups */
+    gap: 20px;
+}
+
+.booking-form .form-group.full-width {
+    grid-column: span 2; /* Spans both columns */
+}
+
+.booking-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.9em;
+}
+
+.booking-form input,
+.booking-form select,
+.booking-form textarea {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #1f2937;
+    background-color: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.booking-form input:focus,
+.booking-form select:focus,
+.booking-form textarea:focus {
+    outline: none;
+    border-color: #028dff;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+.booking-form textarea {
+    resize: vertical;
+}
+
+.booking-form .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+.booking-form .btn-primary {
+    background: #0382f9;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.booking-form .btn-primary:hover {
+    background: #059fff;
+    transform: translateY(-1px);
 }
 
 
-/* Responsive Design */
+/* --- Responsive Design --- */
 @media (max-width: 768px) {
     .container {
         padding: 16px;
     }
 
-    .doctor-info {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .doctor-meta {
-        grid-template-columns: 1fr;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .patient-info {
-        grid-template-columns: 1fr;
-    }
-
-    .patients-list {
-        grid-template-columns: 1fr;
-    }
-
-    .schedule-header,
-    .patient-header {
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .auth-container {
-        padding: 16px;
-    }
-
-    .auth-card {
-        padding: 24px;
-    }
-
     .doctor-header {
         flex-direction: column;
+        align-items: center;
+        text-align: center;
         gap: 16px;
     }
 
-    .logout-section {
-        margin-left: 0;
-        align-self: flex-end;
+    .doctor-profile {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .doctor-info {
+        align-items: center;
+    }
+
+    .doctor-contact {
+        grid-template-columns: 1fr; /* Stack contact items */
+    }
+
+    .dashboard-overview {
+        grid-template-columns: 1fr; /* Stack stat cards */
+    }
+
+    .tabs {
+        flex-direction: column; /* Stack tabs vertically on small screens */
+        max-width: 100%; /* Allow container to take full width */
+        align-items: center; /* Center the narrower buttons horizontally */
+    }
+
+    .tab-button {
+        width: auto; /* Let button size to its content */
+        max-width: 200px; /* Optional: set a max width for vertical buttons if they get too wide with auto */
+        margin-bottom: 8px;
+        margin-left: auto; /* Center the button */
+        margin-right: auto; /* Center the button */
+    }
+
+    .schedule-list,
+    .patients-list {
+        grid-template-columns: 1fr; /* Stack cards */
+    }
+
+    .schedule-header,
+    .report-header,
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     .action-buttons {
         flex-direction: column;
     }
 
-    /* Adjustments for Working Places & Timings on smaller screens */
+    /* Auth Section Responsive */
+    .auth-card {
+        padding: 24px;
+    }
+
+    /* Working Places Responsive */
     .working-place-row {
         flex-direction: column;
         align-items: stretch;
@@ -852,5 +1099,58 @@ body {
     .remove-input-button {
         align-self: flex-end;
         margin-top: 5px;
+    }
+
+    /* Modal Responsive */
+    .modal {
+        padding: 20px;
+        width: 95%;
+    }
+
+    .modal-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .booking-form .form-grid {
+        grid-template-columns: 1fr; /* Stack modal form inputs */
+    }
+
+    .booking-form .form-group.full-width {
+        grid-column: span 1;
+    }
+
+    .booking-form .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 25px 15px;
+    }
+
+    .auth-header i {
+        font-size: 2.5em;
+    }
+
+    .auth-header h1 {
+        font-size: 1.8em;
+    }
+
+    .auth-button {
+        font-size: 1em;
+        padding: 12px;
+    }
+
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .stat-icon {
+        margin-bottom: 10px;
     }
 }
