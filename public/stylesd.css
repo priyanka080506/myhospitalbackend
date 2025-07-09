@@ -229,6 +229,7 @@ body {
     border-radius: 8px;
     padding: 4px;
     margin-bottom: 24px;
+    max-width: 400px; /* Re-added max-width to control overall tab container size */
     margin-left: auto; /* Center the tabs */
     margin-right: auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -238,7 +239,7 @@ body {
 }
 
 .tab-button {
-    flex: 1; /* Distribute space equally */
+    /* Removed flex: 1 to prevent stretching */
     padding: 12px 16px;
     border: none;
     background: transparent;
@@ -253,6 +254,8 @@ body {
     gap: 8px;
     color: #4b5563; /* Default text color */
     white-space: nowrap; /* Prevent text from wrapping inside buttons */
+    /* Added some margin to separate buttons if not using gap on parent */
+    margin: 0 4px; 
 }
 
 .tab-button.active {
