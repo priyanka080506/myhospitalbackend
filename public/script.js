@@ -237,6 +237,27 @@ function validateCurrentStep() {
     return isValid;
 }
 
+// Function to move to the next step
+function nextStep() {
+    if (validateCurrentStep()) {
+        if (currentStep < totalSteps) {
+            currentStep++;
+            updateStep();
+            if (currentStep === totalSteps) {
+                updateSummary(); // Populate summary on the last step
+            }
+        }
+    }
+}
+
+// Function to move to the previous step
+function previousStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        updateStep();
+    }
+}
+
 // Populate the appointment summary on the final step
 function updateSummary() {
     if (!bookingFormElement || !summaryContentElement) return;
@@ -245,15 +266,31 @@ function updateSummary() {
 
     const firstName = formData.get('firstName');
     const lastName = formData.get('lastName');
+    const email = formData.get('email');
+    const phone = formData.get('phone');
+    const address = formData.get('address');
     const service = formData.get('service');
     const doctor = formData.get('doctor');
     const appointmentDate = formData.get('appointmentDate');
     const appointmentTime = formData.get('appointmentTime');
+    const notes = formData.get('notes');
 
     summaryContentElement.innerHTML = `
         <div class="summary-item">
             <span class="summary-label">Patient:</span>
             <span class="summary-value">${firstName} ${lastName}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Email:</span>
+            <span class="summary-value">${email}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Phone:</span>
+            <span class="summary-value">${phone}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Address:</span>
+            <span class="summary-value">${address || 'N/A'}</span>
         </div>
         <div class="summary-item">
             <span class="summary-label">Service:</span>
@@ -266,6 +303,10 @@ function updateSummary() {
         <div class="summary-item">
             <span class="summary-label">Date & Time:</span>
             <span class="summary-value">${formatDate(appointmentDate)} at ${appointmentTime}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Notes:</span>
+            <span class="summary-value">${notes || 'N/A'}</span>
         </div>
     `;
 }
@@ -440,7 +481,7 @@ async function handleFormSubmit(e) {
             service: formData.get('service'),
             doctor: formData.get('doctor'),
             appointmentDate: formData.get('appointmentDate'),
-            appointmentTime: formData.get('appointmentTime'),
+                        appointmentTime: formData.get('appointmentTime'),
             notes: formData.get('notes')
         };
 
