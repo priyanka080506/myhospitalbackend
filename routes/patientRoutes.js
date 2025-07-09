@@ -5,6 +5,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs'); // For hashing passwords
 const jwt = require('jsonwebtoken'); // For creating JWTs
 const Patient = require('../models/Patient'); // Import the Patient model
+const Report = require('../models/Report');   // NEW: Import the Report model
 // const authMiddleware = require('../middleware/authMiddleware'); // You'll use this later for protected routes
 
 // @route   POST /api/patients/register
@@ -16,7 +17,6 @@ router.post('/register', async (req, res) => {
     // --- END DEBUGGING LINE ---
 
     // Correctly destructure dateOfBirth and gender from req.body
-    // These names MUST match the frontend payload and the Patient model schema
     const { name, email, phone, dateOfBirth, gender, password } = req.body;
 
     try {
@@ -129,21 +129,87 @@ router.get('/profile', async (req, res) => {
 // @route   GET /api/patients/reports/:patientId
 // @desc    Get medical reports for a specific patient
 // @access  Private (e.g., Patient themselves, Doctors, Admins)
-// You will need to implement this to fetch actual reports from your database
 router.get('/reports/:patientId', async (req, res) => {
     try {
         const { patientId } = req.params;
-        // In a real app, you'd fetch reports related to this patientId from your database
-        // For now, sending mock data
-        const mockReports = [
-            { id: 1, title: "Blood Test Results", date: "2024-06-15", type: "Laboratory", doctor: "Dr. Raksha", status: "final", summary: "Complete blood count and lipid panel within normal ranges" },
-            { id: 2, title: "Chest X-Ray", date: "2024-05-20", type: "Radiology", doctor: "Dr. Brunda S", status: "final", summary: "No abnormalities detected, clear lung fields" },
-            // ... more mock reports
-        ];
-        res.json(mockReports);
+
+        // Find reports where the patient field matches the provided patientId
+        // Populate the 'doctor' field to get doctor's name and specialty
+        const reports = await Report.find({ patient: patientId })
+                                    .populate('doctor', 'name specialty _id') // Select only necessary doctor fields
+                                    .sort({ date: -1 }); // Sort by newest first
+
+        // Transform reports to match frontend's expected structure
+        const formattedReports = reports.map(report => ({
+            id: report._id,
+            title: report.title,
+            date: report.date,
+            type: report.type,
+            doctor: report.doctor ? `Dr. ${report.doctor.name} (${report.doctor.specialty})` : 'N/A',
+            doctorId: report.doctor ? report.doctor._id : 'N/A',
+            status: report.status,
+            summary: report.summary,
+            nextAction: report.nextAction
+        }));
+
+        res.json(formattedReports);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
+        console.error('Error fetching patient reports for patient:', err.message);
+        res.status(500).send('Server Error fetching patient reports');
+    }
+});
+
+// @route   POST /api/patients/add-report
+// @desc    Add a new medical report by a patient (self-report)
+// @access  Private (requires patient auth) - you'll need auth middleware
+router.post('/add-report', async (req, res) => {
+    // For a real app, you'd get patientId from authMiddleware (req.patient.id)
+    // For now, let's assume patientId is sent in the body for testing, or use currentUser._id from frontend
+    const { patientId, title, date, type, status, summary, nextAction } = req.body;
+
+    // --- DEBUGGING LINE: Log the received add-report payload ---
+    console.log('Backend received patient self-report payload:', req.body);
+    // --- END DEBUGGING LINE ---
+
+    try {
+        // Basic validation
+        if (!patientId || !title || !summary) {
+            return res.status(400).json({ message: 'Missing required report fields (patientId, title, summary).' });
+        }
+
+        // Verify patient exists (optional but recommended for data integrity)
+        const patientExists = await Patient.findById(patientId);
+        if (!patientExists) {
+            return res.status(404).json({ message: 'Patient not found.' });
+        }
+        
+        // For patient-added reports, the doctor field can be null or 'self-reported'
+        // You might want to add a default 'Self-Reported' doctor ID or leave it null
+        const newReport = new Report({
+            patient: patientId,
+            doctor: null, // Patient self-reported, no specific doctor yet
+            title,
+            date: date || Date.now(), // Use provided date or default to now
+            type: type || 'Other',
+            status: status || 'pending', // Patient reports might start as pending review
+            summary,
+            nextAction
+        });
+
+        await newReport.save();
+        res.status(201).json({ message: 'Report added successfully!', report: newReport });
+
+    } catch (err) {
+        console.error('Error adding patient self-report:', err.message);
+        // Handle validation errors from Mongoose
+        if (err.name === 'ValidationError') {
+            let errors = {};
+            Object.keys(err.errors).forEach((key) => {
+                errors[key] = err.errors[key].message;
+            });
+            return res.status(400).json({ message: 'Validation Error', errors });
+        }
+        res.status(500).send('Server Error adding patient self-report');
     }
 });
 
