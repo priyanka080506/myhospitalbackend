@@ -169,13 +169,16 @@ if (loginFormElement) {
                 localStorage.setItem('currentLoggedInDoctorEmail', email); // Store email for re-auth
                 console.log('Doctor login successful:', currentDoctor);
                 showDashboard();
-                if (loginFormElement) loginFormElement.reset();
+                if (loginFormElement) loginFormElement.reset(); // This line clears the form on SUCCESS
             } else {
+                // This alert shows the error message
                 alert(data.message || 'Login failed. Please check your credentials.');
+                if (loginFormElement) loginFormElement.reset(); // This line clears the form on FAILURE
             }
         } catch (error) {
             console.error('Login error:', error);
             alert('An error occurred during login. Please try again later.');
+            if (loginFormElement) loginFormElement.reset(); // This line clears the form on NETWORK ERROR
         }
     });
 }
