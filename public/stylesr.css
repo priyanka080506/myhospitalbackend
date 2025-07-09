@@ -1,0 +1,194 @@
+/* stylesr.css (Previously add-report-styles.css) */
+
+/* --- Global Styles & Typography (reusing from your existing styles) --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacMacFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: rgb(204, 232, 243); /* Consistent with your doctor portal background */
+    min-height: 100vh;
+    color: #1f2937;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* Add some padding for smaller screens */
+}
+
+/* --- Page Container for the Report Form --- */
+.report-page-container {
+    width: 100%;
+    max-width: 800px; /* Max width for the form card */
+    margin: auto;
+    padding: 20px;
+}
+
+.report-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #d1d5db; /* Consistent border color */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    gap: 15px; /* Space between title and button */
+}
+
+.report-title-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.report-title-section i {
+    font-size: 2.2em;
+    color: #0481ef; /* Primary blue from your existing styles */
+}
+
+.report-title-section h2 {
+    font-size: 1.8em;
+    margin: 0;
+    color: #0767f7; /* Primary blue from your existing styles */
+    font-weight: bold;
+}
+
+.back-button {
+    background: #6b7280; /* A neutral gray for back button */
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.back-button:hover {
+    background-color: #4b5563; /* Darker gray on hover */
+}
+
+/* --- Form Styles --- */
+.report-form .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.report-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #374151; /* Consistent with your existing form labels */
+    font-size: 14px;
+}
+
+.report-form input[type="text"],
+.report-form input[type="date"],
+.report-form select,
+.report-form textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #d1d5db; /* Consistent border color */
+    border-radius: 8px;
+    font-size: 1em;
+    color: #1f2937; /* Consistent text color */
+    background-color: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.report-form input:focus,
+.report-form select:focus,
+.report-form textarea:focus {
+    outline: none;
+    border-color: #028dff; /* Consistent focus border */
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1); /* Consistent focus shadow */
+}
+
+.report-form textarea {
+    resize: vertical; /* Allow vertical resizing */
+}
+
+.report-form .form-group.full-width {
+    grid-column: span 2; /* For grid layouts, spans full width */
+}
+
+.report-form .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    border-top: 1px solid #e5e7eb; /* Consistent border */
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+.btn-submit {
+    background: #0382f9; /* Primary blue from your existing styles */
+    color: white;
+    border: none;
+    padding: 14px 25px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-submit:hover {
+    background: #059fff; /* Darker blue on hover */
+    transform: translateY(-1px);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .report-page-container {
+        padding: 10px;
+    }
+
+    .report-card {
+        padding: 20px;
+    }
+
+    .report-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .report-title-section h2 {
+        font-size: 1.5em;
+    }
+
+    .back-button {
+        width: 100%; /* Full width on small screens */
+        justify-content: center;
+    }
+
+    .report-form .form-grid {
+        grid-template-columns: 1fr; /* Stack inputs on small screens */
+    }
+
+    .report-form .form-group.full-width {
+        grid-column: span 1;
+    }
+
+    .report-form .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

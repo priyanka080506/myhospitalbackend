@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Medical Report</title>
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Link to the new stylesheet for this page -->
+    <link rel="stylesheet" href="stylesr.css">
+</head>
+<body>
+    <div class="report-page-container">
+        <div class="report-card">
+            <div class="report-header">
+                <div class="report-title-section">
+                    <i class="fas fa-file-medical"></i>
+                    <h2>Add New Medical Report</h2>
+                </div>
+                <!-- Back button to return to the dashboard -->
+                <button class="back-button" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+            </div>
+
+            <form id="addReportForm" class="report-form">
+                <!-- Patient ID selection (visible for doctors, hidden for patients) -->
+                <div class="form-group" id="patientIdGroup">
+                    <label for="patientId">Select Patient</label>
+                    <select id="patientId" name="patientId" required>
+                        <option value="">Loading Patients...</option>
+                        <!-- Patients will be dynamically populated here by JavaScript -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportTitle">Report Title</label>
+                    <input type="text" id="reportTitle" name="title" placeholder="e.g., Annual Check-up, Blood Work" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportDate">Report Date</label>
+                    <input type="date" id="reportDate" name="date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportType">Report Type</label>
+                    <select id="reportType" name="type" required>
+                        <option value="">Select Type</option>
+                        <option value="Laboratory">Laboratory</option>
+                        <option value="Radiology">Radiology</option>
+                        <option value="Consultation">Consultation</option>
+                        <option value="Prescription">Prescription</option>
+                        <option value="Symptoms Log">Symptoms Log</option>
+                        <option value="Home Monitoring">Home Monitoring</option>
+                        <option value="Questionnaire">Questionnaire</option>
+                        <option value="Other">Other</option> <!-- Added 'Other' option -->
+                    </select>
+                </div>
+
+                <!-- New input field for 'Other' report type, initially hidden -->
+                <div class="form-group" id="otherReportTypeGroup" style="display: none;">
+                    <label for="otherReportType">Specify Report Type</label>
+                    <input type="text" id="otherReportType" name="otherType" placeholder="e.g., Dental Check-up, Allergy Test">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="reportSummary">Summary</label>
+                    <textarea id="reportSummary" name="summary" rows="5" placeholder="Provide a brief summary of the report findings..." required></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="reportNextAction">Next Action / Recommendations (Optional)</label>
+                    <textarea id="reportNextAction" name="nextAction" rows="3" placeholder="e.g., Follow up in 3 months, Prescribed medication X"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i>
+                        Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Link to the new JavaScript file for this page -->
+    <script src="scriptr.js"></script>
+</body>
+</html>

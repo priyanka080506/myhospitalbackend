@@ -45,12 +45,12 @@ const doctorLicenseDisplay = document.getElementById('doctorLicenseDisplay');
 const doctorPhoneDisplay = document.getElementById('doctorPhoneDisplay');
 const doctorWorkingPlacesDisplay = document.getElementById('doctorWorkingPlacesDisplay'); // Corrected ID
 
-// Add Report Modal Elements
-const addReportModal = document.getElementById('addReportModal');
-const addNewReportBtn = document.getElementById('addNewReportBtn');
-const addReportForm = document.getElementById('addReportForm');
-const reportPatientIdSelect = document.getElementById('reportPatientId');
-const reportDateInput = document.getElementById('reportDate');
+// Removed Add Report Modal Elements as it's now a separate page
+// const addReportModal = document.getElementById('addReportModal');
+// const addNewReportBtn = document.getElementById('addNewReportBtn'); // This button will now be an <a> tag
+// const addReportForm = document.getElementById('addReportForm');
+// const reportPatientIdSelect = document.getElementById('reportPatientId');
+// const reportDateInput = document.getElementById('reportDate');
 
 
 // --- Helper Functions ---
@@ -228,13 +228,13 @@ if (registerFormElement) {
             return;
         }
 
-        if (password !== confirmPassword) {
-            alert('Passwords do not match.');
+        if (password.length < 6) {
+            alert('Password must be at least 6 characters long.');
             return;
         }
 
-        if (password.length < 6) {
-            alert('Password must be at least 6 characters long.');
+        if (password !== confirmPassword) {
+            alert('Passwords do not match.');
             return;
         }
 
@@ -293,7 +293,7 @@ if (logoutButton) {
         localStorage.removeItem('authToken'); // Clear auth token
         localStorage.removeItem('currentLoggedInDoctorEmail'); // Clear mock login state
         showAuth();
-        if (loginFormElement) loginFormElement.reset(); // Clear forms
+        if (loginFormElement) loginFormElement.reset();
         if (registerFormElement) registerFormElement.reset();
         if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
 
@@ -420,17 +420,7 @@ async function initializeDashboardContent() {
             renderPatientReports([]); // Render empty if fetch fails
         }
 
-        // Fetch all patients for the 'Add Report' dropdown
-        const allPatientsResponse = await fetch(`${BASE_URL}/api/patients`, { // Assuming /api/patients returns all patients
-            headers: { 'Authorization': `Bearer ${token}` } // If this route is protected
-        });
-        const allPatients = await allPatientsResponse.json();
-        if (allPatientsResponse.ok) {
-            populatePatientDropdown(allPatients);
-        } else {
-            console.error('Failed to fetch all patients:', allPatients.message);
-            populatePatientDropdown([]); // Render empty if fetch fails
-        }
+        // Removed populatePatientDropdown call from here as it's now in add-report-script.js
 
 
         // Setup search and tabs after data is potentially loaded
@@ -645,99 +635,12 @@ function updateStats(schedule, reports) {
         }).length;
         upcomingAppointmentsElement.textContent = upcoming.toString();
     }
-}
 
-// --- Add Report Modal Functions ---
-function openAddReportModal() {
-    if (addReportModal) {
-        addReportModal.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-        // Set current date as default for report date
-        if (reportDateInput) {
-            reportDateInput.valueAsDate = new Date();
-        }
-        // Populate patient dropdown (already done in initializeDashboardContent)
-    }
-}
-
-function closeAddReportModal() {
-    if (addReportModal) {
-        addReportModal.classList.remove('active');
-        document.body.style.overflow = 'auto'; // Allow background scrolling
-        if (addReportForm) addReportForm.reset(); // Reset the form
-    }
-}
-
-// Populate the patient dropdown in the "Add Report" modal
-function populatePatientDropdown(patients) {
-    if (reportPatientIdSelect) {
-        reportPatientIdSelect.innerHTML = '<option value="">Select Patient</option>'; // Clear existing options
-        patients.forEach(patient => {
-            const option = document.createElement('option');
-            option.value = patient._id; // Use patient's _id as the value
-            option.textContent = `${patient.name} (${patient.email})`; // Display name and email
-            reportPatientIdSelect.appendChild(option);
-        });
-    }
-}
-
-// Handle Add Report Form Submission
-if (addReportForm) {
-    addReportForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData(addReportForm);
-        const patientId = formData.get('patientId');
-        const title = formData.get('title');
-        const date = formData.get('date');
-        const type = formData.get('type');
-        const summary = formData.get('summary');
-        const nextAction = formData.get('nextAction');
-
-        // Basic client-side validation
-        if (!patientId || !title || !date || !type || !summary) {
-            alert('Please fill in all required fields for the report.');
-            return;
-        }
-
-        if (!currentDoctor || !currentDoctor._id) {
-            alert('Doctor not logged in. Please log in to add a report.');
-            return;
-        }
-
-        try {
-            const response = await fetch(`${BASE_URL}/api/doctors/add-report`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}` // Send auth token
-                },
-                body: JSON.stringify({
-                    patientId,
-                    doctorId: currentDoctor._id, // Send current doctor's ID
-                    title,
-                    date,
-                    type,
-                    summary,
-                    nextAction
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert('Report added successfully!');
-                closeAddReportModal();
-                initializeDashboardContent(); // Refresh reports list
-            } else {
-                alert(data.message || 'Failed to add report. Please try again.');
-            }
-        } catch (error) {
-            console.error('Error submitting report:', error);
-            alert('An error occurred while adding the report. Please check your connection.');
-        }
-    });
-}
+// Removed Add Report Modal Functions as it's now a separate page
+// function openAddReportModal() { ... }
+// function closeAddReportModal() { ... }
+// function populatePatientDropdown(patients) { ... }
+// if (addReportForm) { ... }
 
 
 // --- Initial App Load & Authentication Check ---
@@ -789,19 +692,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Attach "Add New Report" button listener
-    if (addNewReportBtn) {
-        addNewReportBtn.addEventListener('click', openAddReportModal);
-    }
+    // Removed "Add New Report" button listener as it's now an <a> tag
+    // if (addNewReportBtn) { addNewReportBtn.addEventListener('click', openAddReportModal); }
 
-    // Close Add Report modal when clicking on the overlay itself
-    if (addReportModal) {
-        addReportModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeAddReportModal();
-            }
-        });
-    }
+    // Removed Close Add Report modal listener
+    // if (addReportModal) { addReportModal.addEventListener('click', function(e) { ... }); }
+
+    // Removed Add Report Form Submission listener
+    // if (addReportForm) { addReportForm.addEventListener('submit', async (e) => { ... }); }
+
 
     // Attach logout listener
     if (logoutButton) {

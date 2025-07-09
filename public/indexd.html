@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Portal - Medical Management System</title>
+    <title>Doctor Portal</title>
     <link rel="stylesheet" href="stylesd.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -13,11 +13,11 @@
             <div class="auth-header">
                 <i class="fas fa-user-md"></i>
                 <h1>Doctor Portal</h1>
-                <p>Manage your practice and patient care</p>
+                <p>Manage your patients and appointments</p>
             </div>
 
             <div id="loginForm" class="auth-form active">
-                <h2>Doctor Login</h2>
+                <h2>Login to Your Account</h2>
                 <form id="loginFormElement">
                     <div class="form-group">
                         <label for="loginEmail">Email Address</label>
@@ -29,20 +29,20 @@
                     </div>
                     <button type="submit" class="auth-button">
                         <i class="fas fa-sign-in-alt"></i>
-                        Login to Portal
+                        Login
                     </button>
                 </form>
                 <div class="auth-switch">
-                    <p>New doctor? <button id="showRegister" class="link-button">Create Account</button></p>
+                    <p>Don't have an account? <button id="showRegister" class="link-button">Register Now</button></p>
                 </div>
             </div>
 
             <div id="registerForm" class="auth-form">
-                <h2>Create Doctor Account</h2>
+                <h2>Register as a Doctor</h2>
                 <form id="registerFormElement">
                     <div class="form-group">
                         <label for="registerName">Full Name</label>
-                        <input type="text" id="registerName" placeholder="Dr. Raksha" required>
+                        <input type="text" id="registerName" required>
                     </div>
                     <div class="form-group">
                         <label for="registerEmail">Email Address</label>
@@ -53,37 +53,26 @@
                         <input type="tel" id="registerPhone" required>
                     </div>
                     <div class="form-group">
-                        <label for="registerSpecialty">Medical Specialty</label>
-                        <select id="registerSpecialty" required>
-                            <option value="">Select Specialty</option>
-                            <option value="Cardiology">Cardiology</option>
-                            <option value="Internal Medicine">Internal Medicine</option>
-                            <option value="Dermatology">Dermatology</option>
-                            <option value="Orthopedics">Orthopedics</option>
-                            <option value="Neurology">Neurology</option>
-                            <option value="Pediatrics">Pediatrics</option>
-                            <option value="Radiology">Radiology</option>
-                        </select>
+                        <label for="registerSpecialty">Specialty</label>
+                        <input type="text" id="registerSpecialty" placeholder="e.g., Cardiology, Pediatrics" required>
                     </div>
                     <div class="form-group">
                         <label for="registerLicense">Medical License Number</label>
                         <input type="text" id="registerLicense" required>
                     </div>
-
-                    <div class="form-group" id="workingPlacesGroup">
+                    <div class="form-group">
                         <label>Working Places & Timings</label>
                         <div id="workingPlacesContainer">
                             <div class="working-place-row">
                                 <input type="text" class="working-place-input" placeholder="e.g., City General Hospital" required>
-                                <input type="text" class="working-timing-input" placeholder="e.g., Mon-Fri 9AM-5PM" required>
-                                <!-- Remove button will be added dynamically for subsequent rows -->
+                                <input type="text" class="working-timing-input" placeholder="e.g., Mon 9AM-5PM" required>
+                                <button type="button" class="remove-input-button" style="display:none;"><i class="fas fa-times-circle"></i></button>
                             </div>
                         </div>
                         <button type="button" id="addWorkingPlace" class="add-more-button">
-                            <i class="fas fa-plus-circle"></i> Add Another Place & Timings
+                            <i class="fas fa-plus-circle"></i> Add More
                         </button>
                     </div>
-
                     <div class="form-group">
                         <label for="registerPassword">Password</label>
                         <input type="password" id="registerPassword" required>
@@ -94,7 +83,7 @@
                     </div>
                     <button type="submit" class="auth-button">
                         <i class="fas fa-user-plus"></i>
-                        Create Account
+                        Register
                     </button>
                 </form>
                 <div class="auth-switch">
@@ -107,37 +96,37 @@
     <div id="mainDashboard" class="container" style="display: none;">
         <div class="doctor-header">
             <div class="doctor-info">
-                <div class="avatar" id="doctorAvatarContainer">
+                <div class="avatar">
                     <img id="doctorPhoto" src="https://i.pravatar.cc/80?img=1" alt="Doctor Photo">
-                    <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
-                    <label for="photoUploadInput" class="change-photo-overlay" title="Change Photo">
+                    <label for="photoUploadInput" class="change-photo-overlay">
                         <i class="fas fa-camera"></i>
                     </label>
+                    <input type="file" id="photoUploadInput" accept="image/*" style="display:none;">
                 </div>
                 <div class="doctor-details">
-                    <h1 id="doctorName">Dr. Raksha</h1>
-                    <p class="doctor-specialty" id="doctorSpecialty">Cardiology Specialist</p>
+                    <h1 id="doctorName">Dr. John Doe</h1>
+                    <p id="doctorSpecialty" class="doctor-specialty">Cardiology Specialist</p>
                     <div class="doctor-meta">
                         <div class="meta-item">
-                            <i class="fas fa-id-badge"></i>
-                            <span id="doctorLicenseDisplay">License: N/A</span>
+                            <i class="fas fa-envelope"></i>
+                            <span id="doctorEmail">john.doe@example.com</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-id-card"></i>
+                            <span id="doctorLicenseDisplay">License: L123456</span>
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-phone"></i>
-                            <span id="doctorPhoneDisplay">N/A</span>
+                            <span id="doctorPhoneDisplay">+1 234 567 8900</span>
                         </div>
-                        <div class="meta-item">
-                            <i class="fas fa-envelope"></i>
-                            <span id="doctorEmail">N/A</span>
-                        </div>
-                        <!-- Working places will be dynamically populated here by JS -->
-                        <div id="doctorWorkingPlacesDisplay" class="meta-item">
+                        <div class="meta-item" id="doctorWorkingPlacesDisplay">
+                            <!-- Working places will be dynamically loaded here -->
                             <i class="fas fa-hospital"></i>
-                            <span></span>
+                            <span>City Hospital (Mon-Fri)</span>
                         </div>
                     </div>
                     <div class="badges">
-                        <span class="badge active">Active</span>
+                        <span class="badge active">Online</span>
                         <span class="badge verified">Verified</span>
                     </div>
                 </div>
@@ -152,39 +141,31 @@
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
+                <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
                 <div class="stat-info">
                     <h3 id="todayAppointments">0</h3>
-                    <p>Today's Appointments</p>
+                    <p>Appointments Today</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-users"></i>
-                </div>
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
                 <div class="stat-info">
                     <h3 id="totalPatients">0</h3>
                     <p>Total Patients</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-file-medical"></i>
-                </div>
+                <div class="stat-icon"><i class="fas fa-file-medical"></i></div>
                 <div class="stat-info">
                     <h3 id="pendingReports">0</h3>
                     <p>Pending Reports</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
+                <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
                 <div class="stat-info">
                     <h3 id="upcomingAppointments">0</h3>
-                    <p>This Week</p>
+                    <p>Upcoming Appointments</p>
                 </div>
             </div>
         </div>
@@ -192,13 +173,13 @@
         <div class="search-section">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search patients, appointments, or reports...">
+                <input type="text" id="searchInput" placeholder="Search schedule or patient reports...">
             </div>
         </div>
 
         <div class="tabs">
             <button class="tab-button active" data-tab="schedule-tab">
-                <i class="fas fa-calendar"></i>
+                <i class="fas fa-calendar-alt"></i>
                 Schedule
             </button>
             <button class="tab-button" data-tab="patients-tab">
@@ -213,79 +194,28 @@
                     <h2>Today's Schedule</h2>
                     <span class="count-badge" id="scheduleCount">0 appointments</span>
                 </div>
-                <div id="scheduleList" class="schedule-list"></div>
+                <div id="scheduleList" class="schedule-list">
+                    <!-- Schedule items will be loaded here by JavaScript -->
+                </div>
             </div>
 
             <div id="patients-tab" class="tab-panel">
                 <div class="section-header">
-                    <h2>Patient Reports & Follow-ups</h2>
+                    <h2>Patient Reports</h2>
                     <span class="count-badge" id="patientsCount">0 reports</span>
-                    <button id="addNewReportBtn" class="btn btn-primary add-new-button">
-                        <i class="fas fa-plus-circle"></i> Add New Report
-                    </button>
+                    <!-- Updated button to link to the new add-report.html page -->
+                    <a href="report.html" class="add-new-button">
+                        <i class="fas fa-plus"></i> Add New Report
+                    </a>
                 </div>
-                <div id="patientsList" class="patients-list"></div>
+                <div id="patientsList" class="patients-list">
+                    <!-- Patient reports will be loaded here by JavaScript -->
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Add New Report Modal -->
-    <div id="addReportModal" class="modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <i class="fas fa-file-medical"></i>
-                    <h2>Add New Patient Report</h2>
-                </div>
-                <button class="modal-close" onclick="closeAddReportModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="addReportForm" class="booking-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="reportPatientId">Patient</label>
-                        <select id="reportPatientId" name="patientId" required>
-                            <option value="">Select Patient</option>
-                            <!-- Patient options will be dynamically loaded by JS -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="reportTitle">Report Title</label>
-                        <input type="text" id="reportTitle" name="title" placeholder="e.g., Blood Test Results" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reportType">Report Type</label>
-                        <select id="reportType" name="type" required>
-                            <option value="">Select Type</option>
-                            <option value="Laboratory">Laboratory</option>
-                            <option value="Radiology">Radiology</option>
-                            <option value="Consultation">Consultation</option>
-                            <option value="Prescription">Prescription</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="reportDate">Report Date</label>
-                        <input type="date" id="reportDate" name="date" required>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="reportSummary">Summary</label>
-                        <textarea id="reportSummary" name="summary" rows="4" placeholder="Brief summary of the report findings..." required></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="reportNextAction">Next Action / Recommendation</label>
-                        <textarea id="reportNextAction" name="nextAction" rows="2" placeholder="e.g., Schedule follow-up in 2 weeks"></textarea>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Add Report
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- Removed the addReportModal HTML from here -->
 
     <script src="scriptd.js"></script>
 </body>

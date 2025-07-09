@@ -27,19 +27,21 @@ const completedAppointmentsElement = document.getElementById('completedAppointme
 const totalReportsElement = document.getElementById('totalReports');
 const searchInput = document.getElementById('searchInput');
 
-// New DOM elements for patient profile details
+// New DOM element for gender display
+const patientGenderDisplay = document.getElementById('patientGenderDisplay');
+// New DOM elements for other patient details (from index2.html)
 const patientIdDisplay = document.getElementById('patientIdDisplay');
 const patientDobDisplay = document.getElementById('patientDobDisplay');
 const patientPhoneDisplay = document.getElementById('patientPhoneDisplay');
 const patientEmailDisplay = document.getElementById('patientEmailDisplay');
 const patientAddressDisplay = document.getElementById('patientAddressDisplay');
-const patientGenderDisplay = document.getElementById('patientGenderDisplay');
 
-// Patient Add Report Modal Elements
-const patientAddReportModal = document.getElementById('patientAddReportModal');
-const patientAddNewReportBtn = document.getElementById('patientAddNewReportBtn');
-const patientAddReportForm = document.getElementById('patientAddReportForm');
-const patientReportDateInput = document.getElementById('patientReportDate');
+
+// Removed Add Report Modal Elements as they are now in a separate page
+// const patientAddReportModal = document.getElementById('patientAddReportModal');
+// const patientAddNewReportBtn = document.getElementById('patientAddNewReportBtn');
+// const patientAddReportForm = document.getElementById('patientAddReportForm');
+// const patientReportDateInput = document.getElementById('patientReportDate');
 
 
 // --- Helper Functions ---
@@ -47,6 +49,7 @@ const patientReportDateInput = document.getElementById('patientReportDate');
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
     const options = {
+        weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -64,11 +67,7 @@ function getReportIcon(type) {
     switch (type) {
         case 'Laboratory': return '<i class="fas fa-flask"></i>';
         case 'Radiology': return '<i class="fas fa-x-ray"></i>';
-        case 'Consultation': return '<i class="fas fa-user-md"></i>';
-        case 'Prescription': return '<i class="fas fa-prescription-bottle-alt"></i>';
-        case 'Symptoms Log': return '<i class="fas fa-notes-medical"></i>'; // New icon for patient self-reports
-        case 'Home Monitoring': return '<i class="fas fa-heartbeat"></i>'; // New icon for patient self-reports
-        case 'Questionnaire': return '<i class="fas fa-clipboard-question"></i>'; // New icon
+        case 'Cardiology': return '<i class="fas fa-heartbeat"></i>';
         default: return '<i class="fas fa-file-alt"></i>';
     }
 }
@@ -104,6 +103,7 @@ if (loginFormElement) {
         }
 
         try {
+            // UPDATED URL: /api/auth/login
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
@@ -139,15 +139,17 @@ if (registerFormElement) {
         const emailInput = document.getElementById('registerEmail');
         const phoneInput = document.getElementById('registerPhone');
         const dobInput = document.getElementById('registerDob');
-        const genderInput = document.getElementById('registerGender');
+        const genderInput = document.getElementById('registerGender'); // Get gender input
         const passwordInput = document.getElementById('registerPassword');
         const confirmPasswordInput = document.getElementById('confirmPassword');
 
-        const name = nameInput ? nameInput.value : '';
-        const email = emailInput ? emailInput.value : '';
-        const phone = phoneInput ? phoneInput.value : '';
-        const dob = dobInput ? dobInput.value : '';
-        const gender = genderInput ? genderInput.value : '';
+        let name = nameInput ? nameInput.value : '';
+        let email = emailInput ? emailInput.value : '';
+        let phone = phoneInput ? phoneInput.value : '';
+        let dob = dobInput ? dobInput.value : '';
+        let gender = genderInput ? genderInput.value : ''; // Get gender value
+        
+        console.log('passwordInput:', passwordInput);
         
         let password = '';
         if (passwordInput) {
@@ -176,11 +178,13 @@ if (registerFormElement) {
         }
 
         try {
+            // UPDATED URL: /api/auth/register
             const response = await fetch(`${BASE_URL}/api/patients/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                // Send dateOfBirth and gender
                 body: JSON.stringify({ name, email, phone, dateOfBirth: dob, gender, password }),
             });
 
@@ -207,10 +211,9 @@ if (logoutButton) {
         currentUser = null;
         localStorage.removeItem('authToken'); // Clear auth token
         localStorage.removeItem('currentLoggedInPatientEmail'); // Clear mock login state
-        // Redirect to the main index.html or show auth section
         if (authSection) authSection.style.display = 'flex';
         if (mainDashboard) mainDashboard.style.display = 'none';
-        if (loginFormElement) loginFormElement.reset(); // Clear forms
+        if (loginFormElement) loginFormElement.reset();
         if (registerFormElement) registerFormElement.reset();
         if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
     });
@@ -220,7 +223,6 @@ if (logoutButton) {
 function showAuth() {
     if (authSection) authSection.style.display = 'flex';
     if (mainDashboard) mainDashboard.style.display = 'none';
-    // Ensure login form is active by default
     if (loginForm) loginForm.classList.add('active');
     if (registerForm) registerForm.classList.remove('active');
 }
@@ -229,21 +231,20 @@ async function showDashboard() {
     if (authSection) authSection.style.display = 'none';
     if (mainDashboard) mainDashboard.style.display = 'block';
 
-    // Update patient info if user is logged in
     if (currentUser) {
-        // Assuming your backend sends back full patient data including these fields
         if (patientNameElement) patientNameElement.textContent = currentUser.name || 'Patient';
         if (dashboardWelcomeText) dashboardWelcomeText.textContent = `Welcome, ${currentUser.name || 'Patient'}!`;
 
+        // Update other patient details
         if (patientIdDisplay) patientIdDisplay.textContent = currentUser.id || 'N/A';
-        if (patientDobDisplay) patientDobDisplay.textContent = `DOB: ${formatDate(currentUser.dateOfBirth) || 'N/A'}`; // Use dateOfBirth
+        // Use currentUser.dateOfBirth for display if available, fallback to currentUser.dob
+        if (patientDobDisplay) patientDobDisplay.textContent = `DOB: ${formatDate(currentUser.dateOfBirth || currentUser.dob) || 'N/A'}`;
         if (patientPhoneDisplay) patientPhoneDisplay.textContent = currentUser.phone || 'N/A';
         if (patientEmailDisplay) patientEmailDisplay.textContent = currentUser.email || 'N/A';
         if (patientAddressDisplay) patientAddressDisplay.textContent = currentUser.address || 'N/A';
-        if (patientGenderDisplay) patientGenderDisplay.textContent = `Gender: ${currentUser.gender || 'N/A'}`; // Use gender
+        if (patientGenderDisplay) patientGenderDisplay.textContent = `Gender: ${currentUser.gender || 'N/A'}`;
     }
 
-    // Initialize dashboard content with data from backend
     await initializeDashboardContent();
 }
 
@@ -262,32 +263,35 @@ async function initializeDashboardContent() {
         return;
     }
 
+    let appointments = []; // Initialize as empty array
+    let reports = [];     // Initialize as empty array
+
     try {
-        // Fetch Appointments
         const appointmentsResponse = await fetch(`${BASE_URL}/api/appointments/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const appointments = await appointmentsResponse.json();
-        if (appointmentsResponse.ok) {
+        const appointmentsData = await appointmentsResponse.json();
+        if (appointmentsResponse.ok && Array.isArray(appointmentsData)) {
+            appointments = appointmentsData;
             renderAppointments(appointments);
         } else {
-            console.error('Failed to fetch appointments:', appointments.message);
-            renderAppointments([]); // Render empty if fetch fails
+            console.error('Failed to fetch appointments or received non-array data:', appointmentsData);
+            renderAppointments([]);
         }
 
-        // Fetch Reports
         const reportsResponse = await fetch(`${BASE_URL}/api/patients/reports/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const reports = await reportsResponse.json();
-        if (reportsResponse.ok) {
+        const reportsData = await reportsResponse.json();
+        if (reportsResponse.ok && Array.isArray(reportsData)) {
+            reports = reportsData;
             renderReports(reports);
         } else {
-            console.error('Failed to fetch reports:', reports.message);
-            renderReports([]); // Render empty if fetch fails
+            console.error('Failed to fetch reports or received non-array data:', reportsData);
+            renderReports([]);
         }
 
-        // Setup search and tabs after data is potentially loaded
+        // Pass the guaranteed-to-be-arrays to setupSearch
         setupSearch(appointments, reports);
         setupTabs();
         updateStats(appointments, reports);
@@ -295,8 +299,6 @@ async function initializeDashboardContent() {
     } catch (error) {
         console.error('Error initializing dashboard content:', error);
         alert('Failed to load dashboard data. Please try refreshing or logging in again.');
-        // Consider logging out on severe error
-        // logout();
     }
 }
 
@@ -369,7 +371,7 @@ function renderReports(reports) {
     reportsCount.textContent = `${reports.length} reports`;
 
     if (reports.length === 0) {
-        reportsList.innerHTML = '<p class="no-data-message">No medical reports available. Click "Add New Report" to add one.</p>';
+        reportsList.innerHTML = '<p class="no-data-message">No patient reports found.</p>';
         return;
     }
 
@@ -391,7 +393,7 @@ function renderReports(reports) {
 
             <div class="report-doctor">
                 <i class="fas fa-user-md"></i>
-                <span>By ${report.doctor || 'Self-Reported'}</span>
+                <span>By ${report.doctor || 'N/A'}</span>
             </div>
 
             <div class="report-summary">
@@ -486,82 +488,6 @@ function updateStats(appointments, reports) {
     }
 }
 
-// --- Patient Add Report Modal Functions ---
-function openPatientAddReportModal() {
-    if (patientAddReportModal) {
-        patientAddReportModal.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-        // Set current date as default for report date
-        if (patientReportDateInput) {
-            patientReportDateInput.valueAsDate = new Date();
-        }
-    }
-}
-
-function closePatientAddReportModal() {
-    if (patientAddReportModal) {
-        patientAddReportModal.classList.remove('active');
-        document.body.style.overflow = 'auto'; // Allow background scrolling
-        if (patientAddReportForm) patientAddReportForm.reset(); // Reset the form
-    }
-}
-
-// Handle Patient Add Report Form Submission
-if (patientAddReportForm) {
-    patientAddReportForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData(patientAddReportForm);
-        const title = formData.get('title');
-        const date = formData.get('date');
-        const type = formData.get('type');
-        const summary = formData.get('summary');
-        const nextAction = formData.get('nextAction');
-
-        // Basic client-side validation
-        if (!title || !date || !type || !summary) {
-            alert('Please fill in all required fields for the report.');
-            return;
-        }
-
-        if (!currentUser || !currentUser._id) {
-            alert('Patient not logged in. Please log in to add a report.');
-            return;
-        }
-
-        try {
-            const response = await fetch(`${BASE_URL}/api/patients/add-report`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}` // Send auth token
-                },
-                body: JSON.stringify({
-                    patientId: currentUser._id, // Send current patient's ID
-                    title,
-                    date,
-                    type,
-                    summary,
-                    nextAction
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert('Report added successfully!');
-                closePatientAddReportModal();
-                initializeDashboardContent(); // Refresh reports list
-            } else {
-                alert(data.message || 'Failed to add report. Please try again.');
-            }
-        } catch (error) {
-            console.error('Error submitting patient self-report:', error);
-            alert('An error occurred while adding the report. Please check your connection.');
-        }
-    });
-}
-
 
 // --- Initial App Load & Authentication Check ---
 function checkAuth() {
@@ -570,6 +496,7 @@ function checkAuth() {
 
     if (loggedInEmail && authToken) {
         // Attempt to re-authenticate using the stored email and token
+        // UPDATED URL: /api/patients/profile?email=${loggedInEmail}
         fetch(`${BASE_URL}/api/patients/profile?email=${loggedInEmail}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         })
@@ -620,28 +547,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutButton) {
         logoutButton.addEventListener('click', () => {
             logout();
-        });
-    }
-
-    // Attach "Add New Report" button listener for patients
-    if (patientAddNewReportBtn) {
-        patientAddNewReportBtn.addEventListener('click', openPatientAddReportModal);
-    }
-
-    // Close Patient Add Report modal when clicking on the overlay itself
-    if (patientAddReportModal) {
-        patientAddReportModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closePatientAddReportModal();
-            }
-        });
-    }
-
-    // Handle Patient Add Report Form Submission
-    if (patientAddReportForm) {
-        patientAddReportForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent default form submission
-            // Form submission logic is now handled by the event listener attached above
         });
     }
 });
