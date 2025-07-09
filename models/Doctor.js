@@ -25,7 +25,7 @@ const DoctorSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Phone number is required'],
         trim: true,
-        sparse: true // Allows nulls, but unique if present
+        sparse: true
     },
     license: { // NEW: Added license field
         type: String,
@@ -55,11 +55,6 @@ const DoctorSchema = new mongoose.Schema({
         type: String,
         default: 'https://i.pravatar.cc/80?img=1' // Default photo URL
     },
-    appointmentFees: { // NEW: Added appointmentFees field
-        type: Number,
-        default: 0, // Default to 0 if not provided
-        min: [0, 'Appointment fees cannot be negative']
-    },
     experienceYears: {
         type: Number,
         min: [0, 'Experience years cannot be negative'],
@@ -68,12 +63,16 @@ const DoctorSchema = new mongoose.Schema({
     availableForAppointments: {
         type: Boolean,
         default: true
+    },
+    appointmentFees: { // NEW: Added appointmentFees field
+        type: Number,
+        default: 0,
+        min: [0, 'Appointment fees cannot be negative']
     }
 }, {
-    timestamps: true // Adds createdAt and updatedAt timestamps automatically
+    timestamps: true
 });
 
-// Create the Mongoose Model from the Schema
 const Doctor = mongoose.model('Doctor', DoctorSchema);
 
 module.exports = Doctor;

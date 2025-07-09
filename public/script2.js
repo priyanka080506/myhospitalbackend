@@ -1,22 +1,24 @@
-// --- Configuration ---
+// --- Global Variables and Data ---
 const BASE_URL = 'https://proud-doctors.onrender.com'; // Your Render deployment URL
 
 // Authentication state
+let isAuthenticated = false;
 let currentUser = null; // Stores user data upon successful login
 
-// DOM elements (Ensuring they exist before accessing)
+// DOM Elements (cached for efficiency) ---
 const authSection = document.getElementById('authSection');
 const mainDashboard = document.getElementById('mainDashboard');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
+
+const loginForm = document.getElementById('loginForm'); // Assuming these exist in index2.html
+const registerForm = document.getElementById('registerForm'); // Assuming these exist in index2.html
 const loginFormElement = document.getElementById('loginFormElement');
 const registerFormElement = document.getElementById('registerFormElement');
 const showRegisterBtn = document.getElementById('showRegister');
 const showLoginBtn = document.getElementById('showLogin');
 const logoutButton = document.getElementById('logoutButton');
-const patientNameElement = document.getElementById('patientName'); // For displaying patient name on dashboard
-const dashboardWelcomeText = document.getElementById('dashboardWelcomeText'); // Assuming you have this for a welcome message
 
+const dashboardWelcomeText = document.getElementById('dashboardWelcomeText');
+const patientNameElement = document.getElementById('patientName');
 const appointmentsList = document.getElementById('appointmentsList');
 const appointmentCount = document.getElementById('appointmentCount');
 const reportsList = document.getElementById('reportsList');
@@ -27,25 +29,18 @@ const completedAppointmentsElement = document.getElementById('completedAppointme
 const totalReportsElement = document.getElementById('totalReports');
 const searchInput = document.getElementById('searchInput');
 
-// New DOM element for gender display
-const patientGenderDisplay = document.getElementById('patientGenderDisplay');
-// New DOM elements for other patient details (from index2.html)
+// New DOM elements for patient profile details
 const patientIdDisplay = document.getElementById('patientIdDisplay');
 const patientDobDisplay = document.getElementById('patientDobDisplay');
 const patientPhoneDisplay = document.getElementById('patientPhoneDisplay');
 const patientEmailDisplay = document.getElementById('patientEmailDisplay');
 const patientAddressDisplay = document.getElementById('patientAddressDisplay');
-
-
-// Removed Add Report Modal Elements as they are now in a separate page
-// const patientAddReportModal = document.getElementById('patientAddReportModal');
-// const patientAddNewReportBtn = document.getElementById('patientAddNewReportBtn');
-// const patientAddReportForm = document.getElementById('patientAddReportForm');
-// const patientReportDateInput = document.getElementById('patientReportDate');
+const patientGenderDisplay = document.getElementById('patientGenderDisplay');
 
 
 // --- Helper Functions ---
 
+// Helper function to format date for display
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
     const options = {
@@ -67,7 +62,8 @@ function getReportIcon(type) {
     switch (type) {
         case 'Laboratory': return '<i class="fas fa-flask"></i>';
         case 'Radiology': return '<i class="fas fa-x-ray"></i>';
-        case 'Cardiology': return '<i class="fas fa-heartbeat"></i>';
+        case 'Consultation': return '<i class="fas fa-user-md"></i>';
+        case 'Prescription': return '<i class="fas fa-prescription-bottle-alt"></i>';
         default: return '<i class="fas fa-file-alt"></i>';
     }
 }
@@ -75,15 +71,15 @@ function getReportIcon(type) {
 // --- Authentication event listeners ---
 if (showRegisterBtn) {
     showRegisterBtn.addEventListener('click', () => {
-        if (loginForm) loginForm.classList.remove('active');
-        if (registerForm) registerForm.classList.add('active');
+        if (loginFormElement) loginFormElement.classList.remove('active');
+        if (registerFormElement) registerFormElement.classList.add('active');
     });
 }
 
 if (showLoginBtn) {
     showLoginBtn.addEventListener('click', () => {
-        if (registerForm) registerForm.classList.remove('active');
-        if (loginForm) loginForm.classList.add('active');
+        if (registerFormElement) registerFormElement.classList.remove('active');
+        if (loginFormElement) loginFormElement.classList.add('active');
     });
 }
 
@@ -103,7 +99,6 @@ if (loginFormElement) {
         }
 
         try {
-            // UPDATED URL: /api/auth/login
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
@@ -139,27 +134,17 @@ if (registerFormElement) {
         const emailInput = document.getElementById('registerEmail');
         const phoneInput = document.getElementById('registerPhone');
         const dobInput = document.getElementById('registerDob');
-        const genderInput = document.getElementById('registerGender'); // Get gender input
+        const genderInput = document.getElementById('registerGender');
         const passwordInput = document.getElementById('registerPassword');
         const confirmPasswordInput = document.getElementById('confirmPassword');
 
-        let name = nameInput ? nameInput.value : '';
-        let email = emailInput ? emailInput.value : '';
-        let phone = phoneInput ? phoneInput.value : '';
-        let dob = dobInput ? dobInput.value : '';
-        let gender = genderInput ? genderInput.value : ''; // Get gender value
-        
-        console.log('passwordInput:', passwordInput);
-        
-        let password = '';
-        if (passwordInput) {
-            password = passwordInput.value;
-        }
-
-        let confirmPassword = '';
-        if (confirmPasswordInput) {
-            confirmPassword = confirmPasswordInput.value;
-        }
+        const name = nameInput ? nameInput.value : '';
+        const email = emailInput ? emailInput.value : '';
+        const phone = phoneInput ? phoneInput.value : '';
+        const dob = dobInput ? dobInput.value : '';
+        const gender = genderInput ? genderInput.value : '';
+        const password = passwordInput ? passwordInput.value : '';
+        const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
 
         // Validate form
         if (!name || !email || !phone || !dob || !gender || !password || !confirmPassword) {
@@ -178,13 +163,11 @@ if (registerFormElement) {
         }
 
         try {
-            // UPDATED URL: /api/auth/register
             const response = await fetch(`${BASE_URL}/api/patients/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                // Send dateOfBirth and gender
                 body: JSON.stringify({ name, email, phone, dateOfBirth: dob, gender, password }),
             });
 
@@ -192,8 +175,8 @@ if (registerFormElement) {
 
             if (response.ok) {
                 alert('Account created successfully! Please log in.');
-                if (loginForm) loginForm.classList.add('active');
-                if (registerForm) registerForm.classList.remove('active');
+                if (loginFormElement) loginFormElement.classList.add('active');
+                if (registerFormElement) registerFormElement.classList.remove('active');
                 if (registerFormElement) registerFormElement.reset();
             } else {
                 alert(data.message || 'Registration failed. Please try again.');
@@ -211,9 +194,10 @@ if (logoutButton) {
         currentUser = null;
         localStorage.removeItem('authToken'); // Clear auth token
         localStorage.removeItem('currentLoggedInPatientEmail'); // Clear mock login state
+        // Redirect to the main index.html or show auth section
         if (authSection) authSection.style.display = 'flex';
         if (mainDashboard) mainDashboard.style.display = 'none';
-        if (loginFormElement) loginFormElement.reset();
+        if (loginFormElement) loginFormElement.reset(); // Clear forms
         if (registerFormElement) registerFormElement.reset();
         if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
     });
@@ -223,28 +207,30 @@ if (logoutButton) {
 function showAuth() {
     if (authSection) authSection.style.display = 'flex';
     if (mainDashboard) mainDashboard.style.display = 'none';
-    if (loginForm) loginForm.classList.add('active');
-    if (registerForm) registerForm.classList.remove('active');
+    // Ensure login form is active by default
+    if (loginFormElement) loginFormElement.classList.add('active');
+    if (registerFormElement) registerFormElement.classList.remove('active');
 }
 
 async function showDashboard() {
     if (authSection) authSection.style.display = 'none';
     if (mainDashboard) mainDashboard.style.display = 'block';
 
+    // Update patient info if user is logged in
     if (currentUser) {
+        // Assuming your backend sends back full patient data including these fields
         if (patientNameElement) patientNameElement.textContent = currentUser.name || 'Patient';
         if (dashboardWelcomeText) dashboardWelcomeText.textContent = `Welcome, ${currentUser.name || 'Patient'}!`;
 
-        // Update other patient details
         if (patientIdDisplay) patientIdDisplay.textContent = currentUser.id || 'N/A';
-        // Use currentUser.dateOfBirth for display if available, fallback to currentUser.dob
-        if (patientDobDisplay) patientDobDisplay.textContent = `DOB: ${formatDate(currentUser.dateOfBirth || currentUser.dob) || 'N/A'}`;
+        if (patientDobDisplay) patientDobDisplay.textContent = `DOB: ${formatDate(currentUser.dateOfBirth) || 'N/A'}`; // Use dateOfBirth
         if (patientPhoneDisplay) patientPhoneDisplay.textContent = currentUser.phone || 'N/A';
         if (patientEmailDisplay) patientEmailDisplay.textContent = currentUser.email || 'N/A';
         if (patientAddressDisplay) patientAddressDisplay.textContent = currentUser.address || 'N/A';
-        if (patientGenderDisplay) patientGenderDisplay.textContent = `Gender: ${currentUser.gender || 'N/A'}`;
+        if (patientGenderDisplay) patientGenderDisplay.textContent = `Gender: ${currentUser.gender || 'N/A'}`; // Use gender
     }
 
+    // Initialize dashboard content with data from backend
     await initializeDashboardContent();
 }
 
@@ -263,35 +249,32 @@ async function initializeDashboardContent() {
         return;
     }
 
-    let appointments = []; // Initialize as empty array
-    let reports = [];     // Initialize as empty array
-
     try {
+        // Fetch Appointments
         const appointmentsResponse = await fetch(`${BASE_URL}/api/appointments/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const appointmentsData = await appointmentsResponse.json();
-        if (appointmentsResponse.ok && Array.isArray(appointmentsData)) {
-            appointments = appointmentsData;
+        const appointments = await appointmentsResponse.json();
+        if (appointmentsResponse.ok) {
             renderAppointments(appointments);
         } else {
-            console.error('Failed to fetch appointments or received non-array data:', appointmentsData);
-            renderAppointments([]);
+            console.error('Failed to fetch appointments:', appointments.message);
+            renderAppointments([]); // Render empty if fetch fails
         }
 
+        // Fetch Reports
         const reportsResponse = await fetch(`${BASE_URL}/api/patients/reports/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const reportsData = await reportsResponse.json();
-        if (reportsResponse.ok && Array.isArray(reportsData)) {
-            reports = reportsData;
+        const reports = await reportsResponse.json();
+        if (reportsResponse.ok) {
             renderReports(reports);
         } else {
-            console.error('Failed to fetch reports or received non-array data:', reportsData);
-            renderReports([]);
+            console.error('Failed to fetch reports:', reports.message);
+            renderReports([]); // Render empty if fetch fails
         }
 
-        // Pass the guaranteed-to-be-arrays to setupSearch
+        // Setup search and tabs after data is potentially loaded
         setupSearch(appointments, reports);
         setupTabs();
         updateStats(appointments, reports);
@@ -299,6 +282,8 @@ async function initializeDashboardContent() {
     } catch (error) {
         console.error('Error initializing dashboard content:', error);
         alert('Failed to load dashboard data. Please try refreshing or logging in again.');
+        // Consider logging out on severe error
+        // logout();
     }
 }
 
@@ -371,7 +356,7 @@ function renderReports(reports) {
     reportsCount.textContent = `${reports.length} reports`;
 
     if (reports.length === 0) {
-        reportsList.innerHTML = '<p class="no-data-message">No patient reports found.</p>';
+        reportsList.innerHTML = '<p class="no-data-message">No medical reports available.</p>';
         return;
     }
 
@@ -393,7 +378,7 @@ function renderReports(reports) {
 
             <div class="report-doctor">
                 <i class="fas fa-user-md"></i>
-                <span>By ${report.doctor || 'N/A'}</span>
+                <span>By ${report.doctor || 'Self-Reported'}</span>
             </div>
 
             <div class="report-summary">
@@ -428,27 +413,23 @@ function setupSearch(appointments, reports) {
 
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
-        const activeTab = document.querySelector('.tab-panel.active'); // Get the currently active tab panel
 
-        if (!activeTab) return; // Exit if no active tab is found
+        const filteredAppointments = originalAppointments.filter(appointment =>
+            (appointment.doctor && appointment.doctor.toLowerCase().includes(searchTerm)) ||
+            (appointment.department && appointment.department.toLowerCase().includes(searchTerm)) ||
+            (appointment.diagnosis && appointment.diagnosis.toLowerCase().includes(searchTerm)) ||
+            (appointment.notes && appointment.notes.toLowerCase().includes(searchTerm))
+        );
 
-        if (activeTab.id === 'appointments-tab') {
-            const filteredAppointments = originalAppointments.filter(appointment =>
-                (appointment.doctor && appointment.doctor.toLowerCase().includes(searchTerm)) ||
-                (appointment.department && appointment.department.toLowerCase().includes(searchTerm)) ||
-                (appointment.diagnosis && appointment.diagnosis.toLowerCase().includes(searchTerm)) ||
-                (appointment.notes && appointment.notes.toLowerCase().includes(searchTerm))
-            );
-            renderAppointments(filteredAppointments);
-        } else if (activeTab.id === 'reports-tab') {
-            const filteredReports = originalReports.filter(report =>
-                (report.title && report.title.toLowerCase().includes(searchTerm)) ||
-                (report.type && report.type.toLowerCase().includes(searchTerm)) ||
-                (report.doctor && report.doctor.toLowerCase().includes(searchTerm)) ||
-                (report.summary && report.summary.toLowerCase().includes(searchTerm))
-            );
-            renderReports(filteredReports);
-        }
+        const filteredReports = originalReports.filter(report =>
+            (report.title && report.title.toLowerCase().includes(searchTerm)) ||
+            (report.type && report.type.toLowerCase().includes(searchTerm)) ||
+            (report.doctor && report.doctor.toLowerCase().includes(searchTerm)) ||
+            (report.summary && report.summary.toLowerCase().includes(searchTerm))
+        );
+
+        renderAppointments(filteredAppointments);
+        renderReports(filteredReports);
     });
 }
 
@@ -517,7 +498,6 @@ function checkAuth() {
 
     if (loggedInEmail && authToken) {
         // Attempt to re-authenticate using the stored email and token
-        // UPDATED URL: /api/patients/profile?email=${loggedInEmail}
         fetch(`${BASE_URL}/api/patients/profile?email=${loggedInEmail}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         })
@@ -539,7 +519,8 @@ function checkAuth() {
         })
         .catch(error => {
             console.error('Error during re-authentication:', error);
-            logout(); // Clear state on network/API error
+            alert('An error occurred. Please log in again.');
+            window.location.href = 'index.html'; // Redirect to main marketing site
         });
     } else {
         showAuth(); // No stored credentials, show login/register
@@ -555,8 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tabButtonsContainer) {
         tabButtonsContainer.addEventListener('click', (e) => {
             if (e.target.classList.contains('tab-button')) {
-                // Call setupTabs to ensure the clicked tab becomes active
-                setupTabs();
+                setupTabs(); // Re-run setupTabs to activate the clicked tab
             }
         });
     }

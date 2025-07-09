@@ -617,7 +617,8 @@ function checkAuth() {
         })
         .catch(error => {
             console.error('Error during re-authentication:', error);
-            logout(); // Clear state on network/API error
+            alert('An error occurred. Please log in again.');
+            window.location.href = 'index.html'; // Redirect to main marketing site
         });
     } else {
         showAuth(); // No stored credentials, show login/register
