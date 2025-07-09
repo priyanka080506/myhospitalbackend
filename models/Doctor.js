@@ -55,6 +55,11 @@ const DoctorSchema = new mongoose.Schema({
         type: String,
         default: 'https://i.pravatar.cc/80?img=1' // Default photo URL
     },
+    appointmentFees: { // NEW: Added appointmentFees field
+        type: Number,
+        default: 0, // Default to 0 if not provided
+        min: [0, 'Appointment fees cannot be negative']
+    },
     experienceYears: {
         type: Number,
         min: [0, 'Experience years cannot be negative'],

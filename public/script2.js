@@ -103,6 +103,7 @@ if (loginFormElement) {
         }
 
         try {
+            // UPDATED URL: /api/auth/login
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
@@ -177,6 +178,7 @@ if (registerFormElement) {
         }
 
         try {
+            // UPDATED URL: /api/auth/register
             const response = await fetch(`${BASE_URL}/api/patients/register`, {
                 method: 'POST',
                 headers: {
@@ -291,7 +293,7 @@ async function initializeDashboardContent() {
 
         // Pass the guaranteed-to-be-arrays to setupSearch
         setupSearch(appointments, reports);
-        setupTabs(); // This correctly sets up the tab listeners
+        setupTabs();
         updateStats(appointments, reports);
 
     } catch (error) {
@@ -515,6 +517,7 @@ function checkAuth() {
 
     if (loggedInEmail && authToken) {
         // Attempt to re-authenticate using the stored email and token
+        // UPDATED URL: /api/patients/profile?email=${loggedInEmail}
         fetch(`${BASE_URL}/api/patients/profile?email=${loggedInEmail}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         })
@@ -547,9 +550,20 @@ function checkAuth() {
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth(); // Initial check for authentication status
 
-    // The direct event listener on the parent .tabs container is removed here.
-    // The tab switching is now handled directly by the individual button listeners
-    // set up within the setupTabs() function, which is called by initializeDashboardContent.
+    // Attach dashboard search and tab listeners
+    const tabButtonsContainer = document.querySelector('.tabs');
+    if (tabButtonsContainer) {
+        tabButtonsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('tab-button')) {
+                // Call setupTabs to ensure the clicked tab becomes active
+                setupTabs();
+            }
+        });
+    }
+    if (searchInput) {
+        // setupSearch needs to be called with actual data after it's fetched by initializeDashboardContent
+        // The listener is attached here, but the data it filters will be the ones loaded by initializeDashboardContent
+    }
 
     // Attach logout listener
     if (logoutButton) {

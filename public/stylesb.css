@@ -1,0 +1,211 @@
+/* stylesb.css */
+
+/* --- Global Styles & Typography --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacMacFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: rgb(204, 232, 243); /* Consistent background */
+    min-height: 100vh;
+    color: #1f2937;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* --- Page Container for the Booking Form --- */
+.booking-page-container {
+    width: 100%;
+    max-width: 700px; /* Max width for the form card */
+    margin: auto;
+    padding: 20px;
+}
+
+.booking-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #d1d5db;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.booking-title-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.booking-title-section i {
+    font-size: 2.2em;
+    color: #0481ef; /* Primary blue */
+}
+
+.booking-title-section h2 {
+    font-size: 1.8em;
+    margin: 0;
+    color: #0767f7; /* Primary blue */
+    font-weight: bold;
+}
+
+.back-button {
+    background: #6b7280; /* Neutral gray */
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.back-button:hover {
+    background-color: #4b5563;
+}
+
+/* --- Form Styles --- */
+.booking-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns for form fields */
+    gap: 20px; /* Space between form groups */
+}
+
+.booking-form .form-group {
+    margin-bottom: 0; /* Reset margin as gap handles spacing */
+    text-align: left;
+}
+
+.booking-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #374151;
+    font-size: 14px;
+}
+
+.booking-form input[type="text"],
+.booking-form input[type="date"],
+.booking-form input[type="time"],
+.booking-form select,
+.booking-form textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #1f2937;
+    background-color: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.booking-form input:focus,
+.booking-form select:focus,
+.booking-form textarea:focus {
+    outline: none;
+    border-color: #028dff;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+}
+
+.booking-form textarea {
+    resize: vertical;
+}
+
+.booking-form .form-group.full-width {
+    grid-column: span 2; /* Spans full width in the two-column grid */
+}
+
+/* Style for displaying fees */
+.fees-amount {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #0767f7; /* Primary blue for fees */
+    margin-top: 5px;
+}
+
+.booking-form .form-actions {
+    grid-column: span 2; /* Spans full width for buttons */
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 20px;
+    margin-top: 10px; /* Adjust margin to align with grid */
+}
+
+.btn-submit {
+    background: #0382f9; /* Primary blue */
+    color: white;
+    border: none;
+    padding: 14px 25px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-submit:hover {
+    background: #059fff;
+    transform: translateY(-1px);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .booking-page-container {
+        padding: 10px;
+    }
+
+    .booking-card {
+        padding: 20px;
+    }
+
+    .booking-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .booking-title-section h2 {
+        font-size: 1.5em;
+    }
+
+    .back-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .booking-form {
+        grid-template-columns: 1fr; /* Stack inputs on small screens */
+    }
+
+    .booking-form .form-group.full-width {
+        grid-column: span 1;
+    }
+
+    .booking-form .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

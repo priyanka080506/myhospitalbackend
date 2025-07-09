@@ -26,7 +26,7 @@ const doctorProfilePhoto = document.getElementById('doctorProfilePhoto');
 const dashboardWelcomeText = document.getElementById('dashboardWelcomeText');
 
 const totalAppointmentsElement = document.getElementById('totalAppointments');
-const upcomingAppointmentsElement = document.getElementById('upcomingAppointments');
+const upcomingAppointmentsElement = document.getElementById('upcomingAppointments'); // Corrected line
 const patientsTodayElement = document.getElementById('patientsToday');
 const totalPatientsElement = document.getElementById('totalPatients');
 
@@ -38,6 +38,10 @@ const searchInput = document.getElementById('searchInput');
 
 const workingPlacesContainer = document.getElementById('workingPlacesContainer');
 const addMoreWorkingPlaceButton = document.getElementById('addMoreWorkingPlace');
+
+// NEW: DOM element for Appointment Fees input
+const registerAppointmentFeesInput = document.getElementById('registerAppointmentFees');
+
 
 // --- Helper Functions ---
 
@@ -176,6 +180,9 @@ if (registerFormElement) {
         const licenseInput = document.getElementById('registerLicense');
         const passwordInput = document.getElementById('registerPassword');
         const confirmPasswordInput = document.getElementById('confirmPassword');
+        // NEW: Get appointment fees input value
+        const appointmentFeesInput = document.getElementById('registerAppointmentFees');
+
 
         let name = nameInput ? nameInput.value : '';
         let email = emailInput ? emailInput.value : '';
@@ -184,6 +191,9 @@ if (registerFormElement) {
         let license = licenseInput ? licenseInput.value : '';
         let password = passwordInput ? passwordInput.value : '';
         let confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
+        // NEW: Get appointment fees value, convert to number
+        let appointmentFees = appointmentFeesInput ? parseFloat(appointmentFeesInput.value) : 0;
+
 
         // Collect working places and timings
         const workingPlaces = [];
@@ -213,13 +223,30 @@ if (registerFormElement) {
             return;
         }
 
+        // NEW: Validate appointment fees
+        if (isNaN(appointmentFees) || appointmentFees < 0) {
+            alert('Please enter a valid positive number for Appointment Fees.');
+            return;
+        }
+
+
         try {
             const response = await fetch(`${BASE_URL}/api/doctors/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, email, phone, specialty, license, password, workingPlaces, photo: 'https://i.pravatar.cc/80?img=1' }),
+                body: JSON.stringify({ 
+                    name, 
+                    email, 
+                    phone, 
+                    specialty, 
+                    license, 
+                    password, 
+                    workingPlaces, 
+                    photo: 'https://i.pravatar.cc/80?img=1',
+                    appointmentFees // NEW: Include appointmentFees in the payload
+                }),
             });
 
             const data = await response.json();

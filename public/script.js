@@ -48,64 +48,64 @@ const servicesData = [
 // Doctors data (still hardcoded here as per your original script)
 const doctorsData = [
     {
-        name: 'Dr. Raksha',
+        name: 'Dr. Ajanya',
         specialty: 'Cardiology',
         experience: '4+ Years',
         rating: 4.9,
         reviews: 127,
-        image: 'Raksha.jpg.jpeg',
+        image: 'Ajanya.jpg.jpeg',
         education: 'Harvard Medical School',
-        availability: 'Mon, Wed, Fri'
+        availability: 'Jayadeva Hospital - Mon, Wed, Fri'
     },
     {
-        name: 'Dr. Brunda S',
+        name: 'Dr. Brunda',
         specialty: 'Neurology',
-        experience: '10+ Years',
+        experience: '6+ Years',
         rating: 4.8,
         reviews: 269,
-        image: 'Brunda.jpg.jpeg',
+        image: 'brunda.jpg.jpeg',
         education: 'Madras Medical College',
-        availability: 'Tue, Thu, Sat'
+        availability: 'Manipal Hospital - Tue, Thu, Sat'
     },
     {
-        name: 'Dr. Aishwarya D S',
+        name: 'Dr. Ashwin',
         specialty: 'Pediatrics',
         experience: '4+ Years',
         rating: 4.9,
         reviews: 156,
-        image: 'Aishwarya.jpg.jpeg',
+        image: 'ashwin.jpg.jpeg',
         education: 'St. Johns Medical college',
-        availability: 'Mon, Tue, Thu'
+        availability: 'Suraksha Hospital - Mon, Tue, Thu'
     },
     {
-        name: 'Dr. Sruthi N',
+        name: 'Dr. Madhukumar',
         specialty: 'Orthopedics',
-        experience: '9+ Years',
+        experience: '5+ Years',
         rating: 4.7,
         reviews: 89,
-        image: 'Shruthi.jpg.jpeg',
+        image: 'madhukumar.jpg.jpeg',
         education: 'JSS Medical College Mysore',
-        availability: 'Wed, Fri, Sat'
+        availability: 'A R Hospital - Wed, Fri, Sat'
     },
     {
-        name: 'Dr. Vijay',
+        name: 'Dr. Prasanna',
         specialty: 'Surgeon',
-        experience: '3+ Years',
+        experience: '10+ Years',
         rating: 4.8,
         reviews: 112,
-        image: 'Vijay.jpg.jpeg',
+        image: 'prasanna.jpg.jpeg',
         education: 'Stanley Medical College',
-        availability: 'Mon, Wed, Fri'
+        availability: 'Sigma Hospital - Mon, Wed, Fri'
     },
     {
-        name: 'Dr. Amaresh A M',
+        name: 'Dr. Adhi',
         specialty: 'Dermatology',
-        experience: '10+ Years',
+        experience: '4+ Years',
         rating: 4.9,
         reviews: 203,
-        image: 'Amaresh.jpg.jpeg',
+        image: 'adhi.jpg.jpeg',
         education: 'Christian Medical College Vellore',
-        availability: 'Tue, Thu, Fri'
+        availability: 'JSS Hospital - Tue, Thu, Fri'
     }
 ];
 

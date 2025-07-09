@@ -3,188 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctor Portal</title>
+    <title>Doctor Portal - MediCare</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="stylesd.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div id="authSection" class="auth-container">
+
+    <!-- Authentication Section -->
+    <div class="auth-container" id="authSection">
         <div class="auth-card">
             <div class="auth-header">
                 <i class="fas fa-user-md"></i>
                 <h1>Doctor Portal</h1>
-                <p>Login to manage your schedule and patient reports</p>
+                <p>Manage your schedule, patients, and reports.</p>
             </div>
 
-            <div id="loginForm" class="auth-form active">
-                <h2>Login to Your Doctor Account</h2>
-                <form id="loginFormElement">
-                    <div class="form-group">
-                        <label for="loginEmail">Email Address</label>
-                        <input type="email" id="loginEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    <button type="submit" class="auth-button">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Login
-                    </button>
-                </form>
-                <div class="auth-switch">
-                    <p>Don't have an account? <button id="showRegister" class="link-button">Register Here</button></p>
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginFormElement">
+                <h2>Login to Your Account</h2>
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" name="email" placeholder="your.email@example.com" required>
                 </div>
-            </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </button>
+                <div class="auth-switch">
+                    <p>Don't have an account? <button type="button" class="link-button" id="showRegister">Register here</button></p>
+                </div>
+            </form>
 
-            <div id="registerForm" class="auth-form">
-                <h2>Register New Doctor Account</h2>
-                <form id="registerFormElement">
-                    <div class="form-group">
-                        <label for="registerName">Full Name</label>
-                        <input type="text" id="registerName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="registerEmail">Email Address</label>
-                        <input type="email" id="registerEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPhone">Phone Number</label>
-                        <input type="tel" id="registerPhone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="registerSpecialty">Specialty</label>
-                        <input type="text" id="registerSpecialty" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="registerLicense">Medical License No.</label>
-                        <input type="text" id="registerLicense" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPassword">Password</label>
-                        <input type="password" id="registerPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Working Places & Timings</label>
-                        <div id="workingPlacesContainer">
-                            <div class="working-place-row">
-                                <input type="text" class="working-place-input" placeholder="Place (e.g., City Hospital)" required>
-                                <input type="text" class="working-timing-input" placeholder="Timing (e.g., Mon-Fri 9-5)" required>
-                                <button type="button" class="remove-input-button" style="display: none;"><i class="fas fa-times-circle"></i></button>
-                            </div>
-                        </div>
-                        <button type="button" id="addMoreWorkingPlace" class="add-more-button">
-                            <i class="fas fa-plus-circle"></i> Add More
-                        </button>
-                    </div>
-                    <button type="submit" class="auth-button">
-                        <i class="fas fa-user-plus"></i>
-                        Register Account
-                    </button>
-                </form>
-                <div class="auth-switch">
-                    <p>Already have an account? <button id="showLogin" class="link-button">Login</button></p>
+            <!-- Register Form -->
+            <form class="auth-form" id="registerFormElement">
+                <h2>Create a New Doctor Account</h2>
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" name="name" placeholder="Dr. John Doe" required>
                 </div>
-            </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email Address</label>
+                    <input type="email" id="registerEmail" name="email" placeholder="your.email@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">Phone Number</label>
+                    <input type="tel" id="registerPhone" name="phone" placeholder="+1234567890" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerSpecialty">Specialty</label>
+                    <input type="text" id="registerSpecialty" name="specialty" placeholder="e.g., Cardiology" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerLicense">Medical License No.</label>
+                    <input type="text" id="registerLicense" name="license" placeholder="LIC-123456" required>
+                </div>
+                <!-- NEW: Appointment Fees Input -->
+                <div class="form-group">
+                    <label for="registerAppointmentFees">Appointment Fees (in USD)</label>
+                    <input type="number" id="registerAppointmentFees" name="appointmentFees" placeholder="e.g., 50" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Working Places & Timings</label>
+                    <div id="workingPlacesContainer">
+                        <!-- Dynamic inputs will be added here by JS -->
+                    </div>
+                    <button type="button" id="addMoreWorkingPlace" class="add-more-button">
+                        <i class="fas fa-plus-circle"></i> Add More
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" name="password" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-user-plus"></i>
+                    Register
+                </button>
+                <div class="auth-switch">
+                    <p>Already have an account? <button type="button" class="link-button" id="showLogin">Login here</button></p>
+                </div>
+            </form>
         </div>
     </div>
 
-    <div id="mainDashboard" class="container" style="display: none;">
-        <div class="doctor-header">
-            <div class="doctor-profile">
-                <div class="profile-photo-container">
-                    <img id="doctorProfilePhoto" src="https://i.pravatar.cc/80?img=1" alt="Doctor Photo" onerror="this.onerror=null;this.src='https://placehold.co/100x100/e0e7ff/0275f7?text=DR';">
-                    <button class="edit-photo-btn"><i class="fas fa-camera"></i></button>
-                </div>
-                <div class="doctor-info">
-                    <h1 id="doctorName">Dr. John Doe</h1>
-                    <p id="doctorSpecialty" class="doctor-specialty">Cardiologist</p>
-                    <div class="doctor-contact">
-                        <div class="contact-item"><i class="fas fa-envelope"></i> <span id="doctorEmail">john.doe@example.com</span></div>
-                        <div class="contact-item"><i class="fas fa-phone"></i> <span id="doctorPhone">+1234567890</span></div>
-                        <div class="contact-item"><i class="fas fa-id-card"></i> <span id="doctorLicense">LIC-12345</span></div>
-                    </div>
-                    <div class="doctor-working-places">
-                        <div class="contact-item"><i class="fas fa-hospital"></i> <span id="doctorWorkingPlaces"></span></div>
+    <!-- Main Dashboard Section -->
+    <div class="main-dashboard" id="mainDashboard" style="display: none;">
+        <div class="container">
+            <header class="doctor-header">
+                <div class="doctor-profile">
+                    <img src="https://placehold.co/100x100/e0e7ff/0275f7?text=DR" alt="Doctor Profile" class="doctor-profile-photo" id="doctorProfilePhoto">
+                    <div class="doctor-info">
+                        <h1 id="doctorName">Dr. Jane Doe</h1>
+                        <p class="doctor-specialty" id="doctorSpecialty">Cardiologist</p>
+                        <div class="doctor-contact-info">
+                            <div class="contact-item"><i class="fas fa-envelope"></i> <span id="doctorEmail">jane.doe@example.com</span></div>
+                            <div class="contact-item"><i class="fas fa-phone"></i> <span id="doctorPhone">+1234567890</span></div>
+                            <div class="contact-item"><i class="fas fa-id-card"></i> <span id="doctorLicense">LIC-123456</span></div>
+                            <div class="contact-item"><i class="fas fa-hospital"></i> <span id="doctorWorkingPlaces">City Hospital (Mon-Fri 9-5)</span></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="logout-section">
-                <button id="logoutButton" class="logout-button">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Logout
-                </button>
-            </div>
-        </div>
-
-        <h2 class="dashboard-welcome-text" id="dashboardWelcomeText">Welcome, Dr. John Doe!</h2>
-
-        <div class="dashboard-overview">
-            <div class="stat-card">
-                <h3>Total Appointments</h3>
-                <p id="totalAppointments" class="stat-number">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Upcoming Appointments</h3>
-                <p id="upcomingAppointments" class="stat-number">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Patients Today</h3>
-                <p id="patientsToday" class="stat-number">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Total Patients</h3>
-                <p id="totalPatients" class="stat-number">0</p>
-            </div>
-        </div>
-
-        <div class="search-section">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search appointments or patient reports...">
-            </div>
-        </div>
-
-        <div class="tabs">
-            <button class="tab-button active" data-tab="schedule-tab">
-                <i class="fas fa-calendar-alt"></i>
-                My Schedule
-            </button>
-            <button class="tab-button" data-tab="reports-tab">
-                <i class="fas fa-file-alt"></i>
-                Patient Reports
-            </button>
-        </div>
-
-        <div class="tab-content">
-            <div id="schedule-tab" class="tab-panel active">
-                <div class="section-header">
-                    <h2>Upcoming Appointments</h2>
-                    <span class="count-badge" id="scheduleCount">0 appointments</span>
-                    <!-- IMPORTANT: The "Add New Report" button is NOT here -->
+                <div class="logout-section">
+                    <button class="logout-button" id="logoutButton">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
                 </div>
-                <div id="scheduleList" class="schedule-list">
-                    <!-- Schedule cards will be loaded here by JavaScript -->
-                </div>
-            </div>
+            </header>
 
-            <div id="reports-tab" class="tab-panel">
-                <div class="section-header">
-                    <h2>Patient Medical Reports</h2>
-                    <span class="count-badge" id="reportsCount">0 reports</span>
-                    <!-- The "Add New Report" button is ONLY here -->
-                    <a href="report.html" class="add-new-button">
-                        <i class="fas fa-plus"></i> Add New Report
-                    </a>
+            <section class="dashboard-overview">
+                <div class="stat-card">
+                    <h3>Total Appointments</h3>
+                    <span class="stat-number" id="totalAppointments">0</span>
                 </div>
-                <div id="patientsList" class="patients-list">
-                    <!-- Patient report cards will be loaded here by JavaScript -->
+                <div class="stat-card">
+                    <h3>Upcoming Appointments</h3>
+                    <span class="stat-number" id="upcomingAppointments">0</span>
                 </div>
-            </div>
+                <div class="stat-card">
+                    <h3>Patients Today</h3>
+                    <span class="stat-number" id="patientsToday">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Patients</h3>
+                    <span class="stat-number" id="totalPatients">0</span>
+                </div>
+            </section>
+
+            <section class="search-section">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search appointments or reports...">
+                </div>
+            </section>
+
+            <section class="tabs-section">
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="schedule-tab">
+                        <i class="fas fa-calendar-alt"></i> My Schedule
+                    </button>
+                    <button class="tab-button" data-tab="reports-tab">
+                        <i class="fas fa-file-alt"></i> Patient Reports
+                    </button>
+                </div>
+
+                <div id="schedule-tab" class="tab-panel active">
+                    <div class="section-header">
+                        <h2>Today's Schedule</h2>
+                        <span class="count-badge" id="scheduleCount">0 appointments</span>
+                        <!-- No "Add New Report" button here -->
+                    </div>
+                    <div class="schedule-list" id="scheduleList">
+                        <!-- Schedule items will be loaded here by JavaScript -->
+                    </div>
+                </div>
+
+                <div id="reports-tab" class="tab-panel">
+                    <div class="section-header">
+                        <h2>Patient Reports</h2>
+                        <span class="count-badge" id="reportsCount">0 reports</span>
+                        <a href="report.html" class="add-new-button">
+                            <i class="fas fa-plus-circle"></i> Add New Report
+                        </a>
+                    </div>
+                    <div class="patients-list" id="patientsList">
+                        <!-- Patient reports will be loaded here by JavaScript -->
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 
