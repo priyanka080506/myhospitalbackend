@@ -1044,7 +1044,7 @@ body {
     }
 
     .tabs {
-        flex-direction: column; /* Stack tabs vertically */
+        flex-direction: column;
         max-width: 100%;
     }
 
