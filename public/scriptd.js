@@ -173,12 +173,12 @@ if (loginFormElement) {
             } else {
                 // This alert shows the error message
                 alert(data.message || 'Login failed. Please check your credentials.');
-                // Removed loginFormElement.reset() from here
+                // Removed loginFormElement.reset() from here <-- THIS IS THE KEY CHANGE
             }
         } catch (error) {
             console.error('Login error:', error);
             alert('An error occurred during login. Please try again later.');
-            // Removed loginFormElement.reset() from here
+            // Removed loginFormElement.reset() from here <-- THIS IS THE KEY CHANGE
         }
     });
 }
