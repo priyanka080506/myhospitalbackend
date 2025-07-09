@@ -228,10 +228,11 @@ body {
     border-radius: 8px;
     padding: 4px;
     margin-bottom: 24px;
-    max-width: 400px; /* Max width for the tabs container */
-    margin-left: auto; /* Center the tabs if container is smaller than content */
+    /* Removed max-width to allow more flexibility */
+    margin-left: auto; /* Center the tabs */
     margin-right: auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    flex-wrap: nowrap; /* Ensure tabs stay in a single row by default */
 }
 
 .tab-button {
