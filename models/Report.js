@@ -1,53 +1,52 @@
 // models/Report.js
-
 const mongoose = require('mongoose');
 
 const ReportSchema = new mongoose.Schema({
     patient: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Patient', // Reference to the Patient model
-        required: [true, 'Patient ID is required for a report']
-    },
-    doctor: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Doctor', // Reference to the Doctor model
-        // This can be null for patient self-reports, but required for doctor-added reports
-        // You might want to make this `required: true` if all reports MUST have a doctor,
-        // or handle it conditionally in your routes. For now, it's optional here.
-        default: null
+        required: true
     },
     title: {
         type: String,
-        required: [true, 'Report title is required'],
+        required: true,
+        trim: true
+    },
+    type: {
+        type: String,
+        enum: ['Laboratory', 'Radiology', 'Cardiology', 'General', 'Other'], // Define allowed report types
+        required: true
+    },
+    doctorName: {
+        type: String,
+        required: true,
         trim: true
     },
     date: {
         type: Date,
-        default: Date.now // Defaults to the current date
-    },
-    type: {
-        type: String,
-        enum: ['Laboratory', 'Radiology', 'Consultation', 'Prescription', 'Symptoms Log', 'Home Monitoring', 'Questionnaire', 'Other'], // Expanded types
-        default: 'Other'
-    },
-    status: {
-        type: String,
-        enum: ['pending', 'final', 'reviewed'],
-        default: 'pending'
+        required: true
     },
     summary: {
         type: String,
-        trim: true,
-        required: [true, 'Report summary is required']
+        trim: true
     },
-    nextAction: {
+    fileUrl: { // URL to the uploaded file (PDF, image, etc.)
         type: String,
         trim: true
+    },
+    imageUrl: { // Optional: for reports that are purely images and you want to link directly
+        type: String,
+        trim: true
+    },
+    status: {
+        type: String,
+        enum: ['Final', 'Preliminary', 'Pending Review'],
+        default: 'Final'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
-}, {
-    timestamps: true // Adds createdAt and updatedAt timestamps
 });
 
-const Report = mongoose.model('Report', ReportSchema);
-
-module.exports = Report;
+module.exports = mongoose.model('Report', ReportSchema);
