@@ -3,317 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Portal - MediCare</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="styles2.css">
+    <title>Patient Portal Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="stylesd.css">
 </head>
 <body>
 
-    <div class="auth-container" id="authSection">
+    <div id="authSection" class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
-                <i class="fas fa-user-injured"></i>
-                <h1>Patient Portal</h1>
-                <p>Manage your appointments, reports, and profile.</p>
+                <i class="fas fa-user-shield"></i>
+                <h1>Welcome to Patient Portal</h1>
+                <p>Manage your health appointments and reports</p>
             </div>
 
-            <form class="auth-form active" id="loginFormElement" aria-labelledby="loginHeader">
-                <h2 id="loginHeader">Login to Your Account</h2>
+            <form id="loginForm" class="auth-form active">
+                <h2>Login to your account</h2>
                 <div class="form-group">
                     <label for="loginEmail">Email Address</label>
-                    <input type="email" id="loginEmail" name="email" placeholder="your.email@example.com" required autocomplete="email">
+                    <input type="email" id="loginEmail" placeholder="your.email@example.com" required>
                 </div>
                 <div class="form-group">
                     <label for="loginPassword">Password</label>
-                    <input type="password" id="loginPassword" name="password" placeholder="••••••••" required autocomplete="current-password">
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="auth-button">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Login
+                    <i class="fas fa-sign-in-alt"></i> Login
                 </button>
                 <div class="auth-switch">
-                    <p>Don't have an account? <button type="button" class="link-button" id="showRegister">Register here</button></p>
+                    <p>Don't have an account? <button type="button" id="showRegister" class="link-button">Register</button></p>
                 </div>
             </form>
 
-            <form class="auth-form" id="registerFormElement" aria-labelledby="registerHeader">
-                <h2 id="registerHeader">Create a New Patient Account</h2>
+            <form id="registerForm" class="auth-form">
+                <h2>Create a new account</h2>
                 <div class="form-group">
-                    <label for="registerName">Full Name</label>
-                    <input type="text" id="registerName" name="name" placeholder="John Doe" required autocomplete="name">
+                    <label for="registerFirstName">First Name</label>
+                    <input type="text" id="registerFirstName" placeholder="John" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerLastName">Last Name</label>
+                    <input type="text" id="registerLastName" placeholder="Doe" required>
                 </div>
                 <div class="form-group">
                     <label for="registerEmail">Email Address</label>
-                    <input type="email" id="registerEmail" name="email" placeholder="your.email@example.com" required autocomplete="email">
+                    <input type="email" id="registerEmail" placeholder="your.email@example.com" required>
                 </div>
                 <div class="form-group">
                     <label for="registerPhone">Phone Number</label>
-                    <input type="tel" id="registerPhone" name="phone" placeholder="+1234567890" required autocomplete="tel">
+                    <input type="tel" id="registerPhone" placeholder="+91 98765 43210" required>
                 </div>
                 <div class="form-group">
                     <label for="registerDOB">Date of Birth</label>
-                    <input type="date" id="registerDOB" name="dob" required>
+                    <input type="date" id="registerDOB" required>
                 </div>
                 <div class="form-group">
-                    <label for="registerGender">Gender</label>
-                    <select id="registerGender" name="gender" required>
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
+                    <label for="registerAddress">Address</label>
+                    <input type="text" id="registerAddress" placeholder="123 Main St, Anytown" required>
                 </div>
                 <div class="form-group">
                     <label for="registerPassword">Password</label>
-                    <input type="password" id="registerPassword" name="password" placeholder="••••••••" required autocomplete="new-password">
+                    <input type="password" id="registerPassword" placeholder="••••••••" required>
                 </div>
                 <div class="form-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required autocomplete="new-password">
+                    <label for="registerConfirmPassword">Confirm Password</label>
+                    <input type="password" id="registerConfirmPassword" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="auth-button">
-                    <i class="fas fa-user-plus"></i>
-                    Register
+                    <i class="fas fa-user-plus"></i> Register
                 </button>
                 <div class="auth-switch">
-                    <p>Already have an account? <button type="button" class="link-button" id="showLogin">Login here</button></p>
+                    <p>Already have an account? <button type="button" id="showLogin" class="link-button">Login</button></p>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="main-dashboard" id="mainDashboard" style="display: none;">
-        <div class="container">
-            <header class="patient-header">
-                <div class="patient-profile">
-                    <div class="patient-profile-photo-wrapper" role="button" aria-label="Change profile photo" tabindex="0">
-                        <img src="https://placehold.co/100x100/e0e7ff/0275f7?text=PT" alt="Patient Profile" class="patient-profile-photo" id="patientPhoto">
-                        <input type="file" id="photoUploadInput" accept="image/*" class="photo-upload-input">
-                        <div class="upload-overlay" title="Click to change photo">
-                            <i class="fas fa-camera"></i>
-                        </div>
+    <div id="dashboardSection" class="container" style="display: none;">
+        <header class="patient-header">
+            <div class="patient-info">
+                <div class="avatar" id="patientAvatar">JD</div>
+                <div class="patient-details">
+                    <h1 id="patientName">John Doe</h1>
+                    <p class="patient-id">Patient ID: <span id="patientID">P001</span></p>
+                    <div class="patient-meta">
+                        <div class="meta-item"><i class="fas fa-envelope"></i> <span id="patientEmail">john.doe@example.com</span></div>
+                        <div class="meta-item"><i class="fas fa-phone-alt"></i> <span id="patientPhone">+91 98765 43210</span></div>
+                        <div class="meta-item"><i class="fas fa-birthday-cake"></i> <span id="patientDOBDisplay">1990-01-01</span></div>
+                        <div class="meta-item"><i class="fas fa-map-marker-alt"></i> <span id="patientAddress">123 Main St, Anytown</span></div>
                     </div>
-
-                    <div class="patient-info">
-                        <h1 id="patientName">John Doe</h1>
-                        <p class="patient-id" id="patientIdDisplay">ID: PT-XXXX-XXXX</p>
-                        <div class="patient-contact-info">
-                            <div class="contact-item"><i class="fas fa-envelope"></i> <span id="patientEmail">john.doe@example.com</span></div>
-                            <div class="contact-item"><i class="fas fa-phone"></i> <span id="patientPhoneDisplay">+1234567890</span></div>
-                            <div class="contact-item"><i class="fas fa-calendar-alt"></i> <span id="patientDOBDisplay">DOB: 01/01/1990</span></div>
-                            <div class="contact-item"><i class="fas fa-venus-mars"></i> <span id="patientGenderDisplay">Gender: Male</span></div>
-                        </div>
+                    <div class="badges">
+                        <span class="badge active">Active Patient</span>
+                        <span class="badge insurance">Insured: XYZ Plan</span>
                     </div>
                 </div>
-                <div class="logout-section">
-                    <button class="logout-button" id="logoutButton">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </div>
-            </header>
-
-            <section class="dashboard-overview" aria-live="polite">
-                <div class="stat-card">
-                    <h3>Upcoming Appointments</h3>
-                    <span class="stat-number" id="upcomingAppointments">0</span>
-                </div>
-                <div class="stat-card">
-                    <h3>Total Reports</h3>
-                    <span class="stat-number" id="totalReports">0</span>
-                </div>
-                <div class="stat-card">
-                    <h3>Last Visit</h3>
-                    <span class="stat-text" id="lastVisitDate">N/A</span>
-                </div>
-                <div class="stat-card">
-                    <h3>Next Appointment</h3>
-                    <span class="stat-text" id="nextAppointmentDate">N/A</span>
-                </div>
-            </section>
-
-            <section class="search-section">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search appointments or reports..." aria-label="Search appointments or reports">
-                </div>
-            </section>
-
-            <section class="tabs-section">
-                <div class="tabs" role="tablist">
-                    <button class="tab-button active" data-tab="appointments-tab" role="tab" aria-selected="true" aria-controls="appointments-tab-panel" id="tab-appointments">
-                        <i class="fas fa-calendar-alt"></i> My Appointments
-                    </button>
-                    <button class="tab-button" data-tab="reports-tab" role="tab" aria-selected="false" aria-controls="reports-tab-panel" id="tab-reports">
-                        <i class="fas fa-file-alt"></i> My Reports
-                    </button>
-                </div>
-
-                <div id="appointments-tab" class="tab-panel active" role="tabpanel" aria-labelledby="tab-appointments">
-                    <div class="section-header">
-                        <h2>My Appointments</h2>
-                        <span class="count-badge" id="appointmentsCount">0 appointments</span>
-                        <button class="add-new-button" onclick="openBookingModal()">
-                            <i class="fas fa-plus-circle"></i> Book New Appointment
-                        </button>
-                    </div>
-                    <div class="appointments-list" id="appointmentsList" aria-live="polite">
-                        <div class="no-results" id="noAppointmentsMessage">
-                            <i class="fas fa-calendar-times"></i>
-                            <p>No appointments found.</p>
-                            <p>Click "Book New Appointment" to schedule one.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="reports-tab" class="tab-panel" role="tabpanel" aria-labelledby="tab-reports">
-                    <div class="section-header">
-                        <h2>My Reports</h2>
-                        <span class="count-badge" id="reportsCount">0 reports</span>
-                        <a href="report.html" class="add-new-button">
-                            <i class="fas fa-plus-circle"></i> Add New Report
-                        </a>
-                    </div>
-                    <div class="reports-list" id="reportsList" aria-live="polite">
-                        <div class="no-results" id="noReportsMessage">
-                            <i class="fas fa-file-excel"></i>
-                            <p>No reports found.</p>
-                            <p>Click "Add New Report" to upload one.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </div>
-
-    <div id="bookingModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <i class="fas fa-calendar-check"></i>
-                    <h2 id="bookingModalTitle">Book Your Appointment</h2>
-                </div>
-                <button class="modal-close" onclick="closeBookingModal()" aria-label="Close appointment booking form">
-                    <i class="fas fa-times"></i>
+            </div>
+            <div class="logout-section">
+                <button id="logoutButton" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
-            <div class="progress-bar" aria-hidden="true">
-                <div class="progress-steps">
-                    <div class="progress-step active">1</div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step">2</div>
-                    <div class="progress-line"></div>
-                    <div class="progress-step">3</div>
+        </header>
+
+        <section class="quick-stats">
+            <div class="stat-card">
+                <i class="fas fa-calendar-alt icon"></i>
+                <div class="value" id="upcomingAppointmentsCount">0</div>
+                <div class="label">Upcoming Appointments</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-file-medical icon"></i>
+                <div class="value" id="totalReportsCount">0</div>
+                <div class="label">Total Medical Reports</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-hourglass-end icon"></i>
+                <div class="value" id="lastVisitDate">N/A</div>
+                <div class="label">Last Visit Date</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-calendar-check icon"></i>
+                <div class="value" id="nextAppointmentDate">N/A</div>
+                <div class="label">Next Appointment</div>
+            </div>
+        </section>
+
+        <section class="search-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search appointments or reports...">
+            </div>
+        </section>
+
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="appointmentsTab" id="appointmentsTabBtn">
+                <i class="fas fa-calendar-check"></i> Appointments
+            </button>
+            <button class="tab-button" data-tab="reportsTab" id="reportsTabBtn">
+                <i class="fas fa-file-medical-alt"></i> Reports
+            </button>
+        </nav>
+
+        <main class="tab-content">
+            <div id="appointmentsTab" class="tab-panel active">
+                <div class="dashboard-cta-section">
+                    <button id="bookAppointmentBtn" class="book-appointment-btn">
+                        <i class="fas fa-plus-circle"></i> Book New Appointment
+                    </button>
                 </div>
-                <div class="progress-labels">
-                    <span>Patient Info</span>
-                    <span>Appointment Details</span>
-                    <span>Confirmation</span>
+                <div class="section-header">
+                    <h2>Your Appointments</h2>
+                    <span id="appointmentsCountSpan" class="count-badge">0</span>
+                </div>
+                <div id="appointmentsList">
+                    <p class="no-data-message" id="noAppointmentsMessage" style="display: none;">No appointments found.</p>
                 </div>
             </div>
-            <form id="bookingForm" class="booking-form">
+
+            <div id="reportsTab" class="tab-panel">
+                <div class="dashboard-cta-section">
+                    <button id="addReportBtn" class="add-report-btn">
+                        <i class="fas fa-plus-circle"></i> Add New Report
+                    </button>
+                </div>
+                <div class="section-header">
+                    <h2>Your Medical Reports</h2>
+                    <span id="reportsCountSpan" class="count-badge">0</span>
+                </div>
+                <div id="reportsList" class="reports-list">
+                    <p class="no-data-message" id="noReportsMessage" style="display: none;">No reports found.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="bookingModal" class="booking-modal">
+        <div class="booking-modal-content">
+            <div class="booking-modal-header">
+                <h2>Book New Appointment</h2>
+                <span class="close-button" id="closeBookingModal">&times;</span>
+            </div>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-step active" data-step="1"><i class="fas fa-user"></i></div>
+                <div class="progress-step" data-step="2"><i class="fas fa-calendar-alt"></i></div>
+                <div class="progress-step" data-step="3"><i class="fas fa-check-circle"></i></div>
+            </div>
+
+            <form id="bookingForm">
                 <div id="step1" class="form-step active">
-                    <div class="step-header">
-                        <h3>Your Information</h3>
-                        <p>Please confirm your personal details for the appointment.</p>
+                    <h3>Patient Details</h3>
+                    <div class="form-group">
+                        <label for="bookingFirstName">First Name</label>
+                        <input type="text" id="bookingFirstName" name="firstName" required readonly>
                     </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="firstName">First Name</label>
-                            <input type="text" id="firstName" name="firstName" required readonly autocomplete="given-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="lastName">Last Name</label>
-                            <input type="text" id="lastName" name="lastName" required readonly autocomplete="family-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" required readonly autocomplete="email">
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Phone Number</label>
-                            <input type="tel" id="phone" name="phone" required readonly autocomplete="tel">
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="address">Address</label>
-                            <input type="text" id="address" name="address" readonly autocomplete="street-address">
-                        </div>
+                    <div class="form-group">
+                        <label for="bookingLastName">Last Name</label>
+                        <input type="text" id="bookingLastName" name="lastName" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookingEmail">Email</label>
+                        <input type="email" id="bookingEmail" name="email" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookingPhone">Phone</label>
+                        <input type="tel" id="bookingPhone" name="phone" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookingAddress">Address</label>
+                        <input type="text" id="bookingAddress" name="address" required readonly>
                     </div>
                 </div>
 
                 <div id="step2" class="form-step">
-                    <div class="step-header">
-                        <h3>Appointment Details</h3>
-                        <p>Select your desired service, doctor, date, and time.</p>
+                    <h3>Appointment Details</h3>
+                    <div class="form-group">
+                        <label for="bookingService">Service</label>
+                        <select id="bookingService" name="service" required>
+                            <option value="">Select a Service</option>
+                            <option value="General Consultation">General Consultation</option>
+                            <option value="Dental Check-up">Dental Check-up</option>
+                            <option value="Physiotherapy">Physiotherapy</option>
+                            <option value="Cardiology Consultation">Cardiology Consultation</option>
+                            <option value="Dermatology">Dermatology</option>
+                        </select>
                     </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="service">Service</label>
-                            <select id="service" name="service" required>
-                                <option value="">Select a Service</option>
-                                </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="doctor">Preferred Doctor</label>
-                            <select id="doctor" name="doctor" required>
-                                <option value="">Any Doctor</option>
-                                </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="appointmentDate">Appointment Date</label>
-                            <input type="date" id="appointmentDate" name="appointmentDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="appointmentTime">Appointment Time</label>
-                            <input type="time" id="appointmentTime" name="appointmentTime" required>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="notes">Additional Notes (Optional)</label>
-                            <textarea id="notes" name="notes"></textarea>
-                        </div>
+                    <div class="form-group">
+                        <label for="bookingDoctor">Preferred Doctor</label>
+                        <select id="bookingDoctor" name="doctor" required>
+                            <option value="">Select a Doctor</option>
+                            <option value="Dr. Smith">Dr. Smith</option>
+                            <option value="Dr. Johnson">Dr. Johnson</option>
+                            <option value="Dr. Williams">Dr. Williams</option>
+                            <option value="Dr. Brown">Dr. Brown</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookingDate">Date</label>
+                        <input type="date" id="bookingDate" name="appointmentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookingTime">Time</label>
+                        <input type="time" id="bookingTime" name="appointmentTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookingNotes">Notes (Optional)</label>
+                        <textarea id="bookingNotes" name="notes" rows="3" placeholder="Any specific concerns or details..."></textarea>
                     </div>
                 </div>
 
                 <div id="step3" class="form-step">
-                    <div class="step-header">
-                        <h3>Confirm Your Appointment</h3>
-                        <p>Please review your details before confirming your booking.</p>
+                    <h3>Confirm Your Appointment</h3>
+                    <div id="summaryContent">
+                        <p><strong>Patient:</strong> <span id="summaryPatientName"></span></p>
+                        <p><strong>Email:</strong> <span id="summaryPatientEmail"></span></p>
+                        <p><strong>Service:</strong> <span id="summaryService"></span></p>
+                        <p><strong>Doctor:</strong> <span id="summaryDoctor"></span></p>
+                        <p><strong>Date:</strong> <span id="summaryDate"></span></p>
+                        <p><strong>Time:</strong> <span id="summaryTime"></span></p>
+                        <p><strong>Notes:</strong> <span id="summaryNotes"></span></p>
                     </div>
-                    <div class="appointment-summary">
-                        <h4>Appointment Summary</h4>
-                        <div id="summaryContent" class="summary-content" aria-live="polite">
-                            </div>
-                    </div>
+                    <p style="text-align: center; margin-top: 20px; font-weight: 500;">Please review your details before confirming.</p>
                 </div>
 
-                <div class="form-actions">
-                    <button type="button" id="backBtn" class="btn btn-outline" style="display: none;"><i class="fas fa-arrow-left"></i> Back</button>
-                    <button type="button" id="nextBtn" class="btn btn-primary">Next <i class="fas fa-arrow-right"></i></button>
-                    <button type="submit" id="submitBtn" class="btn btn-primary" style="display: none;">Confirm Booking <i class="fas fa-check"></i></button>
+                <div class="form-navigation">
+                    <button type="button" id="backBtn" style="display: none;">Back</button>
+                    <button type="button" id="nextBtn">Next</button>
+                    <button type="submit" id="submitBtn" style="display: none;">Confirm & Book</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="reportImageModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reportImageModalTitle">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <i class="fas fa-image"></i>
-                    <h2 id="reportImageModalTitle">Report Image</h2>
-                </div>
-                <button class="modal-close" onclick="closeReportImageModal()" aria-label="Close report image view">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <img id="reportImageDisplay" src="" alt="Report Image" class="full-width-image">
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeReportImageModal()">Close</button>
-            </div>
-        </div>
+    <div id="reportImageModal" class="report-image-modal">
+        <span class="report-image-modal-close" id="closeReportImageModal">&times;</span>
+        <img class="report-image-modal-content" id="reportImageDisplay">
     </div>
 
-    <script src="script2.js"></script>
+    <script src="scriptd.js"></script>
 </body>
 </html>
