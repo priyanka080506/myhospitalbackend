@@ -53,19 +53,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // --- 6. MongoDB Connection ---
 mongoose.connect(MONGODB_URI)
-    .then(() => {
-        console.log('MongoDB connected successfully!');
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-            console.log(`Access your frontend at: http://localhost:${PORT}`);
-            console.log(`API endpoints will be at: http://localhost:${PORT}/api/...`);
-        });
-    })
-    .catch(err => {
-        console.error('MongoDB connection error:');
-        console.error(err);
-        process.exit(1);
-    });
+    .then(() => {
+        console.log('MongoDB connected successfully!');
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+            console.log(`Access your frontend at: http://localhost:${PORT}`);
+            console.log(`API endpoints will be at: http://localhost:${PORT}/api/...`);
+        });
+    })
+    .catch(err => {
+        console.error('MongoDB connection error:');
+        console.error(err);
+        // process.exit(1); // <--- THIS LINE SHOULD BE COMMENTED OUT FOR DEBUGGING
+    });
 
 // --- 7. API Routes ---
 // *************************************************************************
@@ -82,19 +82,19 @@ app.use('/api/doctors', doctorRoutes); // <-- THIS ONE IS UNCOMMENTED
 
 // --- 8. Serve Frontend (Catch-all for non-API routes) ---
 app.get('*', (req, res) => {
-    if (req.path.startsWith('/api/')) {
-        res.status(404).json({ message: "API endpoint not found" });
-    } else {
-        res.sendFile(path.join(__dirname, 'public', 'index2.html'));
-    }
+    if (req.path.startsWith('/api/')) {
+        res.status(404).json({ message: "API endpoint not found" });
+    } else {
+        res.sendFile(path.join(__dirname, 'public', 'index2.html'));
+    }
 });
 
 
 // --- 9. Global Error Handling Middleware ---
 app.use((err, req, res, next) => {
-    console.error('Global Error Handler:', err.stack);
-    res.status(err.status || 500).json({
-        message: err.message || 'Something went wrong on the server!',
-        error: process.env.NODE_ENV === 'production' ? {} : err
-    });
+    console.error('Global Error Handler:', err.stack);
+    res.status(err.status || 500).json({
+        message: err.message || 'Something went wrong on the server!',
+        error: process.env.NODE_ENV === 'production' ? {} : err
+    });
 });
