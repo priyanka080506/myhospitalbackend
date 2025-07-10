@@ -327,6 +327,7 @@ async function fetchPatientData(patientId) {
         console.error('Error fetching patient data:', error);
         // If token is invalid or expired, log out
         removeToken();
+        localStorage.removeItem('currentPatientId'); // Clear patient ID as well
         showAuthSection();
     }
 }
@@ -486,6 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchAppointments(patientId);
         fetchReports(patientId);
     } else {
+        // This is the corrected line that was likely causing "logout is not defined" error
         showAuthSection();
     }
 });
