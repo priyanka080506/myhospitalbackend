@@ -242,6 +242,13 @@ router.get('/reports/:patientId', authMiddleware, async (req, res) => {
     try {
         const { patientId } = req.params;
 
+        // --- MODIFICATION START: Defensive check for req.patient ---
+        if (!req.patient || !req.patient.id) {
+            console.error('Error: authMiddleware failed to set req.patient or req.patient.id is missing.');
+            return res.status(401).json({ message: 'Authentication required: Patient ID not found in token.' });
+        }
+        // --- MODIFICATION END ---
+
         // Ensure the authenticated patient is only requesting their own reports,
         // or add logic for doctors/admins to view other patient reports
         if (req.patient.id !== patientId) {
@@ -250,8 +257,8 @@ router.get('/reports/:patientId', authMiddleware, async (req, res) => {
         }
 
         const reports = await Report.find({ patient: patientId })
-                                    .populate('doctor', 'name specialization') // Populate doctor details
-                                    .sort({ date: -1 }); // Sort by newest first
+                                         .populate('doctor', 'name specialization') // Populate doctor details
+                                         .sort({ date: -1 }); // Sort by newest first
 
         // --- DEBUGGING LOG ---
         console.log(`Found ${reports.length} reports for patient ${patientId}`);
@@ -278,7 +285,9 @@ router.get('/reports/:patientId', authMiddleware, async (req, res) => {
         if (err.kind === 'ObjectId') {
             return res.status(400).json({ message: 'Invalid Patient ID format.' });
         }
-        res.status(500).send('Server Error fetching patient reports');
+        // --- MODIFICATION START: Send JSON error response ---
+        res.status(500).json({ message: 'Server Error fetching patient reports', error: err.message });
+        // --- MODIFICATION END ---
     }
 });
 
