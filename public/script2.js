@@ -37,13 +37,6 @@ const patientEmailDisplay = document.getElementById('patientEmailDisplay');
 const patientAddressDisplay = document.getElementById('patientAddressDisplay');
 
 
-// Removed Add Report Modal Elements as they are now in a separate page
-// const patientAddReportModal = document.getElementById('patientAddReportModal');
-// const patientAddNewReportBtn = document.getElementById('patientAddNewReportBtn');
-// const patientAddReportForm = document.getElementById('patientAddReportForm');
-// const patientReportDateInput = document.getElementById('patientReportDate');
-
-
 // --- Helper Functions ---
 
 function formatDate(dateString) {
@@ -103,7 +96,6 @@ if (loginFormElement) {
         }
 
         try {
-            // UPDATED URL: /api/auth/login
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
@@ -112,7 +104,18 @@ if (loginFormElement) {
                 body: JSON.stringify({ email, password }),
             });
 
-            const data = await response.json();
+            // --- MODIFICATION: Improved JSON parsing error handling ---
+            let data;
+            try {
+                data = await response.json();
+            } catch (jsonError) {
+                console.error('Login: Error parsing JSON response:', jsonError);
+                const rawText = await response.text();
+                console.error('Login: Raw non-JSON response from server:', rawText);
+                alert('An unexpected server response occurred. Please check console for details.');
+                return; // Stop execution here as response is not usable
+            }
+            // --- END MODIFICATION ---
 
             if (response.ok) {
                 currentUser = data.patient; // Store patient data
@@ -125,7 +128,7 @@ if (loginFormElement) {
                 alert(data.message || 'Login failed. Please check your credentials.');
             }
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('Login error (network or uncaught):', error);
             alert('An error occurred during login. Please try again later.');
         }
     });
@@ -136,7 +139,7 @@ if (registerFormElement) {
     registerFormElement.addEventListener('submit', async (e) => {
         e.preventDefault();
         const nameInput = document.getElementById('registerName');
-        const emailInput = document.getElementById('registerEmail');
+        const emailInput = document.getElementById('C');
         const phoneInput = document.getElementById('registerPhone');
         const dobInput = document.getElementById('registerDob');
         const genderInput = document.getElementById('registerGender'); // Get gender input
@@ -148,9 +151,9 @@ if (registerFormElement) {
         let phone = phoneInput ? phoneInput.value : '';
         let dob = dobInput ? dobInput.value : '';
         let gender = genderInput ? genderInput.value : ''; // Get gender value
-        
+
         console.log('passwordInput:', passwordInput);
-        
+
         let password = '';
         if (passwordInput) {
             password = passwordInput.value;
@@ -178,7 +181,6 @@ if (registerFormElement) {
         }
 
         try {
-            // UPDATED URL: /api/auth/register
             const response = await fetch(`${BASE_URL}/api/patients/register`, {
                 method: 'POST',
                 headers: {
@@ -188,7 +190,18 @@ if (registerFormElement) {
                 body: JSON.stringify({ name, email, phone, dateOfBirth: dob, gender, password }),
             });
 
-            const data = await response.json();
+            // --- MODIFICATION: Improved JSON parsing error handling ---
+            let data;
+            try {
+                data = await response.json();
+            } catch (jsonError) {
+                console.error('Registration: Error parsing JSON response:', jsonError);
+                const rawText = await response.text();
+                console.error('Registration: Raw non-JSON response from server:', rawText);
+                alert('An unexpected server response occurred during registration. Please check console for details.');
+                return; // Stop execution here
+            }
+            // --- END MODIFICATION ---
 
             if (response.ok) {
                 alert('Account created successfully! Please log in.');
@@ -199,24 +212,28 @@ if (registerFormElement) {
                 alert(data.message || 'Registration failed. Please try again.');
             }
         } catch (error) {
-            console.error('Registration error:', error);
+            console.error('Registration error (network or uncaught):', error);
             alert('An error occurred during registration. Please try again later.');
         }
     });
 }
 
 // --- Logout Logic ---
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('authToken'); // Clear auth token
+    localStorage.removeItem('currentLoggedInPatientEmail'); // Clear mock login state
+    if (authSection) authSection.style.display = 'flex';
+    if (mainDashboard) mainDashboard.style.display = 'none';
+    if (loginFormElement) loginFormElement.reset();
+    if (registerFormElement) registerFormElement.reset();
+    if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
+    // Reload the page to ensure a clean state
+    window.location.reload(); 
+}
+
 if (logoutButton) {
-    logoutButton.addEventListener('click', () => {
-        currentUser = null;
-        localStorage.removeItem('authToken'); // Clear auth token
-        localStorage.removeItem('currentLoggedInPatientEmail'); // Clear mock login state
-        if (authSection) authSection.style.display = 'flex';
-        if (mainDashboard) mainDashboard.style.display = 'none';
-        if (loginFormElement) loginFormElement.reset();
-        if (registerFormElement) registerFormElement.reset();
-        if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
-    });
+    logoutButton.addEventListener('click', logout);
 }
 
 // --- UI Display Functions ---
@@ -236,7 +253,7 @@ async function showDashboard() {
         if (dashboardWelcomeText) dashboardWelcomeText.textContent = `Welcome, ${currentUser.name || 'Patient'}!`;
 
         // Update other patient details
-        if (patientIdDisplay) patientIdDisplay.textContent = currentUser.id || 'N/A';
+        if (patientIdDisplay) patientIdDisplay.textContent = currentUser._id || 'N/A'; // Use _id for MongoDB ID
         // Use currentUser.dateOfBirth for display if available, fallback to currentUser.dob
         if (patientDobDisplay) patientDobDisplay.textContent = `DOB: ${formatDate(currentUser.dateOfBirth || currentUser.dob) || 'N/A'}`;
         if (patientPhoneDisplay) patientPhoneDisplay.textContent = currentUser.phone || 'N/A';
@@ -267,28 +284,48 @@ async function initializeDashboardContent() {
     let reports = [];     // Initialize as empty array
 
     try {
+        // --- Fetch Appointments ---
         const appointmentsResponse = await fetch(`${BASE_URL}/api/appointments/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const appointmentsData = await appointmentsResponse.json();
+        let appointmentsData;
+        try {
+            appointmentsData = await appointmentsResponse.json();
+        } catch (jsonError) {
+            console.error('Dashboard: Error parsing Appointments JSON response. This means backend sent non-JSON data:', jsonError);
+            const rawText = await appointmentsResponse.text();
+            console.error('Dashboard: Raw Appointments response (from backend):', rawText.substring(0, 500)); // Log first 500 chars
+            throw new Error(`Failed to parse appointments data from server. Raw response starts with: "${rawText.substring(0, 50)}..."`);
+        }
+
         if (appointmentsResponse.ok && Array.isArray(appointmentsData)) {
             appointments = appointmentsData;
             renderAppointments(appointments);
         } else {
-            console.error('Failed to fetch appointments or received non-array data:', appointmentsData);
-            renderAppointments([]);
+            console.error('Dashboard: Failed to fetch appointments or received non-array data:', appointmentsData);
+            renderAppointments([]); // Render empty list if data is not as expected
         }
 
+        // --- Fetch Reports ---
         const reportsResponse = await fetch(`${BASE_URL}/api/patients/reports/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        const reportsData = await reportsResponse.json();
+        let reportsData;
+        try {
+            reportsData = await reportsResponse.json();
+        } catch (jsonError) {
+            console.error('Dashboard: Error parsing Reports JSON response. This means backend sent non-JSON data:', jsonError);
+            const rawText = await reportsResponse.text();
+            console.error('Dashboard: Raw Reports response (from backend):', rawText.substring(0, 500)); // Log first 500 chars
+            throw new Error(`Failed to parse reports data from server. Raw response starts with: "${rawText.substring(0, 50)}..."`);
+        }
+
         if (reportsResponse.ok && Array.isArray(reportsData)) {
             reports = reportsData;
             renderReports(reports);
         } else {
-            console.error('Failed to fetch reports or received non-array data:', reportsData);
-            renderReports([]);
+            console.error('Dashboard: Failed to fetch reports or received non-array data:', reportsData);
+            renderReports([]); // Render empty list if data is not as expected
         }
 
         // Pass the guaranteed-to-be-arrays to setupSearch
@@ -297,8 +334,8 @@ async function initializeDashboardContent() {
         updateStats(appointments, reports);
 
     } catch (error) {
-        console.error('Error initializing dashboard content:', error);
-        alert('Failed to load dashboard data. Please try refreshing or logging in again.');
+        console.error('Error initializing dashboard content (overall fetch process):', error);
+        alert('Failed to load dashboard data. Please try refreshing or logging in again. Check browser console for specific server message.');
     }
 }
 
@@ -496,16 +533,28 @@ function checkAuth() {
 
     if (loggedInEmail && authToken) {
         // Attempt to re-authenticate using the stored email and token
-        // UPDATED URL: /api/patients/profile?email=${loggedInEmail}
         fetch(`${BASE_URL}/api/patients/profile?email=${loggedInEmail}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         })
-        .then(response => {
+        .then(async response => { // Added async keyword here to use await inside
             if (!response.ok) {
-                // If token is invalid or expired, or profile not found
-                throw new Error('Authentication failed or profile not found');
+                // --- MODIFICATION: Handle non-JSON error for profile fetch ---
+                const errorText = await response.text();
+                console.error('Re-auth: Backend sent non-OK response:', response.status, errorText);
+                throw new Error(`Authentication failed or profile not found. Server said: ${errorText.substring(0, 100)}...`);
             }
-            return response.json();
+            // --- MODIFICATION: Improved JSON parsing error handling ---
+            let patientData;
+            try {
+                patientData = await response.json();
+            } catch (jsonError) {
+                console.error('Re-auth: Error parsing profile JSON response:', jsonError);
+                const rawText = await response.text();
+                console.error('Re-auth: Raw non-JSON profile response from server:', rawText);
+                throw new Error(`Re-authentication data not JSON: ${rawText.substring(0, 100)}...`);
+            }
+            return patientData;
+            // --- END MODIFICATION ---
         })
         .then(patientData => {
             if (patientData && patientData.email === loggedInEmail) {
@@ -517,7 +566,8 @@ function checkAuth() {
             }
         })
         .catch(error => {
-            console.error('Error during re-authentication:', error);
+            console.error('Error during re-authentication (network or API):', error);
+            alert(`Error during re-authentication: ${error.message || 'Please log in again.'}`);
             logout(); // Clear state on network/API error
         });
     } else {
@@ -529,24 +579,7 @@ function checkAuth() {
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth(); // Initial check for authentication status
 
-    // Attach dashboard search and tab listeners
-    const tabButtonsContainer = document.querySelector('.tabs');
-    if (tabButtonsContainer) {
-        tabButtonsContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('tab-button')) {
-                setupTabs(); // Re-run setupTabs to activate the clicked tab
-            }
-        });
-    }
-    if (searchInput) {
-        // setupSearch needs to be called with actual data after it's fetched by initializeDashboardContent
-        // The listener is attached here, but the data it filters will be the ones loaded by initializeDashboardContent
-    }
-
-    // Attach logout listener
-    if (logoutButton) {
-        logoutButton.addEventListener('click', () => {
-            logout();
-        });
-    }
+    // Attach dashboard search and tab listeners (ensures listeners are set)
+    // The setupSearch function will be called with actual data inside initializeDashboardContent
+    // The setupTabs function is called there as well to ensure correct initial state
 });
