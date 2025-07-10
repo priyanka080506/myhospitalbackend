@@ -24,13 +24,14 @@ const path = require('path');
 // --- Import all your route files ---
 // *************************************************************************
 // ******* IMPORTANT: ONLY 'doctorRoutes' IS UNCOMMENTED FOR THIS STEP ******
+// ******* ALL OTHER ROUTE REQUIRES ARE TEMPORARILY COMMENTED OUT **********
 // *************************************************************************
-const authRoutes = require('./routes/authRoutes'); // COMMENTED OUT for debugging
+// const authRoutes = require('./routes/authRoutes'); // COMMENTED OUT for debugging
 const doctorRoutes = require('./routes/doctorRoutes'); // LEAVE THIS ONE UNCOMMENTED
-const patientRoutes = require('./routes/patientRoutes'); // COMMENTED OUT for debugging
-const appointmentRoutes = require('./routes/appointmentRoutes'); // COMMENTED OUT for debugging
-const reportRoutes = require('./routes/reportRoutes'); // COMMENTED OUT for debugging
-const userRoutes = require('./routes/userRoutes'); // COMMENTED OUT for debugging
+// const patientRoutes = require('./routes/patientRoutes'); // COMMENTED OUT for debugging
+// const appointmentRoutes = require('./routes/appointmentRoutes'); // COMMENTED OUT for debugging
+// const reportRoutes = require('./routes/reportRoutes'); // COMMENTED OUT for debugging
+// const userRoutes = require('./routes/userRoutes'); // COMMENTED OUT for debugging
 
 
 // 3. Initialize Express app
@@ -69,13 +70,14 @@ mongoose.connect(MONGODB_URI)
 // --- 7. API Routes ---
 // *************************************************************************
 // ******* IMPORTANT: ONLY 'doctorRoutes' IS UNCOMMENTED FOR THIS STEP ******
+// ******* ALL OTHER APP.USE LINES ARE TEMPORARILY COMMENTED OUT ***********
 // *************************************************************************
-app.use('/api/users', userRoutes); // COMMENTED OUT for debugging
-app.use('/api/auth', authRoutes); // COMMENTED OUT for debugging
+// app.use('/api/users', userRoutes); // COMMENTED OUT for debugging
+// app.use('/api/auth', authRoutes); // COMMENTED OUT for debugging
 app.use('/api/doctors', doctorRoutes); // LEAVE THIS ONE UNCOMMENTED
-app.use('/api/patients', patientRoutes); // COMMENTED OUT for debugging
-app.use('/api/appointments', appointmentRoutes); // COMMENTED OUT for debugging
-app.use('/api/reports', reportRoutes); // COMMENTED OUT for debugging
+// app.use('/api/patients', patientRoutes); // COMMENTED OUT for debugging
+// app.use('/api/appointments', appointmentRoutes); // COMMENTED OUT for debugging
+// app.use('/api/reports', reportRoutes); // COMMENTED OUT for debugging
 
 
 // --- 8. Serve Frontend (Catch-all for non-API routes) ---
