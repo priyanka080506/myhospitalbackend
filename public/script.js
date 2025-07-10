@@ -55,7 +55,7 @@ const doctorsData = [
         reviews: 127,
         image: 'Ajanya.jpg.jpeg',
         education: 'Harvard Medical School',
-        availability: 'Jayadeva Hospital - Mon, Wed, Fri'
+        availability: 'Jayadeva Hospital - Mon, Wed, Fri (8AM-5PM)'
     },
     {
         name: 'Dr. Brunda',
@@ -65,7 +65,7 @@ const doctorsData = [
         reviews: 269,
         image: 'brunda.jpg.jpeg',
         education: 'Madras Medical College',
-        availability: 'Manipal Hospital - Tue, Thu, Sat'
+        availability: 'Manipal Hospital - Tue, Thu, Sat (7AM-3PM)'
     },
     {
         name: 'Dr. Ashwin',
@@ -75,7 +75,7 @@ const doctorsData = [
         reviews: 156,
         image: 'ashwin.jpg.jpeg',
         education: 'St. Johns Medical college',
-        availability: 'Suraksha Hospital - Mon, Tue, Thu'
+        availability: 'Suraksha Hospital - Mon, Tue, Thu (8:30AM-5PM)'
     },
     {
         name: 'Dr. Madhukumar',
@@ -85,7 +85,7 @@ const doctorsData = [
         reviews: 89,
         image: 'madhukumar.jpg.jpeg',
         education: 'JSS Medical College Mysore',
-        availability: 'A R Hospital - Wed, Fri, Sat'
+        availability: 'A R Hospital - Wed, Fri, Sat (7AM-4PM)'
     },
     {
         name: 'Dr. Prasanna',
@@ -95,7 +95,7 @@ const doctorsData = [
         reviews: 112,
         image: 'prasanna.jpg.jpeg',
         education: 'Stanley Medical College',
-        availability: 'Sigma Hospital - Mon, Wed, Fri'
+        availability: 'Sigma Hospital - Mon, Wed, Fri (9AM-6PM)'
     },
     {
         name: 'Dr. Adhi',
@@ -105,7 +105,7 @@ const doctorsData = [
         reviews: 203,
         image: 'adhi.jpg.jpeg',
         education: 'Christian Medical College Vellore',
-        availability: 'JSS Hospital - Tue, Thu, Fri'
+        availability: 'JSS Hospital - Tue, Thu, Fri (7AM-4PM)'
     }
 ];
 
