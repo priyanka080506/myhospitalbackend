@@ -32,7 +32,7 @@ const patientGenderDisplay = document.getElementById('patientGenderDisplay');
 // New DOM elements for other patient details (from index2.html)
 const patientIdDisplay = document.getElementById('patientIdDisplay');
 const patientDobDisplay = document.getElementById('patientDobDisplay');
-const patientPhoneDisplay = document.getElementById('patientPhoneDisplay');
+const patientPhoneDisplay = document = document.getElementById('patientPhoneDisplay');
 const patientEmailDisplay = document.getElementById('patientEmailDisplay');
 const patientAddressDisplay = document.getElementById('patientAddressDisplay');
 
@@ -104,18 +104,19 @@ if (loginFormElement) {
                 body: JSON.stringify({ email, password }),
             });
 
-            // --- MODIFICATION: Improved JSON parsing error handling ---
             let data;
             try {
+                // IMPORTANT: Clone the response BEFORE attempting to read its body (json or text)
+                // This prevents "body stream already read" error if parsing fails and you try to read again
+                const responseClone = response.clone();
                 data = await response.json();
             } catch (jsonError) {
-                console.error('Login: Error parsing JSON response:', jsonError);
-                const rawText = await response.text();
+                console.error('Login: Error parsing JSON response (likely server-side error):', jsonError);
+                const rawText = await response.text(); // Read original response as text
                 console.error('Login: Raw non-JSON response from server:', rawText);
-                alert('An unexpected server response occurred. Please check console for details.');
+                alert('An unexpected server response occurred during login. Please check console for details.');
                 return; // Stop execution here as response is not usable
             }
-            // --- END MODIFICATION ---
 
             if (response.ok) {
                 currentUser = data.patient; // Store patient data
@@ -139,7 +140,7 @@ if (registerFormElement) {
     registerFormElement.addEventListener('submit', async (e) => {
         e.preventDefault();
         const nameInput = document.getElementById('registerName');
-        const emailInput = document.getElementById('C');
+        const emailInput = document.getElementById('registerEmail'); // Corrected from 'C'
         const phoneInput = document.getElementById('registerPhone');
         const dobInput = document.getElementById('registerDob');
         const genderInput = document.getElementById('registerGender'); // Get gender input
@@ -190,18 +191,18 @@ if (registerFormElement) {
                 body: JSON.stringify({ name, email, phone, dateOfBirth: dob, gender, password }),
             });
 
-            // --- MODIFICATION: Improved JSON parsing error handling ---
             let data;
             try {
+                // Clone the response BEFORE attempting to read its body
+                const responseClone = response.clone();
                 data = await response.json();
             } catch (jsonError) {
-                console.error('Registration: Error parsing JSON response:', jsonError);
-                const rawText = await response.text();
+                console.error('Registration: Error parsing JSON response (likely server-side error):', jsonError);
+                const rawText = await response.text(); // Read original response as text
                 console.error('Registration: Raw non-JSON response from server:', rawText);
                 alert('An unexpected server response occurred during registration. Please check console for details.');
                 return; // Stop execution here
             }
-            // --- END MODIFICATION ---
 
             if (response.ok) {
                 alert('Account created successfully! Please log in.');
@@ -228,8 +229,8 @@ function logout() {
     if (loginFormElement) loginFormElement.reset();
     if (registerFormElement) registerFormElement.reset();
     if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
-    // Reload the page to ensure a clean state
-    window.location.reload(); 
+    // Reload the page to ensure a clean state (optional, but good for cleanliness)
+    window.location.reload();
 }
 
 if (logoutButton) {
@@ -254,7 +255,6 @@ async function showDashboard() {
 
         // Update other patient details
         if (patientIdDisplay) patientIdDisplay.textContent = currentUser._id || 'N/A'; // Use _id for MongoDB ID
-        // Use currentUser.dateOfBirth for display if available, fallback to currentUser.dob
         if (patientDobDisplay) patientDobDisplay.textContent = `DOB: ${formatDate(currentUser.dateOfBirth || currentUser.dob) || 'N/A'}`;
         if (patientPhoneDisplay) patientPhoneDisplay.textContent = currentUser.phone || 'N/A';
         if (patientEmailDisplay) patientEmailDisplay.textContent = currentUser.email || 'N/A';
@@ -288,12 +288,14 @@ async function initializeDashboardContent() {
         const appointmentsResponse = await fetch(`${BASE_URL}/api/appointments/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        const appointmentsResponseClone = appointmentsResponse.clone(); // Clone for potential second read
+
         let appointmentsData;
         try {
             appointmentsData = await appointmentsResponse.json();
         } catch (jsonError) {
             console.error('Dashboard: Error parsing Appointments JSON response. This means backend sent non-JSON data:', jsonError);
-            const rawText = await appointmentsResponse.text();
+            const rawText = await appointmentsResponseClone.text(); // Use the clone here
             console.error('Dashboard: Raw Appointments response (from backend):', rawText.substring(0, 500)); // Log first 500 chars
             throw new Error(`Failed to parse appointments data from server. Raw response starts with: "${rawText.substring(0, 50)}..."`);
         }
@@ -310,12 +312,14 @@ async function initializeDashboardContent() {
         const reportsResponse = await fetch(`${BASE_URL}/api/patients/reports/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        const reportsResponseClone = reportsResponse.clone(); // Clone for potential second read
+
         let reportsData;
         try {
             reportsData = await reportsResponse.json();
         } catch (jsonError) {
             console.error('Dashboard: Error parsing Reports JSON response. This means backend sent non-JSON data:', jsonError);
-            const rawText = await reportsResponse.text();
+            const rawText = await reportsResponseClone.text(); // Use the clone here
             console.error('Dashboard: Raw Reports response (from backend):', rawText.substring(0, 500)); // Log first 500 chars
             throw new Error(`Failed to parse reports data from server. Raw response starts with: "${rawText.substring(0, 50)}..."`);
         }
@@ -536,25 +540,24 @@ function checkAuth() {
         fetch(`${BASE_URL}/api/patients/profile?email=${loggedInEmail}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         })
-        .then(async response => { // Added async keyword here to use await inside
+        .then(async response => {
             if (!response.ok) {
-                // --- MODIFICATION: Handle non-JSON error for profile fetch ---
-                const errorText = await response.text();
+                const errorText = await response.text(); // Read the text of the error response
                 console.error('Re-auth: Backend sent non-OK response:', response.status, errorText);
-                throw new Error(`Authentication failed or profile not found. Server said: ${errorText.substring(0, 100)}...`);
+                throw new Error(`Authentication failed or profile not found. Server said: "${errorText.substring(0, 100)}..."`);
             }
-            // --- MODIFICATION: Improved JSON parsing error handling ---
+            // Clone the response BEFORE attempting to read its body
+            const responseClone = response.clone();
             let patientData;
             try {
                 patientData = await response.json();
             } catch (jsonError) {
-                console.error('Re-auth: Error parsing profile JSON response:', jsonError);
-                const rawText = await response.text();
+                console.error('Re-auth: Error parsing profile JSON response (likely server-side error):', jsonError);
+                const rawText = await responseClone.text(); // Use the clone here
                 console.error('Re-auth: Raw non-JSON profile response from server:', rawText);
-                throw new Error(`Re-authentication data not JSON: ${rawText.substring(0, 100)}...`);
+                throw new Error(`Re-authentication data not JSON: "${rawText.substring(0, 100)}..."`);
             }
             return patientData;
-            // --- END MODIFICATION ---
         })
         .then(patientData => {
             if (patientData && patientData.email === loggedInEmail) {
@@ -578,8 +581,4 @@ function checkAuth() {
 // Initialize the app when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth(); // Initial check for authentication status
-
-    // Attach dashboard search and tab listeners (ensures listeners are set)
-    // The setupSearch function will be called with actual data inside initializeDashboardContent
-    // The setupTabs function is called there as well to ensure correct initial state
 });
