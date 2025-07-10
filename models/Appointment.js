@@ -13,7 +13,7 @@ const AppointmentSchema = new mongoose.Schema({
         ref: 'Doctor', // Reference to the Doctor model
         required: [true, 'Doctor ID is required']
     },
-    service: {
+    service: { // Previously serviceType in script.js, now just 'service'
         type: String,
         required: [true, 'Service is required'],
         trim: true

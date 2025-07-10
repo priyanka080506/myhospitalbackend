@@ -1,3 +1,5 @@
+// public/js/script2.js
+
 // --- Configuration ---
 const BASE_URL = 'https://proud-doctors.onrender.com'; // Your Render deployment URL
 
@@ -11,6 +13,7 @@ const loginFormElement = document.getElementById('loginFormElement');
 const registerFormElement = document.getElementById('registerFormElement');
 const showRegisterBtn = document.getElementById('showRegister');
 const showLoginBtn = document.getElementById('showLogin');
+const authErrorMessage = document.getElementById('authErrorMessage'); // Added for login/register error messages
 
 // DOM elements for Dashboard Header
 const logoutButton = document.getElementById('logoutButton');
@@ -37,138 +40,54 @@ const appointmentsList = document.getElementById('appointmentsList');
 const appointmentsCount = document.getElementById('appointmentsCount');
 const reportsList = document.getElementById('reportsList');
 const reportsCount = document.getElementById('reportsCount');
+const addAppointmentButton = document.getElementById('addAppointmentButton'); // Button to open booking modal
 
 // DOM elements for Booking Modal (reused from index.html)
 const bookingModal = document.getElementById('bookingModal');
 const bookingFormElement = document.getElementById('bookingForm');
 const appointmentDateInput = document.getElementById('appointmentDate');
+const appointmentTimeInput = document.getElementById('appointmentTime'); // Added as it's required for booking
 const serviceSelect = document.getElementById('service');
 const doctorSelect = document.getElementById('doctor');
 const summaryContentElement = document.getElementById('summaryContent');
 const backBtn = document.getElementById('backBtn');
 const nextBtn = document.getElementById('nextBtn');
 const submitBtn = document.getElementById('submitBtn');
+const bookingModalCloseBtn = document.getElementById('bookingModalCloseBtn'); // Close button for booking modal
+const bookingErrorMessage = document.getElementById('bookingErrorMessage'); // For booking specific errors
 
 // Report Image Modal Elements
 const reportImageModal = document.getElementById('reportImageModal');
 const reportImageDisplay = document.getElementById('reportImageDisplay');
+const reportImageModalCloseBtn = document.getElementById('reportImageModalCloseBtn'); // Close button for report image modal
 
 // Global variables for booking modal steps
 let currentStep = 1;
 const totalSteps = 3;
 
-// Mock Data (replace with fetches from your backend later)
+// Global data caches (will be fetched from backend)
+let allDoctors = [];
+let allServices = []; // Will be fetched if a service API is available, otherwise use mock
+
+// Mock Data (will be replaced by fetches from your backend)
+// NOTE: These are now just fallback if API fails or for initial development.
+// The script will attempt to fetch real data.
 const servicesData = [
-    {
-        icon: 'fas fa-heart',
-        title: 'Cardiology',
-        description: 'Comprehensive heart care including diagnostics, treatment, and prevention of cardiovascular diseases.',
-        features: ['ECG & Echo', 'Heart Surgery', 'Preventive Care']
-    },
-    {
-        icon: 'fas fa-brain',
-        title: 'Neurology',
-        description: 'Specialized care for brain, spine, and nervous system disorders with advanced treatment options.',
-        features: ['Brain Imaging', 'Neurological Exams', 'Treatment Plans']
-    },
-    {
-        icon: 'fas fa-bone',
-        title: 'Orthopedics',
-        description: 'Expert treatment for bone, joint, and muscle conditions with both surgical and non-surgical options.',
-        features: ['Joint Replacement', 'Sports Medicine', 'Rehabilitation']
-    },
-    {
-        icon: 'fas fa-eye',
-        title: 'Surgeon',
-        description: 'Wide range of surgical operations, using various techniques and tools, to address a variety of conditions.',
-        features: ['3D Visualization', 'Rehabilation', 'Triage Tool']
-    },
-    {
-        icon: 'fas fa-baby',
-        title: 'Pediatrics',
-        description: 'Specialized healthcare for infants, children, and adolescents with compassionate care.',
-        features: ['Well-child Visits', 'Vaccinations', 'Growth Monitoring']
-    },
-    {
-        icon: 'fas fa-stethoscope',
-        title: 'Dermatology',
-        experience: '4+ Years',
-        rating: 4.9,
-        reviews: 203,
-        image: 'adhi.jpg.jpeg',
-        education: 'Christian Medical College Vellore',
-        availability: 'JSS Hospital - Tue, Thu, Fri',
-        features: ['Teledermatology', 'Digital grafing', 'Comparision Imaging']
-    }
+    { icon: 'fas fa-heart', title: 'Cardiology', description: 'Comprehensive heart care...' },
+    { icon: 'fas fa-brain', title: 'Neurology', description: 'Specialized care for brain...' },
+    { icon: 'fas fa-bone', title: 'Orthopedics', description: 'Expert treatment for bone...' },
+    { icon: 'fas fa-eye', title: 'Surgeon', description: 'Wide range of surgical operations...' },
+    { icon: 'fas fa-baby', title: 'Pediatrics', description: 'Specialized healthcare for infants...' },
+    { icon: 'fas fa-stethoscope', title: 'Dermatology', description: 'Expert skin care...' }
 ];
 
 const doctorsData = [
-    {
-        name: 'Dr. Ajanya',
-        specialty: 'Cardiology',
-        experience: '4+ Years',
-        rating: 4.9,
-        reviews: 127,
-        image: 'Ajanya.jpg.jpeg',
-        education: 'Harvard Medical School',
-        availability: 'Jayadeva Hospital - Mon, Wed, Fri',
-        _id: 'doc1' // Mock ID
-    },
-    {
-        name: 'Dr. Brunda',
-        specialty: 'Neurology',
-        experience: '6+ Years',
-        rating: 4.8,
-        reviews: 269,
-        image: 'brunda.jpg.jpeg',
-        education: 'Madras Medical College',
-        availability: 'Manipal Hospital - Tue, Thu, Sat',
-        _id: 'doc2' // Mock ID
-    },
-    {
-        name: 'Dr. Ashwin',
-        specialty: 'Pediatrics',
-        experience: '4+ Years',
-        rating: 4.9,
-        reviews: 156,
-        image: 'ashwin.jpg.jpeg',
-        education: 'St. Johns Medical college',
-        availability: 'Suraksha Hospital - Mon, Tue, Thu',
-        _id: 'doc3' // Mock ID
-    },
-    {
-        name: 'Dr. Madhukumar',
-        specialty: 'Orthopedics',
-        experience: '5+ Years',
-        rating: 4.7,
-        reviews: 89,
-        image: 'madhukumar.jpg.jpeg',
-        education: 'JSS Medical College Mysore',
-        availability: 'A R Hospital - Wed, Fri, Sat',
-        _id: 'doc4' // Mock ID
-    },
-    {
-        name: 'Dr. Prasanna',
-        specialty: 'Surgeon',
-        experience: '10+ Years',
-        rating: 4.8,
-        reviews: 112,
-        image: 'prasanna.jpg.jpeg',
-        education: 'Stanley Medical College',
-        availability: 'Sigma Hospital - Mon, Wed, Fri',
-        _id: 'doc5' // Mock ID
-    },
-    {
-        name: 'Dr. Adhi',
-        specialty: 'Dermatology',
-        experience: '4+ Years',
-        rating: 4.9,
-        reviews: 203,
-        image: 'adhi.jpg.jpeg',
-        education: 'Christian Medical College Vellore',
-        availability: 'JSS Hospital - Tue, Thu, Fri',
-        _id: 'doc6' // Mock ID
-    }
+    { name: 'Dr. Ajanya', specialty: 'Cardiology', _id: 'doc1' },
+    { name: 'Dr. Brunda', specialty: 'Neurology', _id: 'doc2' },
+    { name: 'Dr. Ashwin', specialty: 'Pediatrics', _id: 'doc3' },
+    { name: 'Dr. Madhukumar', specialty: 'Orthopedics', _id: 'doc4' },
+    { name: 'Dr. Prasanna', specialty: 'Surgeon', _id: 'doc5' },
+    { name: 'Dr. Adhi', specialty: 'Dermatology', _id: 'doc6' }
 ];
 
 
@@ -178,7 +97,8 @@ function formatDate(dateString) {
     if (!dateString) return 'N/A';
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     try {
-        const date = new Date(dateString + 'T00:00:00Z'); // Treat as UTC to avoid timezone issues
+        // Ensure date is parsed correctly, consider timezone if needed
+        const date = new Date(dateString);
         return date.toLocaleDateString('en-US', options);
     } catch (e) {
         console.error('Invalid date string for formatting:', dateString, e);
@@ -208,12 +128,28 @@ function setMinDate() {
     }
 }
 
+function showMessage(element, message, isError = true) {
+    if (element) {
+        element.textContent = message;
+        element.style.color = isError ? 'red' : 'green';
+        element.style.display = 'block';
+    }
+}
+
+function hideMessage(element) {
+    if (element) {
+        element.textContent = '';
+        element.style.display = 'none';
+    }
+}
+
 // --- UI/Modal Functions (Authentication) ---
 function showAuth() {
     if (authSection) authSection.style.display = 'flex';
     if (mainDashboard) mainDashboard.style.display = 'none';
-    if (loginFormElement) loginFormElement.classList.add('active');
+    if (loginFormElement) loginFormElement.classList.add('active'); // Default to login view
     if (registerFormElement) registerFormElement.classList.remove('active');
+    hideMessage(authErrorMessage); // Clear messages when showing auth section
 }
 
 async function showDashboard() {
@@ -221,39 +157,65 @@ async function showDashboard() {
     if (mainDashboard) mainDashboard.style.display = 'block';
 
     if (currentPatient) {
-        if (patientNameElement) patientNameElement.textContent = currentPatient.name || 'Patient';
-        if (patientIdDisplay) patientIdDisplay.textContent = `ID: ${currentPatient._id ? currentPatient._id.substring(0, 8) + '...' : 'N/A'}`;
-        if (patientEmail) patientEmail.textContent = currentPatient.email || 'N/A';
-        if (patientPhoneDisplay) patientPhoneDisplay.textContent = currentPatient.phone || 'N/A';
-        if (patientDOBDisplay) patientDOBDisplay.textContent = `DOB: ${formatDate(currentPatient.dob) || 'N/A'}`;
-        if (patientGenderDisplay) patientGenderDisplay.textContent = `Gender: ${currentPatient.gender || 'N/A'}`;
-        if (patientPhotoElement) patientPhotoElement.src = currentPatient.photo || 'https://placehold.co/100x100/e0e7ff/0275f7?text=PT';
+        // Populate header details
+        patientNameElement.textContent = currentPatient.name || 'Patient';
+        patientIdDisplay.textContent = `ID: ${currentPatient._id ? currentPatient._id.substring(0, 8) + '...' : 'N/A'}`;
+        patientEmail.textContent = currentPatient.email || 'N/A';
+        patientPhoneDisplay.textContent = currentPatient.phone || 'N/A';
+        patientDOBDisplay.textContent = `DOB: ${formatDate(currentPatient.dob) || 'N/A'}`;
+        patientGenderDisplay.textContent = `Gender: ${currentPatient.gender || 'N/A'}`;
+        patientPhotoElement.src = currentPatient.photo || 'https://placehold.co/100x100/e0e7ff/0275f7?text=PT';
     }
 
     await initializeDashboardContent();
 }
 
-// --- Photo Upload Logic (Client-Side Only for Mock) ---
+// --- Photo Upload Logic ---
+if (patientPhotoElement) {
+    patientPhotoElement.addEventListener('click', () => {
+        if (photoUploadInput) {
+            photoUploadInput.click();
+        }
+    });
+}
+
 if (photoUploadInput) {
-    photoUploadInput.addEventListener('change', (event) => {
+    photoUploadInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
 
         if (!file) return;
 
         const reader = new FileReader();
-
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             if (patientPhotoElement) patientPhotoElement.src = e.target.result;
+            
             // In a real application, you would upload this file to your backend
-            // and then update the patient's profile on the server.
-            // For now, we'll just update the client-side currentPatient object
-            if (currentPatient) {
-                currentPatient.photo = e.target.result;
-            }
+            // For now, let's just log and provide a placeholder alert
+            alert('Profile photo updated (client-side only for now). In a real app, this would be uploaded to the server to update patient profile.');
+            // Example of how you *would* send to backend (requires server-side handling for file uploads)
+            // const formData = new FormData();
+            // formData.append('profilePicture', file);
+            // const token = localStorage.getItem('authToken');
+            // try {
+            //     const response = await fetch(`${BASE_URL}/api/patients/upload-photo`, {
+            //         method: 'POST',
+            //         headers: { 'Authorization': `Bearer ${token}` },
+            //         body: formData // No Content-Type header needed for FormData
+            //     });
+            //     if (response.ok) {
+            //         const data = await response.json();
+            //         currentPatient.photo = data.photoUrl; // Update local state with server URL
+            //         alert('Profile photo uploaded successfully!');
+            //     } else {
+            //         const errorData = await response.json();
+            //         alert('Failed to upload photo: ' + (errorData.message || 'Unknown error'));
+            //     }
+            // } catch (uploadError) {
+            //     console.error('Photo upload error:', uploadError);
+            //     alert('An error occurred during photo upload.');
+            // }
         };
-
         reader.readAsDataURL(file);
-        alert('Profile photo updated (client-side only)! In a real app, this would be uploaded to the server.');
     });
 }
 
@@ -263,9 +225,10 @@ function openBookingModal() {
         bookingModal.classList.add('active');
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
         populateServiceDropdown();
-        populateDoctorDropdown();
+        populateDoctorDropdown(); // This will now fetch from backend
         prefillPatientInfo(); // Prefill patient data if logged in
         updateStep(); // Reset to step 1 and update UI
+        hideMessage(bookingErrorMessage); // Clear previous errors
     }
 }
 
@@ -274,6 +237,7 @@ function closeBookingModal() {
         bookingModal.classList.remove('active');
         document.body.style.overflow = 'auto'; // Allow background scrolling
         resetBookingForm(); // Reset form state when modal closes
+        hideMessage(bookingErrorMessage); // Clear errors
     }
 }
 
@@ -312,7 +276,9 @@ function validateCurrentStep() {
     });
 
     if (!isValid) {
-        alert('Please fill in all required fields for this step.');
+        showMessage(bookingErrorMessage, 'Please fill in all required fields for this step.', true);
+    } else {
+        hideMessage(bookingErrorMessage);
     }
     return isValid;
 }
@@ -347,7 +313,7 @@ function updateSummary() {
     const phone = formData.get('phone');
     const address = formData.get('address');
     const service = formData.get('service');
-    const doctor = formData.get('doctor');
+    const doctorName = formData.get('doctor'); // This is the doctor's name
     const appointmentDate = formData.get('appointmentDate');
     const appointmentTime = formData.get('appointmentTime');
     const notes = formData.get('notes');
@@ -375,7 +341,7 @@ function updateSummary() {
         </div>
         <div class="summary-item">
             <span class="summary-label">Doctor:</span>
-            <span class="summary-value">${doctor}</span>
+            <span class="summary-value">${doctorName}</span>
         </div>
         <div class="summary-item">
             <span class="summary-label">Date & Time:</span>
@@ -388,56 +354,143 @@ function updateSummary() {
     `;
 }
 
+async function submitAppointment() {
+    if (!bookingFormElement) return;
+
+    const formData = new FormData(bookingFormElement);
+    const appointmentData = {
+        patientName: `${formData.get('firstName')} ${formData.get('lastName')}`,
+        patientEmail: formData.get('email'),
+        patientPhone: formData.get('phone'),
+        patientAddress: formData.get('address') || '', // Optional
+        service: formData.get('service'),
+        doctorName: formData.get('doctor'),
+        doctorId: doctorSelect.options[doctorSelect.selectedIndex].getAttribute('data-doctor-id'), // Get actual doctor ID
+        date: formData.get('appointmentDate'),
+        time: formData.get('appointmentTime'),
+        notes: formData.get('notes') || '', // Optional
+        status: 'Pending' // Default status for new appointments
+    };
+
+    if (!currentPatient || !currentPatient._id) {
+        showMessage(bookingErrorMessage, 'Error: Patient not logged in.', true);
+        return;
+    }
+
+    // Add patient ID to the data
+    appointmentData.patient = currentPatient._id;
+
+    try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch(`${BASE_URL}/api/appointments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Assuming appointments can be booked by logged-in patient
+            },
+            body: JSON.stringify(appointmentData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showMessage(bookingErrorMessage, 'Appointment booked successfully!', false);
+            setTimeout(() => {
+                closeBookingModal();
+                initializeDashboardContent(); // Refresh dashboard to show new appointment
+            }, 2000);
+        } else {
+            showMessage(bookingErrorMessage, data.message || 'Failed to book appointment.', true);
+        }
+    } catch (error) {
+        console.error('Appointment booking error:', error);
+        showMessage(bookingErrorMessage, 'An error occurred during booking. Please try again.', true);
+    }
+}
+
+
 function resetBookingForm() {
     currentStep = 1;
     if (bookingFormElement) {
         bookingFormElement.reset();
         updateStep();
         document.querySelectorAll('input, select, textarea').forEach(input => {
-            input.style.borderColor = '#e2e8f0';
+            input.style.borderColor = '#e2e8f0'; // Reset border styles
         });
     }
+    hideMessage(bookingErrorMessage); // Clear messages
 }
 
 function prefillPatientInfo() {
     if (currentPatient) {
-        const firstNameInput = document.getElementById('firstName');
-        const lastNameInput = document.getElementById('lastName');
-        const emailInput = document.getElementById('email');
-        const phoneInput = document.getElementById('phone');
-        const addressInput = document.getElementById('address'); // Assuming you have an address field
+        // Split name into first/last if applicable, assuming `name` holds full name
+        const nameParts = currentPatient.name ? currentPatient.name.split(' ') : [];
+        const firstName = nameParts.length > 0 ? nameParts[0] : '';
+        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
 
-        if (firstNameInput) firstNameInput.value = currentPatient.name.split(' ')[0] || '';
-        if (lastNameInput) lastNameInput.value = currentPatient.name.split(' ').slice(1).join(' ') || '';
-        if (emailInput) emailInput.value = currentPatient.email || '';
-        if (phoneInput) phoneInput.value = currentPatient.phone || '';
-        if (addressInput) addressInput.value = currentPatient.address || ''; // Populate if address exists in patient model
+        document.getElementById('firstName').value = firstName;
+        document.getElementById('lastName').value = lastName;
+        document.getElementById('email').value = currentPatient.email || '';
+        document.getElementById('phone').value = currentPatient.phone || '';
+        document.getElementById('address').value = currentPatient.address || ''; // Populate if address exists
     }
 }
 
-function populateServiceDropdown() {
-    if (serviceSelect) {
-        serviceSelect.innerHTML = '<option value="">Select a Service</option>';
-        servicesData.forEach(service => {
-            const option = document.createElement('option');
-            option.value = service.title;
-            option.textContent = service.title;
-            serviceSelect.appendChild(option);
-        });
+async function populateServiceDropdown() {
+    if (!serviceSelect) return;
+
+    // Fetch services from backend if available, otherwise use mock data
+    let services = servicesData; // Default to mock data
+
+    // If you have an API endpoint for services, uncomment and adjust this:
+    /*
+    try {
+        const response = await fetch(`${BASE_URL}/api/services`); // Assuming a services API
+        if (response.ok) {
+            allServices = await response.json();
+            services = allServices;
+        } else {
+            console.warn('Failed to fetch services from API. Using mock data.');
+        }
+    } catch (error) {
+        console.error('Error fetching services:', error);
+        console.warn('Using mock services data.');
     }
+    */
+
+    serviceSelect.innerHTML = '<option value="">Select a Service</option>';
+    services.forEach(service => {
+        const option = document.createElement('option');
+        option.value = service.title;
+        option.textContent = service.title;
+        serviceSelect.appendChild(option);
+    });
 }
 
-function populateDoctorDropdown() {
-    if (doctorSelect) {
-        doctorSelect.innerHTML = '<option value="">Any Doctor</option>';
-        doctorsData.forEach(doctor => {
-            const option = document.createElement('option');
-            option.value = doctor.name;
-            option.textContent = `Dr. ${doctor.name} (${doctor.specialty})`;
-            option.setAttribute('data-doctor-id', doctor._id); // Store doctor ID
-            doctorSelect.appendChild(option);
-        });
+async function populateDoctorDropdown() {
+    if (!doctorSelect) return;
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/doctors`); // Fetch doctors from your backend
+        if (response.ok) {
+            allDoctors = await response.json();
+        } else {
+            console.error('Failed to fetch doctors from API. Using mock data.');
+            allDoctors = doctorsData; // Fallback to mock data if API fails
+        }
+    } catch (error) {
+        console.error('Error fetching doctors:', error);
+        allDoctors = doctorsData; // Fallback to mock data on network error
     }
+
+    doctorSelect.innerHTML = '<option value="">Any Doctor</option>';
+    allDoctors.forEach(doctor => {
+        const option = document.createElement('option');
+        option.value = doctor.name;
+        option.textContent = `Dr. ${doctor.name} (${doctor.specialty})`;
+        option.setAttribute('data-doctor-id', doctor._id); // Store doctor ID for booking
+        doctorSelect.appendChild(option);
+    });
 }
 
 // --- Report Image Modal Functions ---
@@ -457,11 +510,13 @@ function closeReportImageModal() {
     }
 }
 
+
 // --- Authentication Logic ---
 if (showRegisterBtn) {
     showRegisterBtn.addEventListener('click', () => {
         if (loginFormElement) loginFormElement.classList.remove('active');
         if (registerFormElement) registerFormElement.classList.add('active');
+        hideMessage(authErrorMessage);
     });
 }
 
@@ -469,6 +524,7 @@ if (showLoginBtn) {
     showLoginBtn.addEventListener('click', () => {
         if (registerFormElement) registerFormElement.classList.remove('active');
         if (loginFormElement) loginFormElement.classList.add('active');
+        hideMessage(authErrorMessage);
     });
 }
 
@@ -482,12 +538,12 @@ if (loginFormElement) {
         const password = passwordInput ? passwordInput.value : '';
 
         if (!email || !password) {
-            alert('Please enter both email and password.');
+            showMessage(authErrorMessage, 'Please enter both email and password.', true);
             return;
         }
 
         try {
-            const response = await fetch(`${BASE_URL}/api/auth/login`, {
+            const response = await fetch(`${BASE_URL}/api/patients/login`, { // Corrected endpoint for patient login
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
@@ -496,18 +552,19 @@ if (loginFormElement) {
             const data = await response.json();
 
             if (response.ok) {
-                currentPatient = data.patient;
-                localStorage.setItem('authToken', data.token);
-                localStorage.setItem('currentLoggedInPatientEmail', email);
+                currentPatient = data.patient; // Patient data should be returned
+                localStorage.setItem('authToken', data.token); // Store the JWT
+                localStorage.setItem('currentLoggedInPatientEmail', email); // Store email for convenience (optional)
                 console.log('Patient login successful:', currentPatient);
-                showDashboard();
+                showMessage(authErrorMessage, 'Login successful!', false);
+                setTimeout(() => showDashboard(), 500); // Small delay before showing dashboard
                 if (loginFormElement) loginFormElement.reset();
             } else {
-                alert(data.message || 'Login failed. Please check your credentials.');
+                showMessage(authErrorMessage, data.message || 'Login failed. Please check your credentials.', true);
             }
         } catch (error) {
             console.error('Login error:', error);
-            alert('An error occurred during login. Please try again later.');
+            showMessage(authErrorMessage, 'An error occurred during login. Please try again later.', true);
         }
     });
 }
@@ -532,20 +589,20 @@ if (registerFormElement) {
         const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
 
         if (!name || !email || !phone || !dob || !gender || !password || !confirmPassword) {
-            alert('Please fill in all fields.');
+            showMessage(authErrorMessage, 'Please fill in all fields.', true);
             return;
         }
         if (password !== confirmPassword) {
-            alert('Passwords do not match.');
+            showMessage(authErrorMessage, 'Passwords do not match.', true);
             return;
         }
         if (password.length < 6) {
-            alert('Password must be at least 6 characters long.');
+            showMessage(authErrorMessage, 'Password must be at least 6 characters long.', true);
             return;
         }
 
         try {
-            const response = await fetch(`${BASE_URL}/api/patients/register`, {
+            const response = await fetch(`${BASE_URL}/api/patients/register`, { // Corrected endpoint for patient registration
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, phone, dob, gender, password }),
@@ -554,16 +611,16 @@ if (registerFormElement) {
             const data = await response.json();
 
             if (response.ok) {
-                alert('Account created successfully! Please log in.');
+                showMessage(authErrorMessage, 'Account created successfully! Please log in.', false);
                 if (loginFormElement) loginFormElement.classList.add('active');
                 if (registerFormElement) registerFormElement.classList.remove('active');
                 if (registerFormElement) registerFormElement.reset();
             } else {
-                alert(data.message || 'Registration failed. Please try again.');
+                showMessage(authErrorMessage, data.message || 'Registration failed. Please try again.', true);
             }
         } catch (error) {
             console.error('Registration error:', error);
-            alert('An error occurred during registration. Please try again later.');
+            showMessage(authErrorMessage, 'An error occurred during registration. Please try again later.', true);
         }
     });
 }
@@ -572,36 +629,58 @@ if (logoutButton) {
     logoutButton.addEventListener('click', () => {
         currentPatient = null;
         localStorage.removeItem('authToken');
-        localStorage.removeItem('currentLoggedInPatientEmail');
-        showAuth();
-        if (loginFormElement) loginFormElement.reset();
+        localStorage.removeItem('currentLoggedInPatientEmail'); // Clear stored email
+        showAuth(); // Show auth section
+        if (loginFormElement) loginFormElement.reset(); // Reset forms
         if (registerFormElement) registerFormElement.reset();
-        if (searchInput) searchInput.value = '';
+        if (searchInput) searchInput.value = ''; // Clear search
         if (patientPhotoElement) patientPhotoElement.src = 'https://placehold.co/100x100/e0e7ff/0275f7?text=PT'; // Reset photo
+        hideMessage(authErrorMessage); // Clear any messages
     });
 }
 
 // --- Dashboard Data Fetching and Rendering ---
 async function initializeDashboardContent() {
-    if (!currentPatient || !currentPatient._id) {
-        console.error("No current patient or patient ID available for dashboard data.");
-        showAuth();
-        return;
-    }
-
     const token = localStorage.getItem('authToken');
+
     if (!token) {
-        console.warn("No auth token found for dashboard data. Please log in.");
-        showAuth();
+        console.warn("No auth token found. Redirecting to login.");
+        showAuth(); // Redirect to auth if no token
         return;
     }
-
-    let appointments = [];
-    let reports = [];
 
     try {
+        // Fetch Patient Profile first (to get patient._id if not already set)
+        const profileResponse = await fetch(`${BASE_URL}/api/patients/profile`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!profileResponse.ok) {
+            if (profileResponse.status === 401) {
+                showErrorMessage('Session expired. Please log in again.');
+                localStorage.removeItem('authToken');
+                setTimeout(() => showAuth(), 1000);
+            } else {
+                const errorData = await profileResponse.json();
+                showErrorMessage(errorData.message || 'Failed to fetch patient profile.');
+            }
+            return; // Stop if profile fetch fails
+        }
+        currentPatient = await profileResponse.json();
+        // Update header details from fresh profile fetch
+        patientNameElement.textContent = currentPatient.name || 'Patient';
+        patientIdDisplay.textContent = `ID: ${currentPatient._id ? currentPatient._id.substring(0, 8) + '...' : 'N/A'}`;
+        patientEmail.textContent = currentPatient.email || 'N/A';
+        patientPhoneDisplay.textContent = currentPatient.phone || 'N/A';
+        patientDOBDisplay.textContent = `DOB: ${formatDate(currentPatient.dob) || 'N/A'}`;
+        patientGenderDisplay.textContent = `Gender: ${currentPatient.gender || 'N/A'}`;
+        patientPhotoElement.src = currentPatient.photo || 'https://placehold.co/100x100/e0e7ff/0275f7?text=PT';
+
+
+        let appointments = [];
+        let reports = [];
+
         // Fetch Patient's Appointments
-        const appointmentsResponse = await fetch(`${BASE_URL}/api/patients/appointments/${currentPatient._id}`, {
+        const appointmentsResponse = await fetch(`${BASE_URL}/api/appointments/patient/${currentPatient._id}`, { // Endpoint needs patient ID
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const appointmentsData = await appointmentsResponse.json();
@@ -614,7 +693,7 @@ async function initializeDashboardContent() {
         }
 
         // Fetch Patient's Reports
-        const reportsResponse = await fetch(`${BASE_URL}/api/patients/reports/${currentPatient._id}`, {
+        const reportsResponse = await fetch(`${BASE_URL}/api/patients/reports/${currentPatient._id}`, { // Endpoint needs patient ID
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const reportsData = await reportsResponse.json();
@@ -627,12 +706,16 @@ async function initializeDashboardContent() {
         }
 
         setupSearch(appointments, reports);
-        setupTabs();
+        setupTabs(); // Re-initialize tab listeners
         updateStats(appointments, reports);
 
     } catch (error) {
         console.error('Error initializing dashboard content:', error);
-        alert('Failed to load dashboard data. Please try refreshing or logging in again.');
+        // More specific error handling could go here
+        showErrorMessage('Failed to load dashboard data. Please try refreshing or logging in again.');
+        // If there's a serious error fetching data, force re-auth
+        localStorage.removeItem('authToken');
+        setTimeout(() => showAuth(), 1000);
     }
 }
 
@@ -652,15 +735,15 @@ function renderAppointments(appointments) {
                 <div>
                     <div class="appointment-time">
                         <i class="fas fa-clock"></i>
-                        <span class="time">${appointment.time}</span>
+                        <span class="time">${appointment.time || 'N/A'}</span>
                     </div>
                     <div class="appointment-duration">
-                        <span>${appointment.duration}</span>
+                        <span>${appointment.duration || 'N/A'}</span>
                     </div>
                 </div>
                 <div class="appointment-badges">
                     <span class="status-badge ${appointment.status?.toLowerCase() || ''}">${appointment.status || 'N/A'}</span>
-                    <span class="type-badge ${appointment.type?.toLowerCase().replace('-', '') || ''}">${appointment.type || 'N/A'}</span>
+                    <span class="type-badge ${appointment.service?.toLowerCase().replace(/\s/g, '') || ''}">${appointment.service || 'N/A'}</span>
                 </div>
             </div>
 
@@ -673,10 +756,10 @@ function renderAppointments(appointments) {
                     </div>
                 </div>
                 <div class="doctor-detail">
-                    <i class="fas fa-hospital"></i>
+                    <i class="fas fa-calendar-alt"></i>
                     <div>
-                        <span class="label">Location:</span>
-                        <div class="value">${appointment.location || 'N/A'}</div>
+                        <span class="label">Date:</span>
+                        <div class="value">${formatDate(appointment.date)}</div>
                     </div>
                 </div>
             </div>
@@ -684,9 +767,9 @@ function renderAppointments(appointments) {
             <div class="appointment-notes">
                 <div class="notes-header">
                     <i class="fas fa-file-text"></i>
-                    <span class="notes-title">Condition:</span>
+                    <span class="notes-title">Notes:</span>
                 </div>
-                <div class="notes-content">${appointment.condition || 'No specific condition mentioned.'}</div>
+                <div class="notes-content">${appointment.notes || 'No specific notes mentioned.'}</div>
             </div>
 
             <div class="action-buttons">
@@ -709,7 +792,7 @@ function renderReports(reports) {
     reportsCount.textContent = `${reports.length} reports`;
 
     if (reports.length === 0) {
-        reportsList.innerHTML = '<p class="no-data-message">No reports found for you. Click "Add New Report" to create one.</p>';
+        reportsList.innerHTML = '<p class="no-data-message">No reports found for you.</p>';
         return;
     }
 
@@ -731,7 +814,7 @@ function renderReports(reports) {
 
             <div class="report-doctor-info">
                 <i class="fas fa-user-md"></i>
-                <span>Doctor: ${report.doctor || 'N/A'}</span>
+                <span>Doctor: ${report.doctorName || 'N/A'}</span>
             </div>
 
             <div class="report-summary">
@@ -765,7 +848,7 @@ function renderReports(reports) {
 }
 
 function setupSearch(appointments, reports) {
-    const searchInput = document.getElementById('searchInput');
+    // Clone original arrays to maintain state during filtering
     const originalAppointments = [...appointments];
     const originalReports = [...reports];
 
@@ -775,17 +858,17 @@ function setupSearch(appointments, reports) {
         const searchTerm = e.target.value.toLowerCase();
         const activeTab = document.querySelector('.tab-panel.active');
 
-        if (activeTab.id === 'appointments-tab') {
+        if (activeTab && activeTab.id === 'appointments-tab-panel') { // Adjusted ID
             const filteredAppointments = originalAppointments.filter(appointment =>
                 (appointment.doctorName && appointment.doctorName.toLowerCase().includes(searchTerm)) ||
-                (appointment.condition && appointment.condition.toLowerCase().includes(searchTerm)) ||
-                (appointment.type && appointment.type.toLowerCase().includes(searchTerm)) ||
-                (appointment.location && appointment.location.toLowerCase().includes(searchTerm))
+                (appointment.service && appointment.service.toLowerCase().includes(searchTerm)) ||
+                (appointment.status && appointment.status.toLowerCase().includes(searchTerm)) ||
+                (appointment.notes && appointment.notes.toLowerCase().includes(searchTerm))
             );
             renderAppointments(filteredAppointments);
-        } else if (activeTab.id === 'reports-tab') {
+        } else if (activeTab && activeTab.id === 'reports-tab-panel') { // Adjusted ID
             const filteredReports = originalReports.filter(report =>
-                (report.doctor && report.doctor.toLowerCase().includes(searchTerm)) ||
+                (report.doctorName && report.doctorName.toLowerCase().includes(searchTerm)) || // Changed to doctorName
                 (report.title && report.title.toLowerCase().includes(searchTerm)) ||
                 (report.summary && report.summary.toLowerCase().includes(searchTerm)) ||
                 (report.nextAction && report.nextAction.toLowerCase().includes(searchTerm)) ||
@@ -800,184 +883,107 @@ function setupTabs() {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabPanels = document.querySelectorAll('.tab-panel');
 
+    const handleTabClick = (e) => {
+        const targetTabId = e.currentTarget.getAttribute('data-tab');
+
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabPanels.forEach(panel => panel.classList.remove('active'));
+
+        e.currentTarget.classList.add('active');
+        document.getElementById(targetTabId).classList.add('active');
+
+        // Re-apply search filter if there's a search term when changing tabs
+        if (searchInput && searchInput.value) {
+            const searchTerm = searchInput.value.toLowerCase();
+            if (targetTabId === 'appointments-tab-panel') {
+                // Re-fetch or re-filter original appointments data
+                initializeDashboardContent(); // Simpler to re-fetch all data and then filter
+            } else if (targetTabId === 'reports-tab-panel') {
+                // Re-fetch or re-filter original reports data
+                initializeDashboardContent();
+            }
+        }
+    };
+
     tabButtons.forEach(button => {
-        button.removeEventListener('click', handleTabClick); // Prevent duplicate listeners
+        // Ensure no duplicate listeners by removing first
+        button.removeEventListener('click', handleTabClick);
         button.addEventListener('click', handleTabClick);
     });
 
-    const activeTab = document.querySelector('.tab-button.active');
-    if (!activeTab && tabButtons.length > 0) {
-        tabButtons[0].click();
+    // Set initial active tab if none is active (default to first)
+    if (!document.querySelector('.tab-button.active') && tabButtons.length > 0) {
+        tabButtons[0].click(); // Simulate click on the first tab
     }
 }
 
-function handleTabClick() {
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabPanels = document.querySelectorAll('.tab-panel');
-    const targetTab = this.getAttribute('data-tab');
-
-    tabButtons.forEach(btn => btn.classList.remove('active'));
-    tabPanels.forEach(panel => panel.classList.remove('active'));
-
-    this.classList.add('active');
-    const targetPanel = document.getElementById(targetTab);
-    if (targetPanel) targetPanel.classList.add('active');
-
-    if (searchInput && searchInput.value.trim() !== '') {
-        searchInput.dispatchEvent(new Event('input'));
-    }
-}
 
 function updateStats(appointments, reports) {
     if (upcomingAppointmentsElement) {
         const now = new Date();
-        const upcoming = appointments.filter(apt => {
-            const apptDate = new Date(apt.date + 'T' + apt.time);
-            return apptDate > now && apt.status !== 'completed' && apt.status !== 'cancelled';
-        }).length;
-        upcomingAppointmentsElement.textContent = upcoming;
+        const upcoming = appointments.filter(appt => new Date(appt.date + 'T' + appt.time) > now);
+        upcomingAppointmentsElement.textContent = upcoming.length;
     }
     if (totalReportsElement) {
         totalReportsElement.textContent = reports.length;
     }
+
     if (lastVisitDateElement) {
-        if (appointments.length > 0) {
-            // Sort appointments by date descending to find the most recent
-            const sortedAppointments = [...appointments].sort((a, b) => new Date(b.date) - new Date(a.date));
-            lastVisitDateElement.textContent = formatDate(sortedAppointments[0].date);
-        } else {
-            lastVisitDateElement.textContent = 'N/A';
-        }
+        const sortedAppointments = [...appointments].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const lastVisit = sortedAppointments.find(appt => new Date(appt.date + 'T' + appt.time) < new Date() && appt.status === 'Completed');
+        lastVisitDateElement.textContent = lastVisit ? formatDate(lastVisit.date) : 'N/A';
     }
+
     if (nextAppointmentDateElement) {
         const now = new Date();
-        const futureAppointments = appointments.filter(apt => {
-            const apptDate = new Date(apt.date + 'T' + apt.time);
-            return apptDate > now && apt.status !== 'completed' && apt.status !== 'cancelled';
-        }).sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
-
-        if (futureAppointments.length > 0) {
-            nextAppointmentDateElement.textContent = formatDate(futureAppointments[0].date);
-        } else {
-            nextAppointmentDateElement.textContent = 'N/A';
-        }
-    }
-}
-
-// --- Booking Form Submission ---
-async function handleBookingFormSubmit(e) {
-    e.preventDefault();
-
-    if (validateCurrentStep()) {
-        const formData = new FormData(bookingFormElement);
-        const selectedDoctorId = doctorSelect.options[doctorSelect.selectedIndex].getAttribute('data-doctor-id');
-
-        const bookingData = {
-            patientId: currentPatient._id, // Use actual patient ID
-            patientName: currentPatient.name,
-            patientEmail: currentPatient.email,
-            patientPhone: currentPatient.phone,
-            service: formData.get('service'),
-            doctorId: selectedDoctorId, // Send doctor's actual ID
-            doctorName: formData.get('doctor'), // Send doctor's name for display
-            date: formData.get('appointmentDate'),
-            time: formData.get('appointmentTime'),
-            notes: formData.get('notes'),
-            status: 'pending', // Default status for new appointments
-            type: 'consultation', // Default type, can be made selectable
-            duration: '30 min' // Default duration, can be made selectable
-        };
-
-        try {
-            const response = await fetch(`${BASE_URL}/api/patients/book-appointment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                },
-                body: JSON.stringify(bookingData)
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert('Appointment booked successfully! You can view it in your appointments tab.');
-                closeBookingModal();
-                await initializeDashboardContent(); // Refresh dashboard data
-            } else {
-                alert(`Appointment booking failed: ${result.message || 'An error occurred.'}`);
-            }
-        } catch (error) {
-            console.error('Booking error:', error);
-            alert('An error occurred during booking. Please check your connection.');
-        }
+        const upcomingSorted = [...appointments].filter(appt => new Date(appt.date + 'T' + appt.time) > now)
+                                                 .sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+        nextAppointmentDateElement.textContent = upcomingSorted.length > 0 ? formatDate(upcomingSorted[0].date) : 'N/A';
     }
 }
 
 
-// --- Initial App Load & Authentication Check ---
-function checkAuth() {
-    const loggedInEmail = localStorage.getItem('currentLoggedInPatientEmail');
-    const authToken = localStorage.getItem('authToken');
-
-    if (loggedInEmail && authToken) {
-        fetch(`${BASE_URL}/api/patients/profile?email=${loggedInEmail}`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Authentication failed or profile not found');
-            }
-            return response.json();
-        })
-        .then(patientData => {
-            if (patientData && patientData.email === loggedInEmail) {
-                currentPatient = patientData;
-                showDashboard();
-            } else {
-                console.error('Patient re-authentication failed or data mismatch.');
-                logout();
-            }
-        })
-        .catch(error => {
-            console.error('Error during patient re-authentication:', error);
-            logout(); // Clear state on network/API error
-        });
-    } else {
-        showAuth();
-    }
-}
-
+// --- Initial Setup & Event Listeners ---
 document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
-    setMinDate(); // Set min date for appointment booking
+    setMinDate(); // Set min date for appointment input
 
-    // Attach event listeners for booking form navigation
-    if (nextBtn) nextBtn.addEventListener('click', nextStep);
+    // Event listeners for booking modal buttons
+    if (addAppointmentButton) addAppointmentButton.addEventListener('click', openBookingModal);
+    if (bookingModalCloseBtn) bookingModalCloseBtn.addEventListener('click', closeBookingModal);
     if (backBtn) backBtn.addEventListener('click', previousStep);
-    if (bookingFormElement) bookingFormElement.addEventListener('submit', handleBookingFormSubmit);
+    if (nextBtn) nextBtn.addEventListener('click', nextStep);
+    if (submitBtn) submitBtn.addEventListener('click', submitAppointment);
 
-    // Close booking modal when clicking on overlay
-    if (bookingModal) {
-        bookingModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeBookingModal();
-            }
-        });
-    }
+    // Event listener for report image modal close
+    if (reportImageModalCloseBtn) reportImageModalCloseBtn.addEventListener('click', closeReportImageModal);
 
-    // Close report image modal when clicking on overlay
-    if (reportImageModal) {
-        reportImageModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeReportImageModal();
-            }
-        });
+    // Check for existing token on page load
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+        // Attempt to fetch patient profile to set currentPatient and show dashboard
+        // This will also validate the token
+        console.log('Auth token found. Attempting to load dashboard...');
+        initializeDashboardContent();
+        showDashboard(); // Temporarily show dashboard, initializeDashboardContent will confirm
+    } else {
+        console.log('No auth token found. Showing authentication section.');
+        showAuth();
     }
 });
 
-// Make functions globally accessible for HTML onclicks if needed (though event listeners are preferred)
-window.openBookingModal = openBookingModal;
-window.closeBookingModal = closeBookingModal;
-window.openReportImageModal = openReportImageModal;
-window.closeReportImageModal = closeReportImageModal;
+// Listener for closing modals by clicking outside (optional, but good UX)
+if (bookingModal) {
+    bookingModal.addEventListener('click', (e) => {
+        if (e.target === bookingModal) {
+            closeBookingModal();
+        }
+    });
+}
+
+if (reportImageModal) {
+    reportImageModal.addEventListener('click', (e) => {
+        if (e.target === reportImageModal) {
+            closeReportImageModal();
+        }
+    });
+}

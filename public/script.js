@@ -1,3 +1,5 @@
+// public/js/script.js
+
 // --- Configuration ---
 const BASE_URL = 'https://proud-doctors.onrender.com'; // Your Render deployment URL
 
@@ -481,7 +483,7 @@ async function handleFormSubmit(e) {
             service: formData.get('service'),
             doctor: formData.get('doctor'),
             appointmentDate: formData.get('appointmentDate'),
-                        appointmentTime: formData.get('appointmentTime'),
+            appointmentTime: formData.get('appointmentTime'),
             notes: formData.get('notes')
         };
 
@@ -491,7 +493,8 @@ async function handleFormSubmit(e) {
 
         try {
             // Send booking data to your backend
-            const response = await fetch(`${BASE_URL}/api/appointments/public-book`, { // Example endpoint for public booking
+            // --- MODIFIED LINE HERE ---
+            const response = await fetch(`${BASE_URL}/api/appointments/public-book`, { // Correct endpoint for public booking
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
