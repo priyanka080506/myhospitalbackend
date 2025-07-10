@@ -100,15 +100,23 @@
         <div class="container">
             <header class="doctor-header">
                 <div class="doctor-profile">
-                    <img src="https://placehold.co/100x100/e0e7ff/0275f7?text=DR" alt="Doctor Profile" class="doctor-profile-photo" id="doctorProfilePhoto">
+                    <!-- Doctor Photo and Upload Input -->
+                    <div class="doctor-profile-photo-wrapper">
+                        <img src="https://placehold.co/100x100/e0e7ff/0275f7?text=DR" alt="Doctor Profile" class="doctor-profile-photo" id="doctorPhoto">
+                        <input type="file" id="photoUploadInput" accept="image/*" class="photo-upload-input">
+                        <div class="upload-overlay" title="Click to change photo">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    
                     <div class="doctor-info">
                         <h1 id="doctorName">Dr. Jane Doe</h1>
                         <p class="doctor-specialty" id="doctorSpecialty">Cardiologist</p>
                         <div class="doctor-contact-info">
                             <div class="contact-item"><i class="fas fa-envelope"></i> <span id="doctorEmail">jane.doe@example.com</span></div>
-                            <div class="contact-item"><i class="fas fa-phone"></i> <span id="doctorPhone">+1234567890</span></div>
-                            <div class="contact-item"><i class="fas fa-id-card"></i> <span id="doctorLicense">LIC-123456</span></div>
-                            <div class="contact-item"><i class="fas fa-hospital"></i> <span id="doctorWorkingPlaces">City Hospital (Mon-Fri 9-5)</span></div>
+                            <div class="contact-item"><i class="fas fa-phone"></i> <span id="doctorPhoneDisplay">+1234567890</span></div>
+                            <div class="contact-item"><i class="fas fa-id-card"></i> <span id="doctorLicenseDisplay">LIC-123456</span></div>
+                            <div class="contact-item" id="doctorWorkingPlacesDisplay"><i class="fas fa-hospital"></i> <span>City Hospital (Mon-Fri 9-5)</span></div>
                         </div>
                     </div>
                 </div>
@@ -121,16 +129,16 @@
 
             <section class="dashboard-overview">
                 <div class="stat-card">
-                    <h3>Total Appointments</h3>
-                    <span class="stat-number" id="totalAppointments">0</span>
+                    <h3>Today's Appointments</h3>
+                    <span class="stat-number" id="todayAppointments">0</span>
                 </div>
                 <div class="stat-card">
                     <h3>Upcoming Appointments</h3>
                     <span class="stat-number" id="upcomingAppointments">0</span>
                 </div>
                 <div class="stat-card">
-                    <h3>Patients Today</h3>
-                    <span class="stat-number" id="patientsToday">0</span>
+                    <h3>Pending Reports</h3>
+                    <span class="stat-number" id="pendingReports">0</span>
                 </div>
                 <div class="stat-card">
                     <h3>Total Patients</h3>
@@ -159,7 +167,6 @@
                     <div class="section-header">
                         <h2>Today's Schedule</h2>
                         <span class="count-badge" id="scheduleCount">0 appointments</span>
-                        <!-- No "Add New Report" button here -->
                     </div>
                     <div class="schedule-list" id="scheduleList">
                         <!-- Schedule items will be loaded here by JavaScript -->
@@ -169,7 +176,7 @@
                 <div id="reports-tab" class="tab-panel">
                     <div class="section-header">
                         <h2>Patient Reports</h2>
-                        <span class="count-badge" id="reportsCount">0 reports</span>
+                        <span class="count-badge" id="patientsCount">0 reports</span>
                         <a href="report.html" class="add-new-button">
                             <i class="fas fa-plus-circle"></i> Add New Report
                         </a>
@@ -179,6 +186,27 @@
                     </div>
                 </div>
             </section>
+        </div>
+    </div>
+
+    <!-- Report Image View Modal -->
+    <div id="reportImageModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-image"></i>
+                    <h2>Report Image</h2>
+                </div>
+                <button class="modal-close" onclick="closeReportImageModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="reportImageDisplay" src="" alt="Report Image" class="full-width-image">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeReportImageModal()">Close</button>
+            </div>
         </div>
     </div>
 

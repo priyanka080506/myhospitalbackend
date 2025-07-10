@@ -6,7 +6,10 @@ const bcrypt = require('bcryptjs'); // For hashing and comparing passwords
 const jwt = require('jsonwebtoken'); // For creating JWTs
 const Doctor = require('../models/Doctor'); // Import the Doctor model
 const Patient = require('../models/Patient'); // Import Patient model to populate patient details
-const Report = require('../models/Report');   // NEW: Import the Report model
+const Report = require('../models/Report');   // Import the Report model
+
+// Middleware for authentication (placeholder for now, you'd implement this fully)
+// const authMiddleware = require('../middleware/authMiddleware');
 
 // @route   POST /api/doctors/register
 // @desc    Register a new doctor
@@ -16,7 +19,7 @@ router.post('/register', async (req, res) => {
     console.log('Backend received doctor registration payload:', req.body);
     // --- END DEBUGGING LINE ---
 
-    const { name, email, phone, specialty, license, password, workingPlaces, photo, appointmentFees } = req.body; // Added appointmentFees
+    const { name, email, phone, specialty, license, password, workingPlaces, photo, appointmentFees } = req.body;
 
     try {
         // 1. Check if doctor with this email already exists
@@ -35,7 +38,7 @@ router.post('/register', async (req, res) => {
             password, // This will be hashed below
             workingPlaces: workingPlaces || [], // Ensure it's an array, even if empty
             photo: photo || 'https://i.pravatar.cc/80?img=1', // Default photo if not provided
-            appointmentFees: appointmentFees // Added appointmentFees
+            appointmentFees // Include appointmentFees
         });
 
         // 3. Hash the password before saving
@@ -72,7 +75,7 @@ router.post('/register', async (req, res) => {
                         license: doctor.license,
                         workingPlaces: doctor.workingPlaces,
                         photo: doctor.photo,
-                        appointmentFees: doctor.appointmentFees // Added appointmentFees
+                        appointmentFees: doctor.appointmentFees // Include appointmentFees
                     }
                 });
             }
@@ -148,7 +151,7 @@ router.post('/login', async (req, res) => {
                         license: doctor.license,
                         workingPlaces: doctor.workingPlaces,
                         photo: doctor.photo,
-                        appointmentFees: doctor.appointmentFees // Added appointmentFees
+                        appointmentFees: doctor.appointmentFees // Include appointmentFees
                     }
                 });
             }
@@ -227,12 +230,12 @@ router.get('/patient-reports/:doctorId', async (req, res) => {
         const { doctorId } = req.params;
 
         // Find reports where the doctor field matches the provided doctorId
-        // We also populate the 'patient' field to get patient's name and ID
+        // Populate the 'patient' field to get patient's name and ID
         const reports = await Report.find({ doctor: doctorId })
                                     .populate('patient', 'name email _id') // Select only necessary patient fields
                                     .sort({ date: -1 }); // Sort by newest first
 
-        // Transform reports to match frontend's expected structure if necessary
+        // Transform reports to match frontend's expected structure
         const formattedReports = reports.map(report => ({
             id: report._id,
             patient: report.patient ? report.patient.name : 'N/A',
@@ -244,13 +247,71 @@ router.get('/patient-reports/:doctorId', async (req, res) => {
             nextAction: report.nextAction,
             title: report.title,
             type: report.type,
-            doctor: report.doctor // This is the doctor's ObjectId, might need to populate if doctor's name is needed
+            doctor: report.doctor, // This is the doctor's ObjectId, might need to populate if doctor's name is needed
+            // ADDED: Placeholder image URL for reports
+            imageUrl: `https://placehold.co/600x400/cccccc/333333?text=Report+Image+${report._id.toString().substring(0,4)}`
         }));
 
         res.json(formattedReports);
     } catch (err) {
         console.error('Error fetching patient reports for doctor:', err.message);
         res.status(500).send('Server Error fetching patient reports');
+    }
+});
+
+// @route   POST /api/doctors/add-report
+// @desc    Add a new medical report for a patient by a doctor
+// @access  Private (requires doctor auth) - you'll need auth middleware
+router.post('/add-report', async (req, res) => {
+    // For a real app, you'd get doctorId from authMiddleware (req.doctor.id)
+    // For now, let's assume doctorId is sent in the body for testing, or use currentDoctor._id from frontend
+    const { patientId, doctorId, title, date, type, status, summary, nextAction } = req.body;
+
+    // --- DEBUGGING LINE: Log the received add-report payload ---
+    console.log('Backend received add-report payload:', req.body);
+    // --- END DEBUGGING LINE ---
+
+    try {
+        // Basic validation
+        if (!patientId || !doctorId || !title || !summary) {
+            return res.status(400).json({ message: 'Missing required report fields.' });
+        }
+
+        // Verify patient and doctor exist (optional but recommended for data integrity)
+        const patientExists = await Patient.findById(patientId);
+        if (!patientExists) {
+            return res.status(404).json({ message: 'Patient not found.' });
+        }
+        const doctorExists = await Doctor.findById(doctorId);
+        if (!doctorExists) {
+            return res.status(404).json({ message: 'Doctor not found.' });
+        }
+
+        const newReport = new Report({
+            patient: patientId,
+            doctor: doctorId,
+            title,
+            date: date || Date.now(), // Use provided date or default to now
+            type: type || 'Other',
+            status: status || 'pending',
+            summary,
+            nextAction
+        });
+
+        await newReport.save();
+        res.status(201).json({ message: 'Report added successfully!', report: newReport });
+
+    } catch (err) {
+        console.error('Error adding report:', err.message);
+        // Handle validation errors from Mongoose
+        if (err.name === 'ValidationError') {
+            let errors = {};
+            Object.keys(err.errors).forEach((key) => {
+                errors[key] = err.errors[key].message;
+            });
+            return res.status(400).json({ message: 'Validation Error', errors });
+        }
+        res.status(500).send('Server Error adding report');
     }
 });
 
