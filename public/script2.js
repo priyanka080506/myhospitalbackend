@@ -7,34 +7,62 @@ let currentUser = null; // Stores user data upon successful login
 // DOM elements (Ensuring they exist before accessing)
 const authSection = document.getElementById('authSection');
 const mainDashboard = document.getElementById('mainDashboard');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
+// Using the correct IDs for login/register forms as per your index2.html
 const loginFormElement = document.getElementById('loginFormElement');
 const registerFormElement = document.getElementById('registerFormElement');
 const showRegisterBtn = document.getElementById('showRegister');
 const showLoginBtn = document.getElementById('showLogin');
 const logoutButton = document.getElementById('logoutButton');
-const patientNameElement = document.getElementById('patientName'); // For displaying patient name on dashboard
-const dashboardWelcomeText = document.getElementById('dashboardWelcomeText'); // Assuming you have this for a welcome message
 
-const appointmentsList = document.getElementById('appointmentsList');
-const appointmentCount = document.getElementById('appointmentCount');
-const reportsList = document.getElementById('reportsList');
-const reportsCount = document.getElementById('reportsCount');
-const totalAppointmentsElement = document.getElementById('totalAppointments');
+// Dashboard Patient Info Elements
+const patientNameElement = document.getElementById('patientName');
+const patientIdDisplay = document.getElementById('patientIdDisplay');
+const patientEmailDisplay = document.getElementById('patientEmail'); // Corrected ID from patientEmailDisplay
+const patientPhoneDisplay = document.getElementById('patientPhoneDisplay');
+const patientDOBDisplay = document.getElementById('patientDOBDisplay'); // Corrected ID from patientDobDisplay
+const patientGenderDisplay = document.getElementById('patientGenderDisplay');
+// Assuming you have an element for patient address on the dashboard, otherwise it's only in the modal.
+// const patientAddressDisplay = document.getElementById('patientAddressDisplay');
+
+// Dashboard Stats Elements
 const upcomingAppointmentsElement = document.getElementById('upcomingAppointments');
-const completedAppointmentsElement = document.getElementById('completedAppointments');
 const totalReportsElement = document.getElementById('totalReports');
+const lastVisitDateElement = document.getElementById('lastVisitDate'); // Your existing ID
+const nextAppointmentDateElement = document.getElementById('nextAppointmentDate'); // Your existing ID
+
+// Dashboard Content Lists
+const appointmentsList = document.getElementById('appointmentsList');
+const noAppointmentsMessage = document.getElementById('noAppointmentsMessage');
+const appointmentsCountSpan = document.getElementById('appointmentsCount'); // Renamed from appointmentCount for consistency
+const reportsList = document.getElementById('reportsList');
+const noReportsMessage = document.getElementById('noReportsMessage');
+const reportsCountSpan = document.getElementById('reportsCount'); // Renamed from reportsCount for consistency
 const searchInput = document.getElementById('searchInput');
 
-// New DOM element for gender display
-const patientGenderDisplay = document.getElementById('patientGenderDisplay');
-// New DOM elements for other patient details (from index2.html)
-const patientIdDisplay = document.getElementById('patientIdDisplay');
-const patientDobDisplay = document.getElementById('patientDobDisplay');
-const patientPhoneDisplay = document = document.getElementById('patientPhoneDisplay');
-const patientEmailDisplay = document.getElementById('patientEmailDisplay');
-const patientAddressDisplay = document.getElementById('patientAddressDisplay');
+// Report Image Modal Elements
+const reportImageModal = document.getElementById('reportImageModal');
+const reportImageDisplay = document.getElementById('reportImageDisplay');
+
+// --- Appointment Booking Modal DOM Elements (NEW/UPDATED) ---
+const bookingModal = document.getElementById('bookingModal');
+const bookingForm = document.getElementById('bookingForm');
+const formSteps = document.querySelectorAll('#bookingForm .form-step');
+const progressSteps = document.querySelectorAll('.progress-step');
+const backBtn = document.getElementById('backBtn');
+const nextBtn = document.getElementById('nextBtn');
+const submitBtn = document.getElementById('submitBtn');
+
+// Input fields in Step 1 of booking modal (to be pre-filled)
+const bookingFirstName = document.getElementById('firstName');
+const bookingLastName = document.getElementById('lastName');
+const bookingEmail = document.getElementById('email');
+const bookingPhone = document.getElementById('phone');
+const bookingAddress = document.getElementById('address');
+
+// Summary content element for Step 3
+const summaryContent = document.getElementById('summaryContent');
+
+let currentStep = 0; // State for multi-step form
 
 
 // --- Helper Functions ---
@@ -42,13 +70,14 @@ const patientAddressDisplay = document.getElementById('patientAddressDisplay');
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
     const options = {
-        weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric'
     };
     try {
-        const date = new Date(dateString + 'T00:00:00Z'); // Treat as UTC to avoid timezone issues
+        // Ensure date is parsed correctly across browsers, especially if it's just 'YYYY-MM-DD'
+        // Using `new Date(dateString + 'T00:00:00Z')` can help for consistent UTC interpretation
+        const date = new Date(dateString);
         return date.toLocaleDateString('en-US', options);
     } catch (e) {
         console.error('Invalid date string for formatting:', dateString, e);
@@ -56,11 +85,25 @@ function formatDate(dateString) {
     }
 }
 
+// Helper to format date for display in the specific "Month Day, Year" format
+function formatAppointmentDateForDisplay(dateString) {
+    if (!dateString) return 'N/A';
+    try {
+        const date = new Date(dateString + 'T00:00:00'); // Treat as local date without timezone issues
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    } catch (e) {
+        console.error('Invalid date string for formatting:', dateString, e);
+        return dateString;
+    }
+}
+
+
 function getReportIcon(type) {
     switch (type) {
         case 'Laboratory': return '<i class="fas fa-flask"></i>';
         case 'Radiology': return '<i class="fas fa-x-ray"></i>';
         case 'Cardiology': return '<i class="fas fa-heartbeat"></i>';
+        case 'General': return '<i class="fas fa-file-medical"></i>'; // Added general type
         default: return '<i class="fas fa-file-alt"></i>';
     }
 }
@@ -68,15 +111,15 @@ function getReportIcon(type) {
 // --- Authentication event listeners ---
 if (showRegisterBtn) {
     showRegisterBtn.addEventListener('click', () => {
-        if (loginForm) loginForm.classList.remove('active');
-        if (registerForm) registerForm.classList.add('active');
+        if (loginFormElement) loginFormElement.classList.remove('active');
+        if (registerFormElement) registerFormElement.classList.add('active');
     });
 }
 
 if (showLoginBtn) {
     showLoginBtn.addEventListener('click', () => {
-        if (registerForm) registerForm.classList.remove('active');
-        if (loginForm) loginForm.classList.add('active');
+        if (registerFormElement) registerFormElement.classList.remove('active');
+        if (loginFormElement) loginFormElement.classList.add('active');
     });
 }
 
@@ -140,30 +183,20 @@ if (registerFormElement) {
     registerFormElement.addEventListener('submit', async (e) => {
         e.preventDefault();
         const nameInput = document.getElementById('registerName');
-        const emailInput = document.getElementById('registerEmail'); // Corrected from 'C'
+        const emailInput = document.getElementById('registerEmail');
         const phoneInput = document.getElementById('registerPhone');
-        const dobInput = document.getElementById('registerDob');
-        const genderInput = document.getElementById('registerGender'); // Get gender input
+        const dobInput = document.getElementById('registerDOB'); // Corrected from 'registerDob'
+        const genderInput = document.getElementById('registerGender');
         const passwordInput = document.getElementById('registerPassword');
         const confirmPasswordInput = document.getElementById('confirmPassword');
 
-        let name = nameInput ? nameInput.value : '';
-        let email = emailInput ? emailInput.value : '';
-        let phone = phoneInput ? phoneInput.value : '';
-        let dob = dobInput ? dobInput.value : '';
-        let gender = genderInput ? genderInput.value : ''; // Get gender value
-
-        console.log('passwordInput:', passwordInput);
-
-        let password = '';
-        if (passwordInput) {
-            password = passwordInput.value;
-        }
-
-        let confirmPassword = '';
-        if (confirmPasswordInput) {
-            confirmPassword = confirmPasswordInput.value;
-        }
+        const name = nameInput ? nameInput.value : '';
+        const email = emailInput ? emailInput.value : '';
+        const phone = phoneInput ? phoneInput.value : '';
+        const dob = dobInput ? dobInput.value : '';
+        const gender = genderInput ? genderInput.value : '';
+        const password = passwordInput ? passwordInput.value : '';
+        const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
 
         // Validate form
         if (!name || !email || !phone || !dob || !gender || !password || !confirmPassword) {
@@ -206,8 +239,8 @@ if (registerFormElement) {
 
             if (response.ok) {
                 alert('Account created successfully! Please log in.');
-                if (loginForm) loginForm.classList.add('active');
-                if (registerForm) registerForm.classList.remove('active');
+                if (loginFormElement) loginFormElement.classList.add('active');
+                if (registerFormElement) registerFormElement.classList.remove('active');
                 if (registerFormElement) registerFormElement.reset();
             } else {
                 alert(data.message || 'Registration failed. Please try again.');
@@ -228,7 +261,7 @@ function logout() {
     if (mainDashboard) mainDashboard.style.display = 'none';
     if (loginFormElement) loginFormElement.reset();
     if (registerFormElement) registerFormElement.reset();
-    if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
+    if (searchInput) searchInput.value = ''; // Clear search input
     // Reload the page to ensure a clean state (optional, but good for cleanliness)
     window.location.reload();
 }
@@ -241,24 +274,25 @@ if (logoutButton) {
 function showAuth() {
     if (authSection) authSection.style.display = 'flex';
     if (mainDashboard) mainDashboard.style.display = 'none';
-    if (loginForm) loginForm.classList.add('active');
-    if (registerForm) registerForm.classList.remove('active');
+    // Ensure login form is active by default when showing auth
+    if (loginFormElement) loginFormElement.classList.add('active');
+    if (registerFormElement) registerFormElement.classList.remove('active');
 }
 
 async function showDashboard() {
     if (authSection) authSection.style.display = 'none';
-    if (mainDashboard) mainDashboard.style.display = 'block';
+    if (mainDashboard) mainDashboard.style.display = 'block'; // Or 'flex' if you prefer for your layout
 
     if (currentUser) {
         if (patientNameElement) patientNameElement.textContent = currentUser.name || 'Patient';
-        if (dashboardWelcomeText) dashboardWelcomeText.textContent = `Welcome, ${currentUser.name || 'Patient'}!`;
+        // if (dashboardWelcomeText) dashboardWelcomeText.textContent = `Welcome, ${currentUser.name || 'Patient'}!`; // No dashboardWelcomeText in your index2.html
 
         // Update other patient details
-        if (patientIdDisplay) patientIdDisplay.textContent = currentUser._id || 'N/A'; // Use _id for MongoDB ID
-        if (patientDobDisplay) patientDobDisplay.textContent = `DOB: ${formatDate(currentUser.dateOfBirth || currentUser.dob) || 'N/A'}`;
+        if (patientIdDisplay) patientIdDisplay.textContent = `ID: ${currentUser._id ? currentUser._id.substring(0, 8).toUpperCase() : 'N/A'}`; // Use _id for MongoDB ID
+        if (patientDOBDisplay) patientDOBDisplay.textContent = `DOB: ${formatDate(currentUser.dateOfBirth || currentUser.dob) || 'N/A'}`;
         if (patientPhoneDisplay) patientPhoneDisplay.textContent = currentUser.phone || 'N/A';
         if (patientEmailDisplay) patientEmailDisplay.textContent = currentUser.email || 'N/A';
-        if (patientAddressDisplay) patientAddressDisplay.textContent = currentUser.address || 'N/A';
+        // if (patientAddressDisplay) patientAddressDisplay.textContent = currentUser.address || 'N/A'; // No element for this in index2.html
         if (patientGenderDisplay) patientGenderDisplay.textContent = `Gender: ${currentUser.gender || 'N/A'}`;
     }
 
@@ -285,7 +319,8 @@ async function initializeDashboardContent() {
 
     try {
         // --- Fetch Appointments ---
-        const appointmentsResponse = await fetch(`${BASE_URL}/api/appointments/${currentUser._id}`, {
+        // Your backend endpoint for patient appointments should be /api/appointments/patient/:patientId
+        const appointmentsResponse = await fetch(`${BASE_URL}/api/appointments/patient/${currentUser._id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const appointmentsResponseClone = appointmentsResponse.clone(); // Clone for potential second read
@@ -337,127 +372,64 @@ async function initializeDashboardContent() {
         setupTabs();
         updateStats(appointments, reports);
 
+        // --- NEW: Initialize Appointment Booking Modal Logic ---
+        setupAppointmentBookingModal(); // Call this after currentUser is set and DOM is ready
+
     } catch (error) {
         console.error('Error initializing dashboard content (overall fetch process):', error);
         alert('Failed to load dashboard data. Please try refreshing or logging in again. Check browser console for specific server message.');
+        // Optionally, force logout if dashboard data cannot be loaded consistently
+        // logout();
     }
 }
 
 
 function renderAppointments(appointments) {
-    if (!appointmentsList || !appointmentCount) return;
+    if (!appointmentsList || !appointmentsCountSpan || !noAppointmentsMessage) return;
 
-    appointmentCount.textContent = `${appointments.length} appointments`;
+    appointmentsCountSpan.textContent = `${appointments.length} appointments`;
 
     if (appointments.length === 0) {
-        appointmentsList.innerHTML = '<p class="no-data-message">No appointments found.</p>';
+        appointmentsList.innerHTML = ''; // Clear any previous appointments
+        noAppointmentsMessage.style.display = 'block'; // Show "No appointments found" message
         return;
     }
 
+    noAppointmentsMessage.style.display = 'none'; // Hide "No appointments found" message
     appointmentsList.innerHTML = appointments.map(appointment => `
-        <div class="card">
-            <div class="appointment-header">
-                <div>
-                    <div class="appointment-date">
-                        <i class="fas fa-calendar"></i>
-                        <span class="date">${formatDate(appointment.date)}</span>
-                    </div>
-                    <div class="appointment-time">
-                        <i class="fas fa-clock"></i>
-                        <span>${appointment.time}</span>
-                    </div>
-                </div>
-                <div class="appointment-badges">
-                    <span class="status-badge ${appointment.status?.toLowerCase() || ''}">${appointment.status || 'N/A'}</span>
-                    <span class="type-badge ${appointment.type?.toLowerCase().replace('-', '') || ''}">${appointment.type || 'N/A'}</span>
-                </div>
-            </div>
-
-            <div class="appointment-details">
-                <div class="detail-item">
-                    <i class="fas fa-user-md"></i>
-                    <div>
-                        <span class="label">${appointment.doctor || 'N/A'}</span>
-                        <div class="value">${appointment.department || 'N/A'}</div>
-                    </div>
-                </div>
-                <div class="detail-item">
-                    <i class="fas fa-stethoscope"></i>
-                    <div>
-                        <span class="label">Diagnosis</span>
-                        <div class="value">${appointment.diagnosis || 'N/A'}</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="appointment-notes">
-                <div class="notes-header">
-                    <i class="fas fa-file-text"></i>
-                    <span class="notes-title">Notes:</span>
-                </div>
-                <div class="notes-content">${appointment.notes || 'No notes available.'}</div>
-            </div>
-
-            <button class="view-button">
-                <i class="fas fa-eye"></i>
-                View Details
-            </button>
+        <div class="appointment-card">
+            <h3>${appointment.service || 'General Consultation'} with ${appointment.doctor || 'Any Doctor'}</h3>
+            <p><strong>Date:</strong> ${formatAppointmentDateForDisplay(appointment.appointmentDate) || 'N/A'}</p>
+            <p><strong>Time:</strong> ${appointment.appointmentTime || 'N/A'}</p>
+            <p><strong>Status:</strong> ${appointment.status || 'Scheduled'}</p>
+            ${appointment.notes ? `<p><strong>Notes:</strong> ${appointment.notes}</p>` : ''}
         </div>
     `).join('');
 }
 
 function renderReports(reports) {
-    if (!reportsList || !reportsCount) return;
+    if (!reportsList || !reportsCountSpan || !noReportsMessage) return;
 
-    reportsCount.textContent = `${reports.length} reports`;
+    reportsCountSpan.textContent = `${reports.length} reports`;
 
     if (reports.length === 0) {
-        reportsList.innerHTML = '<p class="no-data-message">No patient reports found.</p>';
+        reportsList.innerHTML = ''; // Clear any previous reports
+        noReportsMessage.style.display = 'block'; // Show "No reports found" message
         return;
     }
 
+    noReportsMessage.style.display = 'none'; // Hide "No reports found" message
     reportsList.innerHTML = reports.map(report => `
-        <div class="card">
-            <div class="report-header">
-                <div class="report-title-section">
-                    <div class="report-icon">${getReportIcon(report.type)}</div>
-                    <div>
-                        <div class="report-title">${report.title}</div>
-                        <div class="report-date">
-                            <i class="fas fa-calendar"></i>
-                            <span>${formatDate(report.date)}</span>
-                        </div>
-                    </div>
-                </div>
-                <span class="report-type-badge ${report.type?.toLowerCase() || ''}">${report.type || 'N/A'}</span>
-            </div>
-
-            <div class="report-doctor">
-                <i class="fas fa-user-md"></i>
-                <span>By ${report.doctor || 'N/A'}</span>
-            </div>
-
-            <div class="report-summary">
-                <p><strong>Summary:</strong> ${report.summary || 'No summary available.'}</p>
-                <p><strong>Next Action:</strong> ${report.nextAction || 'N/A'}</p>
-            </div>
-
-            <div class="report-footer">
-                <span class="final-badge">✓ ${report.status || 'N/A'}</span>
-                <div class="report-actions">
-                    <button class="action-button view">
-                        <i class="fas fa-eye"></i>
-                        View
-                    </button>
-                    <button class="action-button download">
-                        <i class="fas fa-download"></i>
-                        Download
-                    </button>
-                </div>
-            </div>
+        <div class="report-card">
+            <h3>${report.title || 'Untitled Report'}</h3>
+            <p><strong>Date:</strong> ${formatDate(report.date) || 'N/A'}</p>
+            <p><strong>Doctor:</strong> ${report.doctorName || 'N/A'}${report.doctorSpecialty ? ` (${report.doctorSpecialty})` : ''}</p>
+            <p><strong>Summary:</strong> ${report.summary || 'No summary provided.'}</p>
+            ${report.imageUrl ? `<img src="${report.imageUrl}" alt="Report Image" class="report-image" onclick="openReportImageModal('${report.imageUrl}')">` : ''}
         </div>
     `).join('');
 }
+
 
 function setupSearch(appointments, reports) {
     const searchInput = document.getElementById('searchInput');
@@ -471,17 +443,19 @@ function setupSearch(appointments, reports) {
         const searchTerm = e.target.value.toLowerCase();
 
         const filteredAppointments = originalAppointments.filter(appointment =>
+            (appointment.service && appointment.service.toLowerCase().includes(searchTerm)) || // Changed from 'type' to 'service'
             (appointment.doctor && appointment.doctor.toLowerCase().includes(searchTerm)) ||
-            (appointment.department && appointment.department.toLowerCase().includes(searchTerm)) ||
-            (appointment.diagnosis && appointment.diagnosis.toLowerCase().includes(searchTerm)) ||
-            (appointment.notes && appointment.notes.toLowerCase().includes(searchTerm))
+            (appointment.status && appointment.status.toLowerCase().includes(searchTerm)) ||
+            (appointment.notes && appointment.notes.toLowerCase().includes(searchTerm)) ||
+            (appointment.appointmentDate && formatAppointmentDateForDisplay(appointment.appointmentDate).toLowerCase().includes(searchTerm))
         );
 
         const filteredReports = originalReports.filter(report =>
             (report.title && report.title.toLowerCase().includes(searchTerm)) ||
             (report.type && report.type.toLowerCase().includes(searchTerm)) ||
-            (report.doctor && report.doctor.toLowerCase().includes(searchTerm)) ||
-            (report.summary && report.summary.toLowerCase().includes(searchTerm))
+            (report.doctorName && report.doctorName.toLowerCase().includes(searchTerm)) ||
+            (report.summary && report.summary.toLowerCase().includes(searchTerm)) ||
+            (report.date && formatDate(report.date).toLowerCase().includes(searchTerm))
         );
 
         renderAppointments(filteredAppointments);
@@ -497,35 +471,67 @@ function setupTabs() {
         button.addEventListener('click', () => {
             const targetTab = button.getAttribute('data-tab');
 
-            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
             tabPanels.forEach(panel => panel.classList.remove('active'));
 
             button.classList.add('active');
+            button.setAttribute('aria-selected', 'true');
             const targetPanel = document.getElementById(targetTab);
             if (targetPanel) targetPanel.classList.add('active');
         });
     });
     // Ensure one tab is active by default on load
     if (tabButtons.length > 0) {
-        tabButtons[0].click(); // Activate the first tab by default
+        // Find the initially active tab or click the first one
+        const activeTab = document.querySelector('.tab-button.active');
+        if (activeTab) {
+            activeTab.click();
+        } else {
+            tabButtons[0].click(); // Activate the first tab by default
+        }
     }
 }
 
 function updateStats(appointments, reports) {
-    if (totalAppointmentsElement) {
-        totalAppointmentsElement.textContent = appointments.length;
+    if (upcomingAppointmentsElement) {
+        const now = new Date();
+        const upcoming = appointments.filter(apt => {
+            const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
+            return aptDateTime >= now && apt.status !== 'completed' && apt.status !== 'cancelled';
+        }).length;
+        upcomingAppointmentsElement.textContent = upcoming;
     }
     if (totalReportsElement) {
         totalReportsElement.textContent = reports.length;
     }
-    if (upcomingAppointmentsElement) {
-        // Filter for upcoming appointments (date in future and not completed)
-        const upcoming = appointments.filter(apt => new Date(apt.date) >= new Date() && apt.status !== 'completed').length;
-        upcomingAppointmentsElement.textContent = upcoming;
+
+    if (lastVisitDateElement) {
+        const completedAppointments = appointments.filter(apt => {
+            const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
+            return aptDateTime < new Date() && apt.status === 'completed';
+        }).sort((a, b) => new Date(`${b.appointmentDate}T${b.appointmentTime}`) - new Date(`${a.appointmentDate}T${a.appointmentTime}`)); // Sort desc
+        if (completedAppointments.length > 0) {
+            lastVisitDateElement.textContent = formatAppointmentDateForDisplay(completedAppointments[0].appointmentDate);
+        } else {
+            lastVisitDateElement.textContent = 'N/A';
+        }
     }
-    if (completedAppointmentsElement) {
-        const completed = appointments.filter(apt => apt.status === 'completed').length;
-        completedAppointmentsElement.textContent = completed;
+
+    if (nextAppointmentDateElement) {
+        const upcomingAppointments = appointments.filter(apt => {
+            const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
+            return aptDateTime >= new Date() && apt.status !== 'completed' && apt.status !== 'cancelled';
+        }).sort((a, b) => new Date(`${a.appointmentDate}T${a.appointmentTime}`) - new Date(`${b.appointmentDate}T${b.appointmentTime}`)); // Sort asc
+
+        if (upcomingAppointments.length > 0) {
+            const nextAppt = upcomingAppointments[0];
+            nextAppointmentDateElement.textContent = `${formatAppointmentDateForDisplay(nextAppt.appointmentDate)} at ${nextAppt.appointmentTime}`;
+        } else {
+            nextAppointmentDateElement.textContent = 'N/A';
+        }
     }
 }
 
@@ -536,27 +542,16 @@ function checkAuth() {
     const authToken = localStorage.getItem('authToken');
 
     if (loggedInEmail && authToken) {
-        // Attempt to re-authenticate using the stored email and token
-        fetch(`${BASE_URL}/api/patients/profile?email=${loggedInEmail}`, {
+        fetch(`${BASE_URL}/api/patients/profile?email=${loggedInEmail}`, { // Fetch profile by email to get full patient data
             headers: { 'Authorization': `Bearer ${authToken}` }
         })
         .then(async response => {
             if (!response.ok) {
-                const errorText = await response.text(); // Read the text of the error response
+                const errorText = await response.text();
                 console.error('Re-auth: Backend sent non-OK response:', response.status, errorText);
                 throw new Error(`Authentication failed or profile not found. Server said: "${errorText.substring(0, 100)}..."`);
             }
-            // Clone the response BEFORE attempting to read its body
-            const responseClone = response.clone();
-            let patientData;
-            try {
-                patientData = await response.json();
-            } catch (jsonError) {
-                console.error('Re-auth: Error parsing profile JSON response (likely server-side error):', jsonError);
-                const rawText = await responseClone.text(); // Use the clone here
-                console.error('Re-auth: Raw non-JSON profile response from server:', rawText);
-                throw new Error(`Re-authentication data not JSON: "${rawText.substring(0, 100)}..."`);
-            }
+            const patientData = await response.json(); // Assuming this is always JSON now
             return patientData;
         })
         .then(patientData => {
@@ -582,3 +577,231 @@ function checkAuth() {
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth(); // Initial check for authentication status
 });
+
+// --- Report Image Modal Logic ---
+// These are already in your original script and correctly defined as window functions
+// No changes needed here, just ensuring they are available globally as expected.
+window.openReportImageModal = function(imageUrl) {
+    if (reportImageDisplay && reportImageModal) {
+        reportImageDisplay.src = imageUrl;
+        reportImageModal.classList.add('active');
+    }
+}
+
+window.closeReportImageModal = function() {
+    if (reportImageModal && reportImageDisplay) {
+        reportImageModal.classList.remove('active');
+        reportImageDisplay.src = ''; // Clear image source
+    }
+}
+
+// Close report image modal on outside click
+if (reportImageModal) {
+    reportImageModal.addEventListener('click', (event) => {
+        if (event.target === reportImageModal) {
+            closeReportImageModal();
+        }
+    });
+}
+
+
+// --- Appointment Booking Modal Logic (Integrated with your existing structure) ---
+
+// Function to show a specific step
+function showStep(stepIndex) {
+    formSteps.forEach((step, index) => {
+        step.classList.remove('active');
+        if (index === stepIndex) {
+            step.classList.add('active');
+        }
+    });
+    updateProgressBar(stepIndex);
+    updateNavigationButtons(stepIndex);
+}
+
+// Function to update the progress bar
+function updateProgressBar(stepIndex) {
+    progressSteps.forEach((step, index) => {
+        if (index <= stepIndex) {
+            step.classList.add('active');
+        } else {
+            step.classList.remove('active');
+        }
+    });
+}
+
+// Function to update navigation buttons visibility
+function updateNavigationButtons(stepIndex) {
+    backBtn.style.display = stepIndex === 0 ? 'none' : 'inline-flex';
+    nextBtn.style.display = stepIndex === formSteps.length - 1 ? 'none' : 'inline-flex';
+    submitBtn.style.display = stepIndex === formSteps.length - 1 ? 'inline-flex' : 'none';
+}
+
+// Function to open the booking modal
+// This is called from the HTML button's `onclick`
+window.openBookingModal = function() {
+    if (!currentUser) {
+        alert("Please log in to book an appointment.");
+        showAuth(); // Redirect to login if not logged in
+        return;
+    }
+
+    if (bookingModal) bookingModal.classList.add('active');
+    currentStep = 0; // Reset to first step
+    showStep(currentStep); // Show the first step
+
+    // Populate patient info in Step 1
+    if (currentUser) {
+        // Split name into first and last if combined
+        const nameParts = currentUser.name ? currentUser.name.split(' ') : [];
+        bookingFirstName.value = nameParts[0] || '';
+        bookingLastName.value = nameParts.slice(1).join(' ') || '';
+        bookingEmail.value = currentUser.email || '';
+        bookingPhone.value = currentUser.phone || '';
+        // Assuming 'address' field in your patient model. If not, this will be empty.
+        bookingAddress.value = currentUser.address || '';
+    }
+}
+
+// Function to close the booking modal
+// This is called from the modal's close button `onclick`
+window.closeBookingModal = function() {
+    if (bookingModal) bookingModal.classList.remove('active');
+    if (bookingForm) bookingForm.reset(); // Clear form fields on close
+    currentStep = 0; // Reset step
+    showStep(currentStep); // Ensure step 1 is active for next open
+}
+
+// Function to populate appointment summary in Step 3
+function populateSummary() {
+    // Get values from the form inputs
+    const service = document.getElementById('service').value;
+    const doctor = document.getElementById('doctor').value;
+    const appointmentDate = document.getElementById('appointmentDateInput').value;
+    const appointmentTime = document.getElementById('appointmentTimeInput').value;
+    const notes = document.getElementById('notes').value;
+
+    let summaryHtml = '';
+    summaryHtml += `<p><strong>Patient Name:</strong> ${currentUser.name || 'N/A'}</p>`;
+    summaryHtml += `<p><strong>Service:</strong> ${service || 'N/A'}</p>`;
+    summaryHtml += `<p><strong>Preferred Doctor:</strong> ${doctor || 'Any Doctor'}</p>`;
+    summaryHtml += `<p><strong>Date:</strong> ${appointmentDate ? formatAppointmentDateForDisplay(appointmentDate) : 'N/A'}</p>`;
+    summaryHtml += `<p><strong>Time:</strong> ${appointmentTime || 'N/A'}</p>`;
+    if (notes) {
+        summaryHtml += `<p><strong>Notes:</strong> ${notes}</p>`;
+    } else {
+        summaryHtml += `<p><strong>Notes:</strong> None</p>`;
+    }
+    if (summaryContent) summaryContent.innerHTML = summaryHtml;
+}
+
+
+// Event listeners for multi-step navigation and form submission
+function setupAppointmentBookingModal() {
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            // Basic validation before moving to next step
+            const currentActiveStep = formSteps[currentStep];
+            const inputs = currentActiveStep.querySelectorAll('input[required], select[required], textarea[required]');
+            let allValid = true;
+            inputs.forEach(input => {
+                if (!input.checkValidity()) {
+                    allValid = false;
+                    input.reportValidity(); // Show browser's validation message
+                }
+            });
+
+            if (allValid) {
+                if (currentStep < formSteps.length - 1) {
+                    currentStep++;
+                    if (currentStep === formSteps.length - 1) { // If moving to the last step (summary)
+                        populateSummary();
+                    }
+                    showStep(currentStep);
+                }
+            }
+        });
+    }
+
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+    }
+
+    // Form submission for booking appointment
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            if (!currentUser || !currentUser._id) {
+                alert("Patient not logged in. Cannot book appointment.");
+                logout();
+                return;
+            }
+
+            const formData = new FormData(bookingForm);
+            // Collect all relevant data from the form, including readonly fields
+            const appointmentData = {
+                patient: currentUser._id, // Send patient ID
+                service: formData.get('service'),
+                doctor: formData.get('doctor'),
+                appointmentDate: formData.get('appointmentDate'),
+                appointmentTime: formData.get('appointmentTime'),
+                notes: formData.get('notes'),
+                status: 'Scheduled' // Default status for new appointments
+            };
+
+            console.log('Attempting to book appointment with data:', appointmentData);
+
+            // --- Send data to your backend API ---
+            try {
+                const token = localStorage.getItem('authToken');
+
+                if (!token) {
+                    alert('Authentication token missing. Please log in again.');
+                    logout();
+                    return;
+                }
+
+                const response = await fetch(`${BASE_URL}/api/appointments`, { // Endpoint to create new appointment
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(appointmentData)
+                });
+
+                if (!response.ok) {
+                    const errorResponse = await response.json();
+                    throw new Error(errorResponse.message || `Failed to book appointment: Server responded with status ${response.status}`);
+                }
+
+                const result = await response.json();
+                alert('Appointment booked successfully!');
+                console.log('Appointment booking response:', result);
+
+                closeBookingModal(); // Close the modal
+                // Refresh dashboard content to show new appointment
+                await initializeDashboardContent(); // Re-fetch all dashboard data
+
+            } catch (error) {
+                console.error('Error booking appointment:', error);
+                alert(`Error booking appointment: ${error.message || 'Please check console for details.'}`);
+            }
+        });
+    }
+
+    // Close modal on outside click (for booking modal)
+    if (bookingModal) {
+        bookingModal.addEventListener('click', (event) => {
+            if (event.target === bookingModal) {
+                closeBookingModal();
+            }
+        });
+    }
+}
