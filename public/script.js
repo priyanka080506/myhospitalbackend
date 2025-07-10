@@ -1,5 +1,3 @@
-// public/js/script.js
-
 // --- Configuration ---
 const BASE_URL = 'https://proud-doctors.onrender.com'; // Your Render deployment URL
 
@@ -87,7 +85,7 @@ const doctorsData = [
         reviews: 89,
         image: 'madhukumar.jpg.jpeg',
         education: 'JSS Medical College Mysore',
-        availability: 'A R Hospital - Wed, Fri, Sat (7AM-4PM)'
+        availability: 'A R Hospital - Wed, Fri, Sat'
     },
     {
         name: 'Dr. Prasanna',
@@ -97,7 +95,7 @@ const doctorsData = [
         reviews: 112,
         image: 'prasanna.jpg.jpeg',
         education: 'Stanley Medical College',
-        availability: 'Sigma Hospital - Mon, Wed, Fri (9AM-6PM)'
+        availability: 'Sigma Hospital - Mon, Wed, Fri'
     },
     {
         name: 'Dr. Adhi',
@@ -107,7 +105,7 @@ const doctorsData = [
         reviews: 203,
         image: 'adhi.jpg.jpeg',
         education: 'Christian Medical College Vellore',
-        availability: 'JSS Hospital - Tue, Thu, Fri (7AM-4PM)'
+        availability: 'JSS Hospital - Tue, Thu, Fri'
     }
 ];
 
@@ -483,7 +481,7 @@ async function handleFormSubmit(e) {
             service: formData.get('service'),
             doctor: formData.get('doctor'),
             appointmentDate: formData.get('appointmentDate'),
-            appointmentTime: formData.get('appointmentTime'),
+                        appointmentTime: formData.get('appointmentTime'),
             notes: formData.get('notes')
         };
 
@@ -493,8 +491,7 @@ async function handleFormSubmit(e) {
 
         try {
             // Send booking data to your backend
-            // --- MODIFIED LINE HERE ---
-            const response = await fetch(`${BASE_URL}/api/appointments/public-book`, { // Correct endpoint for public booking
+            const response = await fetch(`${BASE_URL}/api/appointments/public-book`, { // Example endpoint for public booking
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

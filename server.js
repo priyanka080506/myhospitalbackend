@@ -1,118 +1,91 @@
 // server.js
 
-require('dotenv').config(); // Load environment variables from .env file
+// 1. Load environment variables from .env file FIRST.
+// This line must be at the very top of your file.
+require('dotenv').config();
 
+// --- DEBUGGING LOGS: START ---
+console.log('--- Render Deployment Debugging Check ---');
+console.log('Current working directory:', process.cwd());
+console.log('process.env.NODE_ENV:', process.env.NODE_ENV); // Render usually sets this to 'production'
+console.log('process.env.PORT:', process.env.PORT); // Render sets its own PORT
+console.log('process.env.MONGO_URI (raw from process.env):', process.env.MONGO_URI); // THIS IS THE KEY ONE
+console.log('process.env.JWT_SECRET (raw from process.env):', process.env.JWT_SECRET);
+console.log('-----------------------------------------');
+// --- DEBUGGING LOGS: END ---
+
+
+// 2. Import necessary libraries
 const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const path = require('path'); // Core Node.js module for handling file paths
+const mongoose = require('mongoose'); // For MongoDB interaction
+const cors = require('cors');         // For Cross-Origin Resource Sharing
+const path = require('path');         // Node.js built-in module for working with file and directory paths
 
-// --- Import Route Files ---
+// --- Import all your route files ---
+const authRoutes = require('./routes/authRoutes');
+const doctorRoutes = require('./routes/doctorRoutes'); // Ensure this is imported
 const patientRoutes = require('./routes/patientRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
-const doctorRoutes = require('./routes/doctorRoutes');
+// Assuming userRoutes exists, if not, remove or create it
+const userRoutes = require('./routes/userRoutes'); 
 
+
+// 3. Initialize Express app
 const app = express();
 
-// --- Debugging startup logs ---
-console.log('Server starting...');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('MONGO_URI:', process.env.MONGO_URI ? '*********** (set)' : 'MONGO_URI is NOT set');
-console.log('JWT_SECRET:', process.env.JWT_SECRET ? '*********** (set)' : 'JWT_SECRET is NOT set');
+// 4. Get PORT and MongoDB URI from environment variables
+const PORT = process.env.PORT || 5000;
+const MONGODB_URI = process.env.MONGO_URI;
 
+// --- DEBUGGING LOG: Check MONGODB_URI after assignment ---
+console.log('MONGODB_URI variable after assignment:', MONGODB_URI);
+// --- DEBUGGING LOG: END ---
 
-// --- Database Connection ---
-const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('MongoDB Connected...');
-    } catch (err) {
-        console.error('MongoDB Connection Error:', err.message);
-        // Exit process with failure
-        process.exit(1);
-    }
-};
-
-// Connect to Database
-connectDB();
-
-// --- Middleware ---
-// Enable CORS for all origins (adjust in production for specific origins)
+// --- 5. Middleware ---
 app.use(cors());
-
-// Body parser middleware to handle JSON data
 app.use(express.json());
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// --- Basic Health Check Route (Added as a very first route for testing) ---
-// This route is placed very early to test basic Express functionality.
-app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'ok', message: 'API is healthy and basic routes work.' });
-    console.log('Health check route hit successfully.');
+
+// --- 6. MongoDB Connection ---
+mongoose.connect(MONGODB_URI)
+    .then(() => {
+        console.log('MongoDB connected successfully!');
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+            console.log(`Access your frontend at: http://localhost:${PORT}`);
+            console.log(`API endpoints will be at: http://localhost:${PORT}/api/...`);
+        });
+    })
+    .catch(err => {
+        console.error('MongoDB connection error:', err);
+        process.exit(1);
+    });
+
+// --- 7. API Routes ---
+// Mount your route files here
+app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/doctors', doctorRoutes); // Ensure this line is present and correct
+app.use('/api/patients', patientRoutes);
+app.use('/api/appointments', appointmentRoutes);
+
+
+// --- 8. Catch-all for undefined API routes (Optional, but useful for debugging) ---
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        // If it's an API path but no route matched, send 404 JSON
+        res.status(404).json({ message: "API endpoint not found" });
+    } else {
+        // For non-API paths, let Express handle static files or send a generic 404 HTML
+        res.status(404).send("Page not found");
+    }
 });
 
 
-// --- Define API Routes with Error Catching ---
-console.log('Attempting to register API routes...');
-try {
-    app.use('/api/patients', patientRoutes);
-    console.log('Successfully registered /api/patients routes.');
-} catch (e) {
-    console.error('CRITICAL ERROR during /api/patients route registration:', e.message);
-    process.exit(1); // Exit to make error clear in logs
-}
-
-try {
-    app.use('/api/appointments', appointmentRoutes);
-    console.log('Successfully registered /api/appointments routes.');
-} catch (e) {
-    console.error('CRITICAL ERROR during /api/appointments route registration:', e.message);
-    process.exit(1); // Exit to make error clear in logs
-}
-
-try {
-    app.use('/api/doctors', doctorRoutes);
-    console.log('Successfully registered /api/doctors routes.');
-} catch (e) {
-    console.error('CRITICAL ERROR during /api/doctors route registration:', e.message);
-    process.exit(1); // Exit to make error clear in logs
-}
-console.log('All API routes registration attempts completed.');
-
-
-// --- Serve Static Assets in Production ---
-// Check if in production environment
-if (process.env.NODE_ENV === 'production') {
-    // Set static folder
-    app.use(express.static(path.join(__dirname, 'public')));
-    console.log('Serving static files from /public in production mode.');
-
-    // Serve index.html for any unknown routes
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
-        console.log('Serving index.html for production client routes.');
-    });
-} else {
-    // In development, serve static files from 'public' as well
-    app.use(express.static(path.join(__dirname, 'public')));
-    console.log('Serving static files from /public in development mode.');
-    // Simple root route for dev
-    app.get('/', (req, res) => {
-        res.send('API is running in development...');
-        console.log('Dev root route hit.');
-    });
-}
-
-
-// --- Server Start ---
-const PORT = process.env.PORT || 5000; // Use port from .env or default to 5000
-
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-
-// --- Global Error Handling (Catch-all for unhandled errors) ---
+// --- 9. Global Error Handling Middleware (Optional but Recommended) ---
 app.use((err, req, res, next) => {
-    console.error('-------------------------------------------');
-    console.error('GLOBAL UNHANDLED ERROR CAUGHT:');
-    console.error(err.stack); // Log the full stack trace of any unhandled error
-    console.error('-------------------------------------------');
-    res.status(500).send('Server Error: Something went wrong!');
+    console.error(err.stack);
+    res.status(500).json({ message: 'Something went wrong on the server!', error: err.message });
 });
