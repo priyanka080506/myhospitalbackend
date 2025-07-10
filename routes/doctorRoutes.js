@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-// Temporarily comment out all model and middleware imports for strict isolation
+// All other imports are commented out for strict isolation
 // const bcrypt = require('bcryptjs');
 // const jwt = require('jsonwebtoken');
 // const Doctor = require('../models/Doctor');
@@ -11,12 +11,12 @@ const router = express.Router();
 // const doctorAuthMiddleware = require('../middleware/doctorAuthMiddleware');
 
 // --- DEBUGGING LOG ---
-console.log('doctorRoutes.js loaded');
+console.log('doctorRoutes.js loaded'); // This line will show in Render logs
 // --- END DEBUGGING LOG ---
 
 // *******************************************************************
 // ******* IMPORTANT: ALL ROUTES BELOW ARE TEMPORARILY COMMENTED *******
-// ******* DO NOT UNCOMMENT ANY OF THEM FOR THIS STEP ***************
+// ******* There should be NO active router.get or router.post lines here *******
 // *******************************************************************
 
 // router.post('/register', async (req, res) => { /* ... */ });
