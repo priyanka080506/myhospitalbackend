@@ -1,5 +1,5 @@
-// Base URL for your API (MUST MATCH YOUR BACKEND'S PORT)
-const BASE_URL = 'http://localhost:5000'; // CORRECTED: Changed from 3000 to 5000 to match server.js default
+// Base URL for your API (MUST BE YOUR RENDER DEPLOYMENT URL)
+const BASE_URL = 'https://YOUR-RENDER-BACKEND-URL.onrender.com'; // <--- IMPORTANT: REPLACE THIS WITH YOUR ACTUAL RENDER URL
 
 // --- Authentication Elements ---
 const authSection = document.getElementById('authSection');
@@ -487,7 +487,6 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchAppointments(patientId);
         fetchReports(patientId);
     } else {
-        // This is the corrected line that was likely causing "logout is not defined" error
         showAuthSection();
     }
 });
