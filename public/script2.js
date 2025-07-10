@@ -1,5 +1,5 @@
-// Base URL for your API (adjust if your backend is on a different port/domain)
-const BASE_URL = 'http://localhost:3000'; // Example: ensure this matches your backend
+// Base URL for your API (MUST MATCH YOUR BACKEND'S PORT)
+const BASE_URL = 'http://localhost:5000'; // CORRECTED: Changed from 3000 to 5000 to match server.js default
 
 // --- Authentication Elements ---
 const authSection = document.getElementById('authSection');
