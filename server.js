@@ -9,8 +9,8 @@ const path = require('path'); // Core Node.js module for handling file paths
 
 // --- Import Route Files ---
 const patientRoutes = require('./routes/patientRoutes');
-const appointmentRoutes = require('./routes/appointmentRoutes'); // Keep imported but not used yet
-const doctorRoutes = require('./routes/doctorRoutes');       // Keep imported but not used yet
+const appointmentRoutes = require('./routes/appointmentRoutes');
+const doctorRoutes = require('./routes/doctorRoutes'); // NEW: Import doctor routes
 
 const app = express();
 
@@ -55,10 +55,9 @@ if (process.env.NODE_ENV === 'production') {
 
 
 // --- Define API Routes ---
-// ONLY UNCOMMENT ONE OF THESE AT A TIME FOR DEBUGGING
-app.use('/api/patients', patientRoutes);     // <--- KEEP ONLY THIS ONE UNCOMMENTED
-// app.use('/api/appointments', appointmentRoutes);
-// app.use('/api/doctors', doctorRoutes);
+app.use('/api/patients', patientRoutes); // Patient registration, profile, reports etc.
+app.use('/api/appointments', appointmentRoutes); // Appointment booking (public and patient specific)
+app.use('/api/doctors', doctorRoutes); // Doctor registration, login, profile, schedule, reports etc.
 
 
 // --- Basic Root Route (Optional, if not covered by static serving) ---
