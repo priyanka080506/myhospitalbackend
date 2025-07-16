@@ -8,7 +8,7 @@ const app = express();
 // 1. ERROR HANDLING SETUP
 // ======================
 process.on('uncaughtException', (err) => {
-  console.error('💥 CRITICAL UNCAUGHT EXCEPTION! Shutting down...');
+  console.error('CRITICAL UNCAUGHT EXCEPTION! Shutting down...');
   console.error(err.name, err.message);
   process.exit(1);
 });
@@ -22,9 +22,9 @@ const DB = process.env.MONGODB_URI.replace(
 );
 
 mongoose.connect(DB)
-  .then(() => console.log('✅ Database connection successful!'))
+  .then(() => console.log('Database connection successful!'))
   .catch(err => {
-    console.error('❌ DATABASE CONNECTION ERROR:', err);
+    console.error('DATABASE CONNECTION ERROR:', err);
     process.exit(1);
   });
 
@@ -60,8 +60,8 @@ app.get('/api/test/:param', (req, res) => {
 // ======================
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🔗 Test endpoint: http://localhost:${PORT}/api/test/123`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Test endpoint: http://localhost:${PORT}/api/test/123`);
 });
 
 // Handle promise rejections
